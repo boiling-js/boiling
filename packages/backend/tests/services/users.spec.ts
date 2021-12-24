@@ -1,6 +1,7 @@
+import { expect } from 'chai'
+
 import DAOMain from '../../src/dao'
 import { UsersService } from '../../src/services/users'
-import { expect } from 'chai'
 
 before(async () => {
   await DAOMain()
@@ -29,5 +30,22 @@ describe('Users Service', function () {
     expect(
       await UsersService.search('m').count()
     ).to.be.eq(0)
+  })
+  it('should get user by id or username.', async function () {
+    const {
+      id, username
+    } = await UsersService.add({ username: 'test', passwordHash: 'test' })
+    const [
+      getByUId, getByUName, notExist
+    ] = await Promise.all([
+      UsersService.get(id),
+      UsersService.get(username),
+      UsersService.get('undefined')
+    ])
+    expect(getByUId?.id).to.be.eq(getByUName?.id)
+    expect(notExist).to.be.eq(null)
+    // @ts-ignore
+    expect(UsersService.get.bind(UsersService, null))
+      .to.throw('Not support type.')
   })
 })

@@ -27,7 +27,11 @@ export const router = new Router({
     }
   })
   .get('/', async ctx => {
-    ctx.body = 'you are searching users.'
+    const { key } = <{ key: string }>ctx.query
+    ctx.body = await UsersService.search(key)
+  })
+  .get('/:id', async ctx => {
+    ctx.body = await UsersService.get(ctx.params.id)
   })
   .post('/:id/login', async ctx => {
     ctx.body = 'you login.'
