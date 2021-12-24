@@ -5,8 +5,6 @@ temp
 .cache
 .env
 
-tests
-
 yarn.lock
 node_modules/
 npm-debug.log
