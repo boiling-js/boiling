@@ -1,6 +1,18 @@
 {
   "name": "@boiling/frontend",
   "version": "0.1.0",
-  "main": "dist/index.js",
-  "license": "MIT"
+  "main": "dist/index.html",
+  "license": "MIT",
+  "scripts": {
+    "start:dev": "electron -r ts-node/register scripts/electron-runner.ts"
+  },
+  "dependencies": {
+    "electron": "^16.0.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.0.1",
+    "sass": "^1.45.1",
+    "vite": "^2.7.6",
+    "vue": "^3.2.26"
+  }
 }
