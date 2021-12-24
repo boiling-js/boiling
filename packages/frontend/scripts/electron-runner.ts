@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, ipcMain, BrowserWindow } from 'electron'
 import { createServer } from 'vite'
 import * as path from 'path'
 
@@ -10,8 +10,13 @@ async function createWindow() {
     icon: path.join(__dirname, '../../../public/favicon.ico'),
     width: 1200,
     height: 800,
-    minWidth: 800,
-    minHeight: 600
+    minWidth: 940,
+    minHeight: 500,
+    transparent: true,
+    titleBarStyle: 'hidden',
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
   })
   await viteServer.listen()
   await mainWindow.loadURL(`http://localhost:${
@@ -20,6 +25,18 @@ async function createWindow() {
   mainWindow.webContents.openDevTools({
     mode: 'detach'
   })
+  ipcMain.on('window', (e, ...args) => {
+    const [ action ] = args
+    switch (action) {
+      case 'min':
+        mainWindow.minimize()
+        break
+      case 'max':
+        mainWindow.maximize()
+        break
+    }
+    }
+  )
 }
 async function main() {
   await app.whenReady()
