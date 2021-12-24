@@ -3,9 +3,7 @@ import { UsersService } from '../services/users'
 import { StatusCodes } from 'http-status-codes'
 import { Security } from '../utils'
 
-interface Register {
-  /** 用户名称 */
-  username: string
+type Register = Omit<UsersService.U, 'passwordHash'> & {
   /** 用户密码 */
   password: string
 }
@@ -16,7 +14,7 @@ export const router = new Router({
   .post('/', async ctx => {
     const { username, password } = ctx.request.body as Register
     try {
-      await UsersService.addUser({ username, passwordHash: Security.encrypt(password) })
+      await UsersService.add({ username, passwordHash: Security.encrypt(password) })
     } catch (e) {
       if (e instanceof Error) {
         ctx.status = StatusCodes.CONFLICT
