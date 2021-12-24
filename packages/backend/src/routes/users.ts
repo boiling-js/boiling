@@ -1,9 +1,32 @@
 import Router from '@koa/router'
+import { UsersService } from '../services/users'
+import { StatusCodes } from 'http-status-codes'
+import { Security } from '../utils'
+
+interface Register {
+  /** 用户名称 */
+  username: string
+  /** 用户密码 */
+  password: string
+}
 
 export const router = new Router({
   prefix: '/users'
-}).post('/', async ctx => {
-    ctx.body = 'register.'
+})
+  .post('/', async ctx => {
+    const { username, password } = ctx.request.body as Register
+    try {
+      await UsersService.addUser({ username, passwordHash: Security.encrypt(password) })
+    } catch (e) {
+      if (e instanceof Error) {
+        ctx.status = StatusCodes.CONFLICT
+        ctx.body = e.message
+      }
+      return
+    }
+    ctx.body = {
+      username: username
+    }
   })
   .get('/', async ctx => {
     ctx.body = 'you are searching users.'
