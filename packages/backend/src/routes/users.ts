@@ -1,7 +1,6 @@
 import Router from '@koa/router'
 import { Users } from '@boiling/core'
 import { UsersService } from '../services/users'
-import { StatusCodes } from 'http-status-codes'
 import { Security } from '../utils'
 
 export const router = new Router({
@@ -24,11 +23,8 @@ export const router = new Router({
     const u = await UsersService.get(+ctx.params.id)
     if (u === null)
       throw new HttpError('NOT_FOUND', '用户不存在')
-    if (!Security.match(password, u.passwordHash)) {
-      ctx.body = '密码错误'
-      ctx.status = StatusCodes.UNAUTHORIZED
-      return
-    }
+    if (!Security.match(password, u.passwordHash))
+      throw new HttpError('UNAUTHORIZED', '密码错误')
     ctx.body = 'you login.'
   })
   .get('/:id/logout', async ctx => {
