@@ -4,6 +4,7 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
+    "start:pro": "tsc && node -r dotenv/config dist/index.js",
     "start:dev": "nodemon -r dotenv/config src/index.ts"
   },
   "dependencies": {

@@ -4,7 +4,7 @@
   "main": "dist/index.html",
   "license": "MIT",
   "scripts": {
-    "start:dev": "electron -r ts-node/register scripts/electron-runner.ts"
+    "start": "electron -r ts-node/register scripts/electron-runner.ts"
   },
   "dependencies": {
     "electron": "^16.0.5"
