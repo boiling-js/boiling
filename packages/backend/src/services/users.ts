@@ -6,7 +6,7 @@ export namespace UsersService {
   export type U = Omit<User, 'id'>
   export async function add(u: U) {
     if(await exist(u.username))
-      throw new Error('the user has existed')
+      throw new HttpError('CONFLICT', 'the user has existed')
     return new UserModel(Object.assign({
       id: await Seq.auto('users')
     }, u)).save()

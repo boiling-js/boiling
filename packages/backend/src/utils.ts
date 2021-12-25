@@ -10,9 +10,12 @@ namespace Utils {
     }
   }
   export namespace Security {
-    const md5 = createHash('md5')
     export function encrypt(plaintext: string) {
-      return md5.update(plaintext).digest('hex')
+      return createHash('md5')
+        .update(plaintext).digest('hex')
+    }
+    export function match(waitMatch: string, origin: string) {
+      return encrypt(waitMatch) === origin
     }
   }
   export namespace Seq {

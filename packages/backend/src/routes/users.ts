@@ -13,15 +13,7 @@ export const router = new Router({
 })
   .post('/', async ctx => {
     const { username, password } = ctx.request.body as Register
-    try {
-      await UsersService.add({ username, passwordHash: Security.encrypt(password) })
-    } catch (e) {
-      if (e instanceof Error) {
-        ctx.status = StatusCodes.CONFLICT
-        ctx.body = e.message
-      }
-      return
-    }
+    await UsersService.add({ username, passwordHash: Security.encrypt(password) })
     ctx.body = {
       username: username
     }
@@ -34,6 +26,15 @@ export const router = new Router({
     ctx.body = await UsersService.get(ctx.params.id)
   })
   .post('/:id/login', async ctx => {
+    const { password } = ctx.request.body
+    const u = await UsersService.get(+ctx.params.id)
+    if (u === null)
+      throw new HttpError('NOT_FOUND', '用户不存在')
+    if(!Security.match(password, u.passwordHash)) {
+      ctx.body = '密码错误'
+      ctx.status = StatusCodes.UNAUTHORIZED
+      return
+    }
     ctx.body = 'you login.'
   })
   .get('/:id/logout', async ctx => {
