@@ -35,8 +35,7 @@ async function createWindow() {
         mainWindow.maximize()
         break
     }
-    }
-  )
+  })
 }
 async function main() {
   await app.whenReady()
