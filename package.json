@@ -12,7 +12,9 @@
     "pro": "yarn cross-env NODE_ENV=production",
     "dev": "yarn cross-env NODE_ENV=development",
     "start:dev:server": "yarn dev yarn b start:dev",
-    "start:dev:client": "yarn dev yarn f start"
+    "start:dev:client": "yarn dev yarn f start",
+    "start:pro:server": "yarn pro yarn b start:pro",
+    "start:pro:client": "yarn pro yarn f start"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^15.0.0",
