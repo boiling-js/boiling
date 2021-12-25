@@ -1,15 +1,7 @@
 import { Schema, model } from 'mongoose'
+import { Users } from '@boiling/core'
 
-export interface User {
-  /** 用户唯一 id */
-  id: number
-  /** 用户名 */
-  username: string
-  /** 加密的用户密码 */
-  passwordHash: string
-}
-
-const userSchema = new Schema<User>({
+const userSchema = new Schema<Users.Model>({
   id: {
     type: Number,
     unique: true,

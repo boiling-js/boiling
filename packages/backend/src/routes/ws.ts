@@ -9,15 +9,3 @@ export const router: Middleware = async (context, next) => {
     console.log(m.toString())
   })
 }
-
-export namespace WS {
-  export namespace Message {
-    export interface Resp {
-      id: number
-    }
-  }
-  export type Event = {
-    t: 'MESSAGE'
-    p: Message.Resp
-  }
-}

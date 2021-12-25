@@ -1,22 +1,16 @@
 import Router from '@koa/router'
+import { Users } from '@boiling/core'
 import { UsersService } from '../services/users'
 import { StatusCodes } from 'http-status-codes'
 import { Security } from '../utils'
-
-type Register = Omit<UsersService.U, 'passwordHash'> & {
-  /** 用户密码 */
-  password: string
-}
 
 export const router = new Router({
   prefix: '/users'
 })
   .post('/', async ctx => {
-    const { username, password } = ctx.request.body as Register
+    const { username, password } = ctx.request.body as Users.Register
     await UsersService.add({ username, passwordHash: Security.encrypt(password) })
-    ctx.body = {
-      username: username
-    }
+    ctx.body = { username: username }
   })
   .get('/', async ctx => {
     const { key } = <{ key: string }>ctx.query
