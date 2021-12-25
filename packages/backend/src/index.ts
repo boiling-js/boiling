@@ -4,15 +4,6 @@ import bodyParser from 'koa-bodyparser'
 import DAOMain from './dao'
 import './global'
 
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv {
-      PORT: number
-      HOST: string
-    }
-  }
-}
-
 const app = websockify(new Koa())
 
 import { router as WSRouter } from './routes/ws'

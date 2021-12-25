@@ -7,6 +7,7 @@
     "packages/*"
   ],
   "scripts": {
+    "lint": "eslint --fix ./packages/*/src/**/*.{ts,vue}",
     "b": "yarn workspace @boiling/backend",
     "f": "yarn workspace @boiling/frontend",
     "pro": "yarn cross-env NODE_ENV=production",
@@ -26,6 +27,7 @@
     "eslint": "^7.24.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-vue": "^7.8.0",
     "husky": "^7.0.4",
     "postcss": "^8.3.11",
     "postcss-scss": "^4.0.2",

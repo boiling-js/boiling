@@ -2,16 +2,16 @@
   <div class="title-bar">
     <div class="name"><img width="16" src="./assets/img/favicon.svg" alt="主页">Boiling</div>
     <div class="opts">
-      <div class="circle-btn min" @click="min"></div>
-      <div class="circle-btn max" @click="max"></div>
-      <div class="circle-btn cls" @click="cls"></div>
+      <div class="circle-btn min" @click="min"/>
+      <div class="circle-btn max" @click="max"/>
+      <div class="circle-btn cls" @click="cls"/>
     </div>
   </div>
   <div class="container">
     <panel-selector class="l"/>
     <router-view v-slot="{ Component }">
       <transition name="el-fade-in-linear">
-        <component class="r" :is="Component"/>
+        <component :is="Component" class="r"/>
       </transition>
     </router-view>
   </div>

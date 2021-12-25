@@ -11,15 +11,15 @@
         <div class="select"><el-icon :size="24" color="#fff"><plus/></el-icon></div>
       </el-tooltip>
       <el-divider/>
-      <div class="select"></div>
-      <div class="select"></div>
-      <div class="select"></div>
-      <div class="select"></div>
-      <div class="select"></div>
-      <div class="select"></div>
-      <div class="select"></div>
-      <div class="select"></div>
-      <div class="select"></div>
+      <div class="select"/>
+      <div class="select"/>
+      <div class="select"/>
+      <div class="select"/>
+      <div class="select"/>
+      <div class="select"/>
+      <div class="select"/>
+      <div class="select"/>
+      <div class="select"/>
     </div>
   </div>
 </template>

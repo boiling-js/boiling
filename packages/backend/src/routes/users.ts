@@ -30,7 +30,7 @@ export const router = new Router({
     const u = await UsersService.get(+ctx.params.id)
     if (u === null)
       throw new HttpError('NOT_FOUND', '用户不存在')
-    if(!Security.match(password, u.passwordHash)) {
+    if (!Security.match(password, u.passwordHash)) {
       ctx.body = '密码错误'
       ctx.status = StatusCodes.UNAUTHORIZED
       return
@@ -50,4 +50,5 @@ export const router = new Router({
     ctx.body = []
   })
   .del('/:id/channels/:cid', async ctx => {
+    console.log(ctx.params)
   })

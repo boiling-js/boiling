@@ -5,11 +5,16 @@ export const router: Middleware = async (context, next) => {
     return await next()
 
   const { websocket: ws } = context
+  ws.on('message', m => {
+    console.log(m.toString())
+  })
 }
 
 export namespace WS {
   export namespace Message {
-    export interface Resp {}
+    export interface Resp {
+      id: number
+    }
   }
   export type Event = {
     t: 'MESSAGE'

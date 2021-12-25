@@ -1,6 +1,7 @@
 module.exports = {
-  parser: '@typescript-eslint/parser',
+  parser: 'vue-eslint-parser',
   parserOptions: {
+    parser: '@typescript-eslint/parser',
     ecmaVersion: 2020,
     sourceType: 'module',
     ecmaFeatures: {
@@ -8,6 +9,7 @@ module.exports = {
     }
   },
   extends: [
+    'plugin:vue/vue3-recommended',
     'plugin:@typescript-eslint/recommended'
   ],
   rules: {
@@ -25,6 +27,12 @@ module.exports = {
     'keyword-spacing': ['error', { before: true, after: true }],
     'comma-dangle': ['error', 'never'],
     'function-paren-newline': 'off',
+    'vue/custom-event-name-casing': 'off',
+    'vue/html-closing-bracket-newline': 'off',
+    'vue/html-closing-bracket-spacing': 'off',
+    'vue/singleline-html-element-content-newline': 'off',
+    'vue/max-attributes-per-line': 'off',
+    '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/ban-ts-ignore': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
