@@ -1,6 +1,6 @@
 <template>
   <div class="title-bar">
-    <div class="name">Boiling</div>
+    <div class="name"><img width="16" src="./assets/img/favicon.svg" alt="主页">Boiling</div>
     <div class="opts">
       <div class="circle-btn min" @click="min"></div>
       <div class="circle-btn max" @click="max"></div>
@@ -8,14 +8,15 @@
     </div>
   </div>
   <div class="container">
-    <div class="l">
-    </div>
+    <panel-selector class="l"/>
     <div class="r">
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import PanelSelector from './components/PanelSelector.vue'
+
 const min = () => {
   desktop?.min?.()
 }, max = () => {
@@ -42,17 +43,19 @@ body { margin: 5px; }
 </style>
 
 <style lang="scss" scoped>
+$h: 26px;
 div.title-bar {
   display: flex;
   justify-content: space-between;
   padding: 0 10px;
-  height: 26px;
+  min-height: $h;
   color: #afafaf;
   font-size: 14px;
   font-weight: bold;
   background-color: #202225;
   > div.name {
     flex-grow: 1;
+    column-gap: 5px;
     display: flex;
     align-items: center;
     -webkit-app-region: drag;
@@ -92,7 +95,7 @@ div.title-bar {
   }
 }
 div.container {
-  flex-grow: 1;
+  height: calc(100% - #{$h});
   display: flex;
   justify-content: space-between;
   > div.l {
