@@ -63,9 +63,10 @@ div.title-bar {
     justify-content: space-between;
     column-gap: 6px;
     > div.circle-btn {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
+      display: flex;
+      padding: 2px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       cursor: pointer;
       transition: 0.3s;
