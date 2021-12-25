@@ -9,8 +9,11 @@
   </div>
   <div class="container">
     <panel-selector class="l"/>
-    <div class="r">
-    </div>
+    <router-view v-slot="{ Component }">
+      <transition name="el-fade-in-linear">
+        <component class="r" :is="Component"/>
+      </transition>
+    </router-view>
   </div>
 </template>
 
