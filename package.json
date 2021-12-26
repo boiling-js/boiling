@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "lint": "eslint --fix ./packages/*/src/**/*.{ts,vue}",
+    "core": "yarn workspace @boiling/core",
     "b": "yarn workspace @boiling/backend",
     "f": "yarn workspace @boiling/frontend",
     "pro": "yarn cross-env NODE_ENV=production",
