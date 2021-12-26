@@ -1,9 +1,11 @@
 import { expect } from 'chai'
 
-import { Security } from '../src/utils'
+import { Utils } from '../src/utils'
 
 describe('Utils', function () {
   describe('Security', function () {
+    const { Security } = Utils
+
     it('should password is match passwordHash.', function () {
       expect(
         Security.match('123', Security.encrypt('123'))

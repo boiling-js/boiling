@@ -1,7 +1,7 @@
 import Router from '@koa/router'
-import { Users } from '@boiling/core'
+import { Users, Utils } from '@boiling/core'
 import { UsersService } from '../services/users'
-import { Security } from '../utils'
+import Security = Utils.Security
 
 export const router = new Router({
   prefix: '/users'

@@ -23,3 +23,5 @@ export namespace WS {
     p: Message.Resp
   }
 }
+
+export { Utils } from './utils'
