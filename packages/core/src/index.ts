@@ -7,7 +7,7 @@ export namespace Users {
     /** 加密的用户密码 */
     passwordHash: string
   }
-  export type Register = Omit<Model, 'passwordHash'> & {
+  export type Register = Omit<Model, 'id' | 'passwordHash'> & {
     /** 用户密码 */
     password: string
   }
@@ -24,4 +24,5 @@ export namespace WS {
   }
 }
 
+export * from './api'
 export { Utils } from './utils'
