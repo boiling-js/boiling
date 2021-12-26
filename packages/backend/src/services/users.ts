@@ -1,9 +1,10 @@
-import { UserModel, User } from '../dao/user'
+import { Users } from '@boiling/core'
+import { UserModel } from '../dao/user'
 import { Seq } from '../utils'
 
 export namespace UsersService {
   export const Model = UserModel
-  export type U = Omit<User, 'id'>
+  export type U = Omit<Users.Model, 'id'>
   export async function add(u: U) {
     if (await exist(u.username))
       throw new HttpError('CONFLICT', 'the user has existed')
