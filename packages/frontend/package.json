@@ -7,6 +7,7 @@
     "start": "electron -r ts-node/register scripts/electron-runner.ts"
   },
   "dependencies": {
+    "axios": "^0.24.0",
     "electron": "^16.0.5"
   },
   "devDependencies": {
