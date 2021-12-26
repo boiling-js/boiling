@@ -4,11 +4,13 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "start:pro": "tsc && node -r dotenv/config dist/index.js",
+    "build": "ts-node ../../scripts/pre-build.ts & tsc -p tsconfig.pro.json",
+    "start:pro": "yarn build && node -r dotenv/config dist/index.js",
     "start:dev": "nodemon -r dotenv/config src/index.ts"
   },
   "dependencies": {
     "@koa/router": "^10.1.1",
+    "@boiling/core": "^0.1.0",
     "http-status-codes": "^2.1.4",
     "koa": "^2.13.4",
     "koa-websocket": "^6.0.0",
