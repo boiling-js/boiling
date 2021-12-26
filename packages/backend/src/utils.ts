@@ -9,9 +9,9 @@ namespace Utils {
     }
   }
   export namespace Seq {
-    export async function auto(n: string) {
-      return await SeqModel
-        .findOneAndUpdate({ collectionName: n }, { $inc: { seq: 1 } }, { new: true, upsert: true })
+    export async function auto(n: string, initIdent = 1) {
+      return SeqModel
+        .findOneAndUpdate({ collectionName: n }, { $inc: { seq: initIdent } }, { new: true, upsert: true })
         .then(m => m.seq)
     }
   }
