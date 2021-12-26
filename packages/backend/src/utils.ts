@@ -1,7 +1,17 @@
 import { Server } from 'ws'
+import { createHash } from 'crypto'
 import { SeqModel } from './dao/seq'
 
 namespace Utils {
+  export namespace Security {
+    export function encrypt(plaintext: string) {
+      return createHash('md5')
+        .update(plaintext).digest('hex')
+    }
+    export function match(waitMatch: string, origin: string) {
+      return encrypt(waitMatch) === origin
+    }
+  }
   export namespace WS {
     export let s: Server | null = null
     export function register(ns: Server) {

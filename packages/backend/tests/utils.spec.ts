@@ -1,4 +1,4 @@
-import { Seq } from '../src/utils'
+import { Seq, Security } from '../src/utils'
 import DAOMain from '../src/dao'
 import { expect } from 'chai'
 import { SeqModel } from '../src/dao/seq'
@@ -8,6 +8,16 @@ after(() => {
 })
 
 describe('Utils', () => {
+  describe('Security', function () {
+    it('should password is match passwordHash.', function () {
+      expect(
+        Security.match('123', Security.encrypt('123'))
+      ).to.be.eq(true)
+      expect(
+        Security.match('456', Security.encrypt('123'))
+      ).to.be.eq(false)
+    })
+  })
   describe('Seq', () => {
     before(async () => {
       await DAOMain()
