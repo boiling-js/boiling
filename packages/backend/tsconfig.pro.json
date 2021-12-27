@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "sourceMap": true,
+    "outDir": "dist",
+    "paths": {
+      "@boiling/*": [
+        "packages/*/dist"
+      ]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

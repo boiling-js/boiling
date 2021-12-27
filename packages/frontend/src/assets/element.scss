@@ -1,0 +1,11 @@
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+  $colors: (
+    "primary": ("base": #5865f2)
+  )
+);
+
+@use "element-plus/theme-chalk/src/index.scss" as *;
+
+.el-icon {
+  font-size: var(--font-size) !important;
+}

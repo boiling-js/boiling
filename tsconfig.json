@@ -5,13 +5,13 @@
     "lib": [
       "esnext", "dom"
     ],
-    "declaration": false,
+    "declaration": true,
     "outDir": "./dist",
     "removeComments": false,
     "strict": true,
     "moduleResolution": "node",
     "baseUrl": "./",
-    "types": [ "node" ],
+    "types": [ "node", "mocha", "chai" ],
     "paths": {
       "@boiling/*": [
         "packages/*/src"
