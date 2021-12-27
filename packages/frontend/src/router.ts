@@ -3,11 +3,19 @@ import { createRouter, createWebHistory } from 'vue-router'
 const router = createRouter({
   history: createWebHistory(),
   routes: [{
-    path: '/', redirect: '/home'
+    path: '/', redirect: '/login'
   }, {
     path: '/home',
     name: 'home',
     component: () => import('./views/Home.vue')
+  }, {
+    path: '/login',
+    name: 'login',
+    component: () => import('./views/Login.vue')
+  }, {
+    path: '/register',
+    name: 'register',
+    component: () => import('./views/Register.vue')
   }, {
     path: '/:pathMatch(.*)*',
     component: () => import('element-plus').then(({ ElEmpty }) => ElEmpty),

@@ -9,7 +9,7 @@ export namespace UsersService {
     if (await exist(u.username))
       throw new HttpError('CONFLICT', 'the user has existed')
     return new UserModel(Object.assign({
-      id: await Seq.auto('users')
+      id: await Seq.auto('users', 1000)
     }, u)).save()
   }
   export async function del(id: number) {
