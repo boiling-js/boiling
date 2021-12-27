@@ -22,10 +22,10 @@ namespace Utils {
     export async function auto(n: string, initIndent = 0, step = 1) {
       return SeqModel
         .findOneAndUpdate({ collectionName: n }, {
-          $setOnInsert: { seq: initIndent },
-          $set: { $inc: { seq: step } }
+          $setOnInsert: { initIndent },
+          $inc: { seq: step }
         }, { new: true, upsert: true })
-        .then(m => m.seq)
+        .then(m => m.initIndent + m.seq)
     }
   }
 }

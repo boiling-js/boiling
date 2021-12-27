@@ -32,7 +32,7 @@ describe('Utils', () => {
     })
     it('should auto increase on the basis of `1000`.', async () => {
       expect(await Seq.auto('test', 1000))
-        .to.be.eq(1000)
+        .to.be.eq(1001)
     })
     it('should increase target step.', async () => {
       const name = 'test'

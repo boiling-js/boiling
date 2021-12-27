@@ -6,6 +6,10 @@ export const SeqModel = model('Seq', new Schema({
     unique: true,
     required: true
   },
+  initIndent: {
+    type: Number,
+    default: 0
+  },
   seq: {
     type: Number,
     required: true
