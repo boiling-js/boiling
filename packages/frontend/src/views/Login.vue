@@ -4,7 +4,7 @@
       <h3 class="title">欢迎回来~</h3>
       <div class="login-input">
         <div class="label"> 账号： </div>
-        <el-input v-model="account.account" placeholder="请输入账号" />
+        <el-input v-model="account.id" placeholder="请输入账号" />
         <div class="label"> 账号： </div>
         <el-input v-model="account.password" placeholder="请输入密码" show-password />
         <div class="bottom-word">忘记密码？</div>
@@ -24,31 +24,31 @@
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElInput, ElButton,  ElMessage } from 'element-plus'
-import axios from 'axios'
+import { api } from '../api'
+import { Users } from '@boiling/core'
 
-interface Account {
-  account: string,
-  password: string
+type Account = Users.Status & {
+  id: string
 }
 
 const
   account = reactive<Account>({
-    account: '',
-    password: ''
+    id: '',
+    password: '',
+    status: 'online'
   }),
   router = useRouter(),
-  login = () => {
-    router.push('/home')
-    axios.post(`/api/users/${ account.account }/login`, {
-      password: account.password
-    })
-      .then(function (response) {
-        ElMessage.success('登录成功！')
-        console.log(response)
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
+  login = async () => {
+    try {
+      const { id, ...status } = account
+      const res = await api.user(id).status.add(status)
+      console.log(res)
+      ElMessage.success('登录成功！')
+      await router.push('/home')
+    } catch (e) {
+      // @ts-ignore
+      ElMessage.error(e.response.data)
+    }
   },
   register = () => {
     router.push('/register')
@@ -61,7 +61,7 @@ const
   $w: 580px;
   $h: 320px;
   $p: 35px;
-  >.login {
+  > .login {
     position: fixed;
     top: calc(50vh - #{$h} / 2 - #{$p});
     left: calc(50% - #{$w} / 2 - #{$p});
