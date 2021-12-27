@@ -6,11 +6,8 @@ export default defineConfig({
   server: {
     port: 17980,
     proxy: {
-      // 选项写法
       '/api': {
-        // http://localhost:17980/api/users/123
-        // http://localhost:6532/users/123
-        target: 'http://localhost:6532',
+        target: 'http://localhost:32141',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }
