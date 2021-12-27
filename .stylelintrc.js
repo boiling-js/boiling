@@ -7,7 +7,11 @@ module.exports = {
     'stylelint-order',
     './rules/stylelint-plugin.cjs'
   ],
-  customSyntax: 'postcss-scss',
+  customSyntax: 'postcss-html',
+  overrides: [{
+    files: ['**/*.scss', '**/*.sass'],
+    customSyntax: 'postcss-scss'
+  }],
   rules: {
     'in/selector-combinator-space-after': ['always'],
     'font-family-name-quotes': ['always-unless-keyword'],
