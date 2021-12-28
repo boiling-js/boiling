@@ -1,8 +1,8 @@
 import Koa from 'koa'
 import websockify from 'koa-websocket'
 import bodyParser from 'koa-bodyparser'
-import DAOMain from './dao'
 import './global'
+import DAOMain from './dao'
 
 const app = websockify(new Koa())
 
@@ -29,7 +29,11 @@ app
   .use(ChannelsRouter.routes())
   .use(ChannelsRouter.allowedMethods())
 
-app.listen(process.env.PORT, process.env.HOST, async () => {
+const {
+  PORT = '8080',
+  HOST = 'localhost'
+} = process.env
+app.listen(+PORT, HOST, async () => {
   // connect mongodb database
   try {
     await DAOMain()
@@ -37,5 +41,5 @@ app.listen(process.env.PORT, process.env.HOST, async () => {
     console.error(e)
     process.exit(1)
   }
-  console.log(`server is running on http://${ process.env.HOST }:${ process.env.PORT }`)
+  console.log(`server is running on http://${ HOST }:${ PORT }`)
 })
