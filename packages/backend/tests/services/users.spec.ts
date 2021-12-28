@@ -1,11 +1,7 @@
 import { expect } from 'chai'
 
-import DAOMain from '../../src/dao'
 import { UsersService } from '../../src/services/users'
 
-before(async () => {
-  await DAOMain()
-})
 after(() => {
   process.exit(0)
 })
