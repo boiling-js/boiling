@@ -7,9 +7,16 @@ export namespace Users {
     /** 加密的用户密码 */
     passwordHash: string
   }
+  export type Out = Omit<Model, 'passwordHash'>
   export type Register = Omit<Model, 'id' | 'passwordHash'> & {
     /** 用户密码 */
     password: string
+  }
+  export type Status = Omit<Model, 'id' | 'username' | 'passwordHash'> & {
+    /** 用户密码 */
+    password: string
+    /** 用户状态 */
+    status: 'online' | 'leave' | 'offline'
   }
 }
 export namespace Message {

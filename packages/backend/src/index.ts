@@ -20,6 +20,7 @@ app
       if (e instanceof HttpError) {
         ctx.body = e.msg
         ctx.status = e.code
+        return
       }
       throw e
     }

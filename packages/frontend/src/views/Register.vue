@@ -10,11 +10,11 @@
         class="demo-ruleForm"
         label-position="top"
         size="small">
-        <el-form-item label="用户名:" prop="nickname" required>
-          <el-input v-model="newAccount.nickname"></el-input>
+        <el-form-item label="用户名:" prop="username" required>
+          <el-input v-model="newAccount.username"></el-input>
         </el-form-item>
         <el-form-item label="密码:" prop="password" required>
-          <el-input v-model="newAccount.password"  type="password"></el-input>
+          <el-input v-model="newAccount.password" type="password"></el-input>
         </el-form-item>
         <el-form-item label="确认密码:" prop="confirmPassword" required>
           <el-input v-model="newAccount.confirmPassword" type="password"></el-input>
@@ -23,7 +23,7 @@
       <el-button
         class="btn"
         type="primary"
-        @click="register">继续</el-button>
+        @click="register">确认</el-button>
       <div class="login">已有账号？ <span class="click" @click="login">直接登录</span></div>
     </div>
   </div>
@@ -35,21 +35,21 @@ import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { ElForm, ElFormItem, ElInput, ElButton, ElMessageBox, ElMessage } from 'element-plus'
+import { api } from '../api'
+import { Users } from '@boiling/core'
 
-interface NewAccount {
-  nickname: string,
-  password: string,
+type NewAccount =  Users.Register & {
   confirmPassword: string
 }
 
 const newAccount = reactive<NewAccount>({
-  nickname: '',
+  username: '',
   password: '',
   confirmPassword: ''
 }),
   router = useRouter(),
   rules = {
-    nickname: {
+    username: {
       required: true,
       message: '请输入用户名',
       trigger: 'blur'
@@ -76,23 +76,20 @@ const newAccount = reactive<NewAccount>({
       }
     })
   },
-  register = () => {
-    if (newAccount.password !== newAccount.confirmPassword) {
-      ElMessage.error('密码不一致，请保持密码与确认密码一致')
-      return
+  register = async () => {
+    try {
+      if (newAccount.password !== newAccount.confirmPassword)
+        throw new Error('密码不一致，请保持密码与确认密码一致')
+      const { confirmPassword: _, ...register } = newAccount
+      const resp = await api.users.add(register)
+      openMessageBox(resp.id)
+      ElMessage.success('账号注册成功！')
+    } catch (e) {
+      if (e instanceof Error)
+        ElMessage.error(e.toString())
+      else
+        throw e
     }
-    axios.post('/api/users', {
-      username: newAccount.nickname,
-      password: newAccount.password
-    })
-      .then(function (response) {
-        ElMessage.success('账号注册成功！')
-        openMessageBox(response.data.id)
-        console.log(response)
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
   }
 </script>
 
