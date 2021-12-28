@@ -21,6 +21,16 @@ describe('Users Service', function () {
     expect(nu).property('passwordHash')
       .to.be.eq('test')
     expect(await UsersService.exist('test')).to.be.eq(true)
+    await UsersService.add({ username: 'test', passwordHash: 'test' })
+      .catch(e => {
+        if (e instanceof HttpError) {
+          expect(e.msg)
+            .to.be.eq('User with the name "test" already exists')
+          expect(e.code)
+            .to.be.eq(409)
+        } else
+          throw e
+      })
   })
   it('should search user by username.', async function () {
     await UsersService.add({ username: 'test', passwordHash: 'test' })
