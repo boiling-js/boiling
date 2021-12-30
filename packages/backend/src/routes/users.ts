@@ -29,14 +29,18 @@ export const router = new Router({
           throw new HttpError('NOT_FOUND', '用户不存在')
         if (!Security.match(password, u.passwordHash))
           throw new HttpError('UNAUTHORIZED', '密码错误')
-        ctx.body = 'you login.'
+        const { passwordHash: _, ...user } = u
+        ctx.session!.curUser = user
+        ctx.body = user
         break
       case 'offline':
+        delete ctx.session!.curUser
         ctx.body = 'you logout.'
         break
     }
   })
   .post('/:id/friends/:uid', async ctx => {
+    // requirePermissions(ctx)
     ctx.body = []
   })
   .get('/:id/friends', async ctx => {

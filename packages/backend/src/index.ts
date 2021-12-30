@@ -1,18 +1,22 @@
 import Koa from 'koa'
+import session from 'koa-session'
 import websockify from 'koa-websocket'
 import bodyParser from 'koa-bodyparser'
 import './global'
 import DAOMain from './dao'
 
 const app = websockify(new Koa())
+app.keys = ['hker92hjkugfkerbl.e[gewkg68']
 
 import { router as WSRouter } from './routes/ws'
 import { router as UsersRouter } from './routes/users'
 import { router as ChannelsRouter } from './routes/channels'
 import { HttpError } from './global/HttpError'
+
 app.ws.use(WSRouter)
 app
   .use(bodyParser())
+  .use(session(app))
   .use(async (ctx, next) => {
     try {
       return await next()
@@ -29,6 +33,14 @@ app
   .use(UsersRouter.allowedMethods())
   .use(ChannelsRouter.routes())
   .use(ChannelsRouter.allowedMethods())
+  .use(ctx => {
+    // ignore favicon
+    // if (ctx.path === '/favicon.ico') return
+    //
+    // let n = ctx.session?.views || 0
+    // ctx.session.views = ++n
+    // ctx.body = n + ' views'
+  })
 
 const {
   PORT = '8080',

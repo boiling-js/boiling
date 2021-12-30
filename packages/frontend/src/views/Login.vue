@@ -5,9 +5,9 @@
       <div class="login-input">
         <div class="label"> 账号： </div>
         <el-input v-model="account.id" placeholder="请输入账号" />
-        <div class="label"> 账号： </div>
+        <div class="label"> 密码： </div>
         <el-input v-model="account.password" placeholder="请输入密码" show-password />
-        <div class="bottom-word">忘记密码？</div>
+        <div class="bottom-word">记住密码</div>
       </div>
       <el-button
         class="btn"
