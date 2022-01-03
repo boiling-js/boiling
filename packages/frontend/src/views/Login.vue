@@ -35,7 +35,8 @@ const
   account = reactive<Account>({
     id: '',
     password: '',
-    status: 'online'
+    status: 'online',
+    avatar: ''
   }),
   router = useRouter(),
   login = async () => {
