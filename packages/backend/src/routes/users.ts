@@ -8,8 +8,12 @@ export const router = new Router({
 })
   .post('/', async ctx => {
     const { username, password } = <Users.Register>ctx.request.body
-    const user = await UsersService.add({ username, passwordHash: Security.encrypt(password) })
-    ctx.body = { id: user.id, username: user.username }
+    const user = await UsersService.add({
+      username,
+      passwordHash: Security.encrypt(password),
+      avatar: `/img/avatar/${ Math.random() * 10 }.jpg`
+    })
+    ctx.body = { id: user.id, username: user.username, avatar: user.avatar }
   })
   .get('/', async ctx => {
     const { key } = <{ key: string }>ctx.query

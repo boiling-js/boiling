@@ -2,6 +2,8 @@ import Koa from 'koa'
 import session from 'koa-session'
 import websockify from 'koa-websocket'
 import bodyParser from 'koa-bodyparser'
+import staticMiddleware from 'koa-static'
+import { resolve } from 'path'
 import './global'
 import DAOMain from './dao'
 
@@ -15,6 +17,7 @@ import { HttpError } from './global/HttpError'
 
 app.ws.use(WSRouter)
 app
+  .use(staticMiddleware(resolve(__dirname, '../static')))
   .use(bodyParser())
   .use(session(app))
   .use(async (ctx, next) => {
@@ -33,14 +36,6 @@ app
   .use(UsersRouter.allowedMethods())
   .use(ChannelsRouter.routes())
   .use(ChannelsRouter.allowedMethods())
-  .use(ctx => {
-    // ignore favicon
-    // if (ctx.path === '/favicon.ico') return
-    //
-    // let n = ctx.session?.views || 0
-    // ctx.session.views = ++n
-    // ctx.body = n + ' views'
-  })
 
 const {
   PORT = '8080',
