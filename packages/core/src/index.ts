@@ -6,6 +6,8 @@ export namespace Users {
     username: string
     /** 加密的用户密码 */
     passwordHash: string
+    /** 用户头像 */
+    avatar: string
   }
   export type Out = Omit<Model, 'passwordHash'>
   export type Register = Omit<Model, 'id' | 'passwordHash'> & {
