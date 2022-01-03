@@ -96,7 +96,7 @@ const newAccount = reactive<NewAccount>({
 <style lang="scss" scoped>
 .register-box {
   $w: 50vh;
-  $h: 55Vh;
+  $h: 55vh;
   $p: 40px;
   > .register {
     position: fixed;
@@ -116,7 +116,7 @@ const newAccount = reactive<NewAccount>({
       margin: 10px 0;
       width: $w;
     }
-    >.login {
+    > .login {
       font-size: 10px;
       > .click {
         cursor: pointer;
