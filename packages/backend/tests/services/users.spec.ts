@@ -12,12 +12,12 @@ describe('Users Service', function () {
   })
   it('should add user.', async function () {
     expect(await UsersService.exist('test')).to.be.eq(false)
-    const nu = await UsersService.add({ username: 'test', passwordHash: 'test' })
+    const nu = await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
     expect(nu).not.to.be.undefined
     expect(nu).property('passwordHash')
       .to.be.eq('test')
     expect(await UsersService.exist('test')).to.be.eq(true)
-    await UsersService.add({ username: 'test', passwordHash: 'test' })
+    await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
       .catch(e => {
         if (e instanceof HttpError) {
           expect(e.msg)
@@ -29,7 +29,7 @@ describe('Users Service', function () {
       })
   })
   it('should search user by username.', async function () {
-    await UsersService.add({ username: 'test', passwordHash: 'test' })
+    await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
     const [ u ] = await UsersService.search('t').limit(1)
     expect(u).not.to.be.undefined
     expect(u.username).to.be.eq('test')
@@ -40,7 +40,7 @@ describe('Users Service', function () {
   it('should get user by id or username.', async function () {
     const {
       id, username
-    } = await UsersService.add({ username: 'test', passwordHash: 'test' })
+    } = await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
     const [
       getByUId, getByUName, notExist
     ] = await Promise.all([
