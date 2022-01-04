@@ -10,7 +10,7 @@ export namespace Users {
     avatar: string
   }
   export type Out = Omit<Model, 'passwordHash'>
-  export type Register = Omit<Model, 'id' | 'passwordHash'> & {
+  export type Register = Omit<Model, 'id' | 'passwordHash' | 'avatar'> & {
     /** 用户密码 */
     password: string
   }
