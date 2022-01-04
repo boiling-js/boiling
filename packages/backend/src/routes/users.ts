@@ -17,12 +17,10 @@ export const router = new Router({
     ctx.body = { id: user.id, username: user.username, avatar: user.avatar }
   })
   .get('/', async ctx => {
-    const pagination = await usePagination<Users.Out>(
+    ctx.body = await usePagination(
       UsersService, <SearchQuery>ctx.query
-    )
-    // @ts-ignore
-    pagination.items.forEach(item => delete item.passwordHash)
-    ctx.body = pagination
+      // @ts-ignore
+    )<Users.Out>(item => (delete item._doc.passwordHash) && item)
   })
   .get('/:id', async ctx => {
     ctx.body = await UsersService.get(ctx.params.id)

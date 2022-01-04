@@ -1,17 +1,20 @@
 import { Pagination, SearchQuery } from '@boiling/core'
 import mongoose from 'mongoose'
 
-interface SearchService {
-  search(key: string): ReturnType<typeof mongoose.Model.find>
+interface SearchService<M extends mongoose.Model<any>> {
+  Model: M
+  search(key: string): ReturnType<M['find']>
 }
 
-export default async function usePagination<T>(
-  service: SearchService, searchQuery: SearchQuery
-) {
+export default function usePagination<
+  M extends mongoose.Model<any>, S extends SearchService<M>
+>(searchService: S, searchQuery: SearchQuery) {
   const { key, page = 0, num = 10 } = searchQuery
-  const s = service.search(key)
-  const [count, items] = await Promise.all([
-    s.count(), s.skip((+page)*(+num)).limit(+num)
-  ])
-  return <Pagination<T>>{ count, items }
+  const s = searchService.search(key)
+  return async <T>(mapFun?: Parameters<Array<InstanceType<S['Model']>>['map']>[0]) => {
+    const [count, items] = await Promise.all([
+      s.count(), s.limit(+num).skip((+page)*(+num)).then(items => mapFun ? items.map(mapFun) : items)
+    ])
+    return <Pagination<T>>{ count, items }
+  }
 }
