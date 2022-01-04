@@ -9,8 +9,12 @@
     "build": "tsc",
     "test": "mocha tests"
   },
+  "dependencies": {
+    "qs": "^6.10.2"
+  },
   "devDependencies": {
     "@types/chai-as-promised": "^7.1.4",
+    "@types/qs": "^6.9.7",
     "axios-mock-adapter": "^1.20.0",
     "chai-as-promised": "^7.1.1"
   }

@@ -1,6 +1,6 @@
 import { Utils } from './utils'
 import axios, { AxiosResponse, AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios'
-import * as queryString from 'querystring'
+import qs from 'qs'
 
 type TwoParamsMethod = 'get' | 'delete' | 'head' | 'options'
 type ThreeParamsMethod = 'post' | 'put' | 'patch'
@@ -42,7 +42,7 @@ const requestProxy = (a: Api, path: string, cPath = ''): Function => new Proxy((
         case 'query':
           return new Proxy(() => {}, {
             apply(target, thisArg, [ query ]): any {
-              return a.$request.get(path + cPath + `?${ queryString.stringify(query) }`)
+              return a.$request.get(`${path}${cPath}?${qs.stringify(query)}`)
             }
           })
       }
