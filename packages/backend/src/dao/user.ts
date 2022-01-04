@@ -14,6 +14,10 @@ const userSchema = new Schema<Users.Model>({
   passwordHash: {
     type: String,
     required: true
+  },
+  avatar: {
+    type: String,
+    required: true
   }
 })
 

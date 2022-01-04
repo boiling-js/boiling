@@ -11,7 +11,7 @@ export const router = new Router({
     const user = await UsersService.add({
       username,
       passwordHash: Security.encrypt(password),
-      avatar: `/img/avatar/${ Math.random() * 10 }.jpg`
+      avatar: `/img/avatar/${ Math.floor(Math.random() * 10) }.jpg`
     })
     ctx.body = { id: user.id, username: user.username, avatar: user.avatar }
   })
