@@ -38,14 +38,14 @@ import { ElForm, ElFormItem, ElInput, ElButton, ElMessageBox, ElMessage } from '
 import { api } from '../api'
 import { Users } from '@boiling/core'
 
-type NewAccount =  Users.Register & {
+type NewAccount =  Omit<Users.Register, 'avatar'> & {
   confirmPassword: string
 }
 
 const newAccount = reactive<NewAccount>({
   username: '',
   password: '',
-  confirmPassword: ''
+  confirmPassword: '',
 }),
   router = useRouter(),
   rules = {
