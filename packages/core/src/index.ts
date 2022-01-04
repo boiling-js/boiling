@@ -1,3 +1,14 @@
+import { ParsedUrlQuery } from 'querystring'
+
+export interface Pagination<Item> {
+  count: number
+  items: Item[]
+}
+export interface SearchQuery extends ParsedUrlQuery {
+  key: string
+  page?: string
+  num?: string
+}
 export namespace Users {
   export interface Model {
     /** 用户唯一 id */

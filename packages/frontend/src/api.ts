@@ -1,7 +1,7 @@
-import { Api, attachApi, Users } from '@boiling/core'
+import { Api, attachApi, QueryPromise, SearchQuery, Users } from '@boiling/core'
 
 interface OfficialApi {
-  users: {
+  users: QueryPromise<Users.Out[], SearchQuery> & {
     add(d: Users.Register): Promise<Users.Out>
   }
   user(id: string): {

@@ -1,7 +1,8 @@
 import Router from '@koa/router'
-import { Users } from '@boiling/core'
+import { Pagination, SearchQuery, Users } from '@boiling/core'
 import { UsersService } from '../services/users'
 import { Security } from '../utils'
+import usePagination from '../hooks/usePagination'
 
 export const router = new Router({
   prefix: '/users'
@@ -16,8 +17,12 @@ export const router = new Router({
     ctx.body = { id: user.id, username: user.username, avatar: user.avatar }
   })
   .get('/', async ctx => {
-    const { key } = <{ key: string }>ctx.query
-    ctx.body = await UsersService.search(key)
+    const pagination = await usePagination<Users.Out>(
+      UsersService, <SearchQuery>ctx.query
+    )
+    // @ts-ignore
+    pagination.items.forEach(item => delete item.passwordHash)
+    ctx.body = pagination
   })
   .get('/:id', async ctx => {
     ctx.body = await UsersService.get(ctx.params.id)
