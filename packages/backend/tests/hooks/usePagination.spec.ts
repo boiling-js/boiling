@@ -13,9 +13,11 @@ export const TestModel = model('Test', testSchema)
 namespace TestService {
   export const Model = TestModel
   export function search(key: string) {
-    return Model.find({ name: key })
+    return Model.find({ name: new RegExp(`.*${key}.*`) })
   }
 }
+
+after(() => process.exit(0))
 
 describe('use Pagination', () => {
   before(async () => {
