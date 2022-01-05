@@ -1,24 +1,28 @@
-<!--
-    @desc:   好友详情读取
-    @author: liuguanghui
-    @date:   2022-01-04
--->
 <template>
-  <div class="friend-info-card">
+  <div class="user-info-card">
     <div class="avatar">
-
+      <img :src="`/api/${info.avatar}`" alt="">
     </div>
     <div class="info">
-      详情
+      ID：{{ info.id }}
+      <br>
+      昵称：{{ info.username }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { Users } from '@boiling/core'
+
+const
+  props = defineProps<{
+    info: Users.Out
+  }>()
+console.log(props.info)
 </script>
 
 <style lang="scss" scoped>
-.friend-info-card {
+.user-info-card {
   display: flex;
   padding: 10px;
   width: 100%;
@@ -28,6 +32,11 @@
     width: 50px;
     height: 50px;
     border-radius: 50%;
+    overflow: hidden;
+    > img {
+      width: 100%;
+      height: 100%;
+    }
   }
   > div.info {
     flex-grow: 1;

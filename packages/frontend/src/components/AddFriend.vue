@@ -9,10 +9,19 @@
       class="w-50 m-2"
       size="small"
       placeholder="请输入ID/用户名/关键字"
-      :suffix-icon="Search"/>
+      :suffix-icon="Search"
+      @keydown.enter="searchUser"/>
     <div
       class="search-friend">
-      <FriendInfoReadCard/>
+      <user
+        v-for="item in searchFriend.items"
+        :key="item.id"
+        :info="item"/>
+      <el-pagination
+        :page-size="10"
+        :pager-count="10"
+        layout="prev, pager, next"
+        :total="searchFriend.count"/>
     </div>
     <template #footer>
       <span class="dialog-footer">
@@ -27,11 +36,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ElDialog, ElMessageBox, ElButton, ElInput } from 'element-plus'
+import { ElDialog, ElMessageBox, ElButton, ElInput, ElPagination } from 'element-plus'
 import { Search }  from '@element-plus/icons-vue'
-import FriendInfoReadCard from './FriendInfoReadCard.vue'
+import User from './User.vue'
 import useModelWrapper from '../hooks/useModelWrapper'
 import { api } from '../api'
+import { Pagination, Users } from '@boiling/core'
 
 const
   props = defineProps({
@@ -46,10 +56,14 @@ const
   },
   // loading = ref<boolean>(false),
   searchKey = ref<string>('')
-//
-// async function searchUser() {
-//   await api.users
-// }
+  let searchFriend = ref<Pagination<Users.Out>>({ count: 0, items: [] })
+
+async function searchUser() {
+  searchFriend.value = await api.users.query({
+    key: searchKey.value
+  })
+  console.log(searchFriend)
+}
 
 </script>
 
