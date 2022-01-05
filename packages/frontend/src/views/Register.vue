@@ -45,7 +45,7 @@ type NewAccount =  Omit<Users.Register, 'avatar'> & {
 const newAccount = reactive<NewAccount>({
   username: '',
   password: '',
-  confirmPassword: '',
+  confirmPassword: ''
 }),
   router = useRouter(),
   rules = {

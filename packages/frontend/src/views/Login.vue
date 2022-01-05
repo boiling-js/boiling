@@ -93,7 +93,7 @@ const
       margin: 10px 0;
       width: $w;
     }
-    >.register {
+    > .register {
       font-size: 10px;
       > .click {
         cursor: pointer;
