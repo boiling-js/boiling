@@ -43,4 +43,12 @@ describe('use Pagination', () => {
     expect(p.items.length).to.be.eq(15)
     expect(p.items[0].name).to.be.eq('test15')
   })
+  it('should get target test data by mapFun.', async () => {
+    const p = await usePagination(TestService, { key: '' })<{ name: string }>(
+      item => (item.name += '-foo') && item
+    )
+    for (let i = 0; i < p.items.length; i++) {
+      expect(p.items[i].name).to.be.eq(`test${i}-foo`)
+    }
+  })
 })
