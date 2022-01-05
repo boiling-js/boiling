@@ -1,6 +1,6 @@
 <template>
-  <div class="login-box">
-    <div class="login">
+  <div class="login">
+    <div class="login-box">
       <h3 class="title">欢迎回来~</h3>
       <div class="login-input">
         <div class="label"> 账号： </div>
@@ -21,17 +21,19 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue'
+import { onMounted, onUnmounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElInput, ElButton,  ElMessage } from 'element-plus'
 import { api } from '../api'
 import { Users } from '@boiling/core'
+import { useStore } from 'vuex'
 
 type Account = Users.Status & {
   id: string
 }
 
 const
+  store = useStore(),
   account = reactive<Account>({
     id: '',
     password: '',
@@ -55,14 +57,24 @@ const
     router.push('/register')
   }
 
+onMounted(() => {
+  store.commit('toggleLeftSelector', false)
+})
+onUnmounted(() => {
+  store.commit('toggleLeftSelector', true)
+})
 </script>
 
 <style lang="scss" scoped>
-.login-box {
+.login {
   $w: 580px;
   $h: 320px;
   $p: 35px;
-  > .login {
+
+  background-size: cover;
+  background-position: center;
+  background-image: url("../assets/img/bg/1.png");
+  > .login-box {
     position: fixed;
     top: calc(50vh - #{$h} / 2 - #{$p});
     left: calc(50% - #{$w} / 2 - #{$p});
