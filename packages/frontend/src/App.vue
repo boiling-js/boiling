@@ -8,7 +8,7 @@
     </div>
   </div>
   <div class="container">
-    <panel-selector class="l"/>
+    <panel-selector v-if="isHiddenLeftSelector" class="l"/>
     <router-view v-slot="{ Component }">
       <transition name="el-fade-in-linear">
         <component :is="Component" class="r"/>
@@ -19,6 +19,12 @@
 
 <script lang="ts" setup>
 import PanelSelector from './components/PanelSelector.vue'
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+
+const
+  store = useStore(),
+  isHiddenLeftSelector = computed(() => !store.state.isHiddenLeftSelector)
 
 const min = () => {
   desktop?.min?.()
