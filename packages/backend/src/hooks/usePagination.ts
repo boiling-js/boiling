@@ -13,7 +13,7 @@ export default function usePagination<
   const s = searchService.search(key)
   return async <T>(mapFun?: Parameters<Array<InstanceType<S['Model']>>['map']>[0]) => {
     const [count, items] = await Promise.all([
-      s.count(), s.limit(+num).skip((+page)*(+num)).then(items => mapFun ? items.map(mapFun) : items)
+      s.count(), s.clone().limit(+num).skip((+page)*(+num)).then(items => mapFun ? items.map(mapFun) : items)
     ])
     return <Pagination<T>>{ count, items }
   }
