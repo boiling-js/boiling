@@ -1,4 +1,6 @@
 import { Schema, model } from 'mongoose'
+import { expect } from 'chai'
+
 import usePagination from '../../src/hooks/usePagination'
 
 const testSchema = new Schema<{ name: string }>({
@@ -22,17 +24,16 @@ after(() => process.exit(0))
 describe('use Pagination', () => {
   before(async () => {
     await require('../../src/dao/index.ts').default()
-    await new TestModel({ name: 'test001' }).save()
-    await new TestModel({ name: 'test002' }).save()
-    await new TestModel({ name: 'test003' }).save()
-    await new TestModel({ name: 'test004' }).save()
+    for (let i = 0; i < 48; i++) {
+      await TestModel.create({ name: `test${i}` })
+    }
   })
   after(async () => {
     await TestModel.deleteMany({})
   })
-  it('should none.', async () => {
-    console.log(
-      await usePagination(TestService, { key: '' })()
-    )
+  it('should get target test data by use pagination.', async () => {
+    const p = await usePagination(TestService, { key: '' })<{ name: string }>()
+    expect(p.count).to.be.eq(48)
+    expect(p.items.length).to.be.eq(10)
   })
 })
