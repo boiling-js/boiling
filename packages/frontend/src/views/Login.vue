@@ -58,10 +58,10 @@ const
   }
 
 onMounted(() => {
-  store.commit('toggleLeftSelector', false)
+  store.commit('toggleLeftSelector')
 })
 onUnmounted(() => {
-  store.commit('toggleLeftSelector', true)
+  store.commit('toggleLeftSelector')
 })
 </script>
 
