@@ -45,7 +45,7 @@ const
     try {
       const { id, ...status } = account
       const res = await api.user(id).status.add(status)
-      console.log(res)
+      store.commit('setUser', res)
       ElMessage.success('登录成功！')
       await router.push('/home')
     } catch (e) {

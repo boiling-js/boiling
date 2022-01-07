@@ -13,10 +13,10 @@
       </div>
       <div class="self-bar">
         <div class="avatar">
-          <img width="48" src="../assets/img/favicon.svg" alt="">
+          <img width="48" :src="`/api/${user.avatar}`" alt="">
         </div>
         <div class="detail">
-          <div class="name">YiJie</div>
+          <div class="name"> {{ user.username }} </div>
         </div>
         <el-tooltip content="用户设置">
           <el-icon :size="24"><tools/></el-icon>
@@ -34,9 +34,15 @@
 import { ElTooltip, ElIcon } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
 import AddFriend from '../components/AddFriend.vue'
-import { ref } from 'vue'
 
-const addDialog = ref(false)
+const
+  store = useStore(),
+  addDialog = ref(false),
+  user = computed(() => store.state.user)
+
+onMounted(() => {
+  console.log('user', user)
+})
 </script>
 
 <style lang="scss" scoped>
