@@ -33,7 +33,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
-import { Users } from '@boiling/core'
 import { ElTooltip, ElIcon } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
 import AddFriend from '../components/AddFriend.vue'
