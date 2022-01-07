@@ -36,7 +36,8 @@ export const router = new Router({
           throw new HttpError('NOT_FOUND', '用户不存在')
         if (!Security.match(password, u.passwordHash))
           throw new HttpError('UNAUTHORIZED', '密码错误')
-        const { passwordHash: _, ...user } = u
+        // @ts-ignore
+        const user = delete u._doc.passwordHash && u
         ctx.session!.curUser = user
         ctx.body = user
         break
