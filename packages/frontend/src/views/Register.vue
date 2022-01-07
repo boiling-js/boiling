@@ -31,12 +31,13 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { onMounted, onUnmounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { ElForm, ElFormItem, ElInput, ElButton, ElMessageBox, ElMessage } from 'element-plus'
 import { api } from '../api'
 import { Users } from '@boiling/core'
+import store from '../store'
 
 type NewAccount =  Omit<Users.Register, 'avatar'> & {
   confirmPassword: string
@@ -91,6 +92,12 @@ const newAccount = reactive<NewAccount>({
         throw e
     }
   }
+onMounted(() => {
+  store.commit('toggleLeftSelector')
+})
+onUnmounted(() => {
+  store.commit('toggleLeftSelector')
+})
 </script>
 
 <style lang="scss" scoped>
