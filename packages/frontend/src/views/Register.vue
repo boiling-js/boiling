@@ -33,7 +33,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 import { ElForm, ElFormItem, ElInput, ElButton, ElMessageBox, ElMessage } from 'element-plus'
 import { api } from '../api'
 import { Users } from '@boiling/core'
