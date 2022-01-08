@@ -12,12 +12,12 @@ describe('Users Service', function () {
   })
   it('should add user.', async function () {
     expect(await UsersService.exist('test')).to.be.eq(false)
-    const nu = await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
+    const nu = await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test', friends: [], tags: [] })
     expect(nu).not.to.be.undefined
     expect(nu).property('passwordHash')
       .to.be.eq('test')
     expect(await UsersService.exist('test')).to.be.eq(true)
-    await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
+    await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test', friends: [], tags: [] })
       .catch(e => {
         if (e instanceof HttpError) {
           expect(e.msg)
@@ -29,7 +29,7 @@ describe('Users Service', function () {
       })
   })
   it('should search user by username.', async function () {
-    await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
+    await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test', friends: [], tags: [] })
     const [ u ] = await UsersService.search('t').limit(1)
     expect(u).not.to.be.undefined
     expect(u.username).to.be.eq('test')
@@ -40,7 +40,7 @@ describe('Users Service', function () {
   it('should get user by id or username.', async function () {
     const {
       id, username
-    } = await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
+    } = await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test', friends: [], tags: [] })
     const [
       getByUId, getByUName, notExist
     ] = await Promise.all([
@@ -53,5 +53,22 @@ describe('Users Service', function () {
     // @ts-ignore
     expect(UsersService.get.bind(UsersService, null))
       .to.throw('Not support type.')
+  })
+  it('should add tags', async function () {
+    const { id } = await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test', friends: [], tags: [] })
+    await UsersService.addTag(id, 'test')
+    const user = await UsersService.get(id)
+    expect(user?.tags).to.be.deep.eq(['test'])
+  })
+  it('should add friend', async function () {
+    const [ user, friend ] = await Promise.all([
+      UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test', friends: [], tags: [] }),
+      UsersService.add({ username: 'testFriend', passwordHash: 'testFriend', avatar: 'testFriend', friends: [], tags: [] })
+    ])
+    const id = user.id
+    const fId = friend.id
+    await UsersService.Friends.add(id, fId)
+    const addFriendUser = await UsersService.get(id)
+    expect(addFriendUser?.friends[0].id).to.be.eq(fId)
   })
 })

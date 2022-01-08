@@ -1,5 +1,5 @@
 import Router from '@koa/router'
-import { Pagination, SearchQuery, Users } from '@boiling/core'
+import { SearchQuery, Users } from '@boiling/core'
 import { UsersService } from '../services/users'
 import { Security } from '../utils'
 import usePagination from '../hooks/usePagination'
@@ -12,7 +12,9 @@ export const router = new Router({
     const user = await UsersService.add({
       username,
       passwordHash: Security.encrypt(password),
-      avatar: `/img/avatar/${ Math.floor(Math.random() * 10) }.jpg`
+      avatar: `/img/avatar/${ Math.floor(Math.random() * 10) }.jpg`,
+      friends: [],
+      tags: []
     })
     ctx.body = { id: user.id, username: user.username, avatar: user.avatar }
   })
@@ -52,6 +54,7 @@ export const router = new Router({
     ctx.body = []
   })
   .get('/:id/friends', async ctx => {
+
     ctx.body = []
   })
   .get('/:id/channels', async ctx => {
