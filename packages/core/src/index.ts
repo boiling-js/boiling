@@ -19,6 +19,10 @@ export namespace Users {
     passwordHash: string
     /** 用户头像 */
     avatar: string
+    /** 用户好友 */
+    friends: Friend[]
+    /** 用户标签 */
+    tags: string[]
   }
   export type Out = Omit<Model, 'passwordHash'>
   export type Register = Omit<Model, 'id' | 'passwordHash' | 'avatar'> & {
@@ -30,6 +34,12 @@ export namespace Users {
     password: string
     /** 用户状态 */
     status: 'online' | 'leave' | 'offline'
+  }
+  export type Friend = Pick<Model, 'id'> & {
+    /** 好友标签 */
+    tags?: string[]
+    /** 好友备注 */
+    remark?: string
   }
 }
 export namespace Message {
