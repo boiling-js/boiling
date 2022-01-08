@@ -25,6 +25,7 @@ const userSchema = new Schema<Users.Model>({
   },
   friends: {
     type: [{
+      id: Number,
       tags: [String],
       remark: String
     }],
