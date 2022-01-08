@@ -21,7 +21,7 @@
         </el-form-item>
       </el-form>
       <el-button type="primary" @click="register">确认</el-button>
-      <div class="login">已有账号？ <span class="click" @click="login">直接登录</span></div>
+      <div class="login">已有账号？ <span class="ln" @click="login">直接登录</span></div>
     </div>
   </div>
 </template>
@@ -122,7 +122,7 @@ onUnmounted(() => {
     }
     > .login {
       font-size: 10px;
-      > .click {
+      > .ln {
         cursor: pointer;
         &:hover {
           color: var(--color-theme);
