@@ -14,17 +14,15 @@
         @keydown.enter="searchUser"/>
       <div
         class="search-friend">
-        <user
-          v-for="item in searchFriend.items"
-          :key="item.id"
-          class="user"
-          :info="item"/>
+        <user v-for="item in users.items" :key="item.id"
+              class="user"
+              :info="item"/>
       </div>
       <el-pagination
         :page-size="+search.num"
         :pager-count="+search.page"
         layout="prev, pager, next"
-        :total="searchFriend.count"
+        :total="users.count"
         small
         @current-change="searchUser"/>
     </div>
@@ -35,36 +33,35 @@
 import { ref } from 'vue'
 import { ElDialog, ElInput, ElPagination } from 'element-plus'
 import { Search }  from '@element-plus/icons-vue'
-import User from './User.vue'
-import useModelWrapper from '../hooks/useModelWrapper'
-import { api } from '../api'
 import { Pagination, SearchQuery, Users } from '@boiling/core'
+import User from './User.vue'
+import { api } from '../api'
 
 const
-  props = defineProps({
-    modelValue: Boolean
-  }),
-  emit = defineEmits(['update:modelValue']),
+  dialogVisible = ref(false),
   search = ref<SearchQuery>({
     page: '0',
     num: '10',
     key: ''
-  })
-let searchFriend = ref<Pagination<Users.Out>>({ count: 0, items: [] }),
-  dialogVisible =  useModelWrapper(props, emit, 'modelValue')
+  }),
+  users = ref<Pagination<Users.Out>>({ count: 0, items: [] })
 
-function handleClose (done: () => void) {
-  done()
-  dialogVisible.value = false
-}
 async function searchUser() {
-  searchFriend.value = await api.users.query({
+  users.value = await api.users.query({
     key: search.value.key,
     page: search.value.page,
     num: search.value.num
   })
 }
+function handleClose(done: () => void) {
+  done()
+  dialogVisible.value = false
+}
+function show() {
+  dialogVisible.value = true
+}
 
+defineExpose({ show })
 </script>
 
 <style lang="scss" scoped>
