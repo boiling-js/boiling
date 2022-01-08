@@ -2,7 +2,7 @@
   <div class="colors-card">
     <div class="main"
          :style="{
-           color: color,
+           color: 'var(--color-text-placeholder)',
            backgroundColor: colors[0]
          }">
       <span>{{ title }}</span>
@@ -19,13 +19,10 @@
 </template>
 
 <script lang="ts" setup>
-withDefaults(defineProps<{
+defineProps<{
   title: string
-  color?: string
   colors: string[]
-}>(), {
-  color: 'white'
-})
+}>()
 </script>
 
 <style lang="scss" scoped>

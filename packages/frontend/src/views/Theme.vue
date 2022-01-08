@@ -9,7 +9,7 @@
     <h1>色调</h1>
     <p>Boiling 当前主题色调。</p>
     <h2>主色调</h2>
-    <p>主要颜色的基准色调。</p>
+    <p>主体颜色的基准色调。</p>
     <colors-card title="Primary Color"
                  :colors="primaryColors"/>
     <colors-card style="margin-top: 10px;"
@@ -26,7 +26,7 @@
                    :colors="infoColors"/>
     </div>
     <h2>文字色调</h2>
-    <p>文字内容的基准色调。</p>
+    <p>文字部分的基准色调。</p>
     <colors-card title="Text Color"
                  :colors="textColors"/>
     <h1>圆角与阴影</h1>
@@ -66,17 +66,12 @@ onUnmounted(() => {
 })
 </script>
 
-<style lang="scss">
-div.container {
-  color: #fff;
-  background-color: #202225;
-}
-</style>
-
 <style lang="scss" scoped>
 div.directory {
   padding: 10px 20px;
   width: 100px;
+  color: var(--color-text-regular);
+  background-color: var(--color-auxi-regular);
   > ul {
     display: flex;
     flex-direction: column;
@@ -90,7 +85,9 @@ div.directory {
 }
 div.el-scrollbar {
   flex-grow: 1;
-  margin-left: 20px;
+  padding-left: 20px;
+  color: var(--color-text-secondary);
+  background-color: var(--color-auxi-secondary);
   :deep(div.el-scrollbar__view) {
     padding-bottom: 20px;
   }

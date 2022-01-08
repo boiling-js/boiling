@@ -109,10 +109,10 @@ onUnmounted(() => {
     padding: $p;
     width: $w;
     height: $h;
-    color: var(--color-title-default);
-    background-color: var(--bg-color-theme);
-    border-radius: var(--border-radius-default);
-    box-shadow: var(--box-shadow-default);
+    color: var(--color-text-primary);
+    background-color: var(--color-auxi-primary);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
     > .title {
       text-align: center;
     }
@@ -125,7 +125,7 @@ onUnmounted(() => {
       > .ln {
         cursor: pointer;
         &:hover {
-          color: var(--color-theme);
+          color: var(--color-primary);
         }
       }
     }
