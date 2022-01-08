@@ -1,10 +1,12 @@
 import Router from '@koa/router'
 import { SearchQuery, Users } from '@boiling/core'
+
+import { App } from '../'
 import { UsersService } from '../services/users'
 import { Security } from '../utils'
 import usePagination from '../hooks/usePagination'
 
-export const router = new Router({
+export const router = new Router<{}, App>({
   prefix: '/users'
 })
   .post('/', async ctx => {
@@ -38,18 +40,18 @@ export const router = new Router({
           throw new HttpError('UNAUTHORIZED', '密码错误')
         // @ts-ignore
         const user = delete u._doc.passwordHash && u
-        ctx.session!.curUser = user
+        ctx.session && (ctx.session.curUser = user)
         ctx.body = user
         break
       case 'offline':
-        delete ctx.session!.curUser
+        ctx.session && delete ctx.session.curUser
         ctx.body = 'you logout.'
         break
     }
   })
   .post('/:id/friends/:uid', async ctx => {
     if (ctx.params.id === '@me')
-      ctx.params.id = ctx.session!.curUser!.id
+      ctx.params.id = ctx.session?.curUser.id
     ctx.body = await UsersService.Friends.add(+ctx.params.id, +ctx.params.uid, { tags: ctx.request.body.tags, remark: ctx.request.body.remark })
   })
   .get('/:id/friends', async ctx => {

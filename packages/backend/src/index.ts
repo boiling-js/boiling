@@ -51,3 +51,5 @@ app.listen(+PORT, HOST, async () => {
   }
   console.log(`server is running on http://${ HOST }:${ PORT }`)
 })
+
+export type App = typeof app
