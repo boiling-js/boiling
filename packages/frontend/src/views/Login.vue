@@ -58,7 +58,7 @@ const
   }
 
 onMounted(() => {
-  store.commit('toggleLeftSelector')
+  store.commit('setLeftSelectorHidden', true)
 })
 onUnmounted(() => {
   store.commit('toggleLeftSelector')

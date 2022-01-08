@@ -12,6 +12,9 @@ export default createStore({
     }
   },
   mutations: {
+    setLeftSelectorHidden(state, isHidden) {
+      state.isHiddenLeftSelector = isHidden
+    },
     toggleLeftSelector(state) {
       state.isHiddenLeftSelector = !state.isHiddenLeftSelector
     },
