@@ -48,16 +48,15 @@ const
     '#c5cbf5', '#dde1fc', '#f6f7ff', '#ffffff'
   ],
   auxiliaryColors = [
-    '#202225',
-    '#282c34', '#2c313a', '#333842', '#495060'
+    '#202225', '#282c34', '#2c313a', '#333842'
   ],
-  successColors = [ '#1abf73'  ],
-  warningColors = [ '#f5a623' ],
-  errorColors = [ '#f55a4e' ],
-  infoColors = [ '#8f8f8f' ],
   textColors = [
     '#8f8f8f', '#bfbfbf', '#dfdfdf', '#ffffff'
-  ]
+  ],
+  successColors = [ '#1abf73' ],
+  warningColors = [ '#f5a623' ],
+  errorColors = [ '#f55a4e' ],
+  infoColors = [ '#8f8f8f' ]
 
 onMounted(() => {
   store.commit('setLeftSelectorHidden', true)
