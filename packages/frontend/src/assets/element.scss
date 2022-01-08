@@ -1,6 +1,31 @@
 @forward "element-plus/theme-chalk/src/common/var.scss" with (
   $colors: (
-    "primary": ("base": #5865f2)
+    "white": #202225,
+    "black": #ffffff,
+    "primary": (
+      "base": #5c6bc0,
+    ),
+    "success": (
+      "base": #1abf73,
+    ),
+    "warning": (
+      "base": #f5a623,
+    ),
+    "danger": (
+      "base": #f55a4e,
+    ),
+    "error": (
+      "base": #f55a4e,
+    ),
+    "info": (
+      "base": #8f8f8f,
+    )
+  ),
+  $text-color: (
+    "primary": #8f8f8f,
+    "regular": #bfbfbf,
+    "secondary": #dfdfdf,
+    "placeholder": #ffffff
   )
 );
 
