@@ -37,14 +37,14 @@ html { margin: 0; }
 body { margin: 5px; }
 #app {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   height: calc(100vh - 10px);
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+  font-family: "Avenir", "Helvetica", "Arial", sans-serif;
   -webkit-font-smoothing: antialiased;
   border-radius: 6px;
-  overflow: hidden;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 5px rgb(0 0 0 / 80%);
+  flex-direction: column;
+  justify-content: space-between;
 }
 </style>
 
@@ -54,9 +54,9 @@ div.title-bar {
   min-height: $h;
 }
 div.container {
+  display: flex;
   width: 100%;
   height: calc(100% - #{$h});
-  display: flex;
   justify-content: space-between;
   &.loading {
     justify-content: center;
