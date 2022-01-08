@@ -50,11 +50,11 @@ export const router = new Router({
     }
   })
   .post('/:id/friends/:uid', async ctx => {
-    // requirePermissions(ctx)
-    ctx.body = []
+    if (ctx.params.id === '@me')
+      ctx.params.id = ctx.session!.curUser!.id
+    ctx.body = await UsersService.Friends.add(+ctx.params.id, +ctx.params.uid, { tags: ctx.request.body.tags, remark: ctx.request.body.remark })
   })
   .get('/:id/friends', async ctx => {
-
     ctx.body = []
   })
   .get('/:id/channels', async ctx => {
