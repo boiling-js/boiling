@@ -4,7 +4,7 @@ import { Seq } from '../utils'
 
 export namespace UsersService {
   export const Model = UserModel
-  export type U = Omit<Users.Model, 'id'>
+  export type U = Omit<Users.Base, 'id'>
   export async function add(u: U) {
     if (await exist(u.username))
       throw new HttpError('CONFLICT', `User with the name "${ u.username }" already exists`)
