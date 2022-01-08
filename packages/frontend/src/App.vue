@@ -1,6 +1,6 @@
 <template>
   <title-bar/>
-  <div class="container">
+  <div v-if="isLoading" class="container">
     <panel-selector v-if="isHiddenLeftSelector" class="l"/>
     <router-view v-slot="{ Component }">
       <transition name="el-fade-in-linear">
@@ -8,17 +8,28 @@
       </transition>
     </router-view>
   </div>
+  <div v-else class="container loading">
+    <boiling/>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import PanelSelector from './components/PanelSelector.vue'
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
+import PanelSelector from './components/PanelSelector.vue'
 import TitleBar from './components/TitleBar.vue'
+import Boiling from './components/Boiling.vue'
 
 const
   store = useStore(),
-  isHiddenLeftSelector = computed(() => !store.state.isHiddenLeftSelector)
+  isHiddenLeftSelector = computed(() => !store.state.isHiddenLeftSelector),
+  isLoading = ref(false)
+
+onMounted(() => {
+  setTimeout(() => {
+    isLoading.value = true
+  }, 4000)
+})
 </script>
 
 <style lang="scss">
@@ -43,9 +54,15 @@ div.title-bar {
   min-height: $h;
 }
 div.container {
+  width: 100%;
   height: calc(100% - #{$h});
   display: flex;
   justify-content: space-between;
+  &.loading {
+    justify-content: center;
+    align-items: center;
+    background-color: #202225;
+  }
   > div.l {
     width: 70px;
     height: 100%;
