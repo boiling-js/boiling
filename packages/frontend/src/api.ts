@@ -4,7 +4,7 @@ interface OfficialApi {
   users: QueryPromise<Pagination<Users.Out>, SearchQuery> & {
     add(d: Users.Register): Promise<Users.Out>
   }
-  user(id: string): {
+  user(id: number): {
     status: {
       add(d: Users.Status): Promise<Users.Out>
     }

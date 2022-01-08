@@ -11,23 +11,19 @@
         label-position="top"
         size="small">
         <el-form-item label="用户名:" prop="username" required>
-          <el-input v-model="newAccount.username"></el-input>
+          <el-input v-model="newAccount.username"/>
         </el-form-item>
         <el-form-item label="密码:" prop="password" required>
-          <el-input v-model="newAccount.password" type="password"></el-input>
+          <el-input v-model="newAccount.password" type="password"/>
         </el-form-item>
         <el-form-item label="确认密码:" prop="confirmPassword" required>
-          <el-input v-model="newAccount.confirmPassword" type="password"></el-input>
+          <el-input v-model="newAccount.confirmPassword" type="password"/>
         </el-form-item>
       </el-form>
-      <el-button
-        class="btn"
-        type="primary"
-        @click="register">确认</el-button>
-      <div class="login">已有账号？ <span class="click" @click="login">直接登录</span></div>
+      <el-button type="primary" @click="register">确认</el-button>
+      <div class="login">已有账号？ <span class="ln" @click="login">直接登录</span></div>
     </div>
   </div>
-
 </template>
 
 <script setup lang="ts">
@@ -42,11 +38,12 @@ type NewAccount =  Omit<Users.Register, 'avatar'> & {
   confirmPassword: string
 }
 
-const newAccount = reactive<NewAccount>({
-  username: '',
-  password: '',
-  confirmPassword: ''
-}),
+const
+  newAccount = reactive<NewAccount>({
+    username: '',
+    password: '',
+    confirmPassword: ''
+  }),
   router = useRouter(),
   rules = {
     username: {
@@ -91,8 +88,9 @@ const newAccount = reactive<NewAccount>({
         throw e
     }
   }
+
 onMounted(() => {
-  store.commit('toggleLeftSelector')
+  store.commit('setLeftSelectorHidden', true)
 })
 onUnmounted(() => {
   store.commit('toggleLeftSelector')
@@ -111,23 +109,23 @@ onUnmounted(() => {
     padding: $p;
     width: $w;
     height: $h;
-    color: var(--color-title-default);
-    background-color: var(--bg-color-theme);
-    border-radius: var(--border-radius-default);
-    box-shadow: var(--box-shadow-default);
+    color: var(--color-text-primary);
+    background-color: var(--color-auxi-primary);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
     > .title {
       text-align: center;
     }
-    > .btn {
+    > .el-button {
       margin: 10px 0;
       width: $w;
     }
     > .login {
       font-size: 10px;
-      > .click {
+      > .ln {
         cursor: pointer;
         &:hover {
-          color: var(--color-theme);
+          color: var(--color-primary);
         }
       }
     }
