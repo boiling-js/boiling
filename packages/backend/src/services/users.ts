@@ -15,8 +15,24 @@ export namespace UsersService {
   export async function del(id: number) {
     Model.findOneAndDelete({ id })
   }
+  export async function addTag(id: number, tag: string) {
+    const user = await UsersService.getOrThrow(id)
+    if (user.tags.includes(tag))
+      throw new HttpError('CONFLICT', `${ tag }标签已存在`)
+    user.tags.push(tag)
+    await user.save()
+  }
+  export async function delTag(id: number, tag: string) {
+    const user = await UsersService.getOrThrow(id)
+    const index = user.tags.indexOf(tag)
+    if (index === -1)
+      throw new HttpError('NOT_FOUND', `${ tag }标签不存在`)
+    user.tags.splice(index, 1)
+    await user.save()
+  }
   export function get(id: number): ReturnType<typeof Model.findOne>
   export function get(username: string): ReturnType<typeof Model.findOne>
+  export function get(val: number | string): ReturnType<typeof Model.findOne>
   export function get(val: number | string) {
     switch (typeof val) {
       case 'number':
@@ -27,10 +43,46 @@ export namespace UsersService {
         throw new Error('Not support type.')
     }
   }
+  export async function getOrThrow(val: number | string) {
+    const m = await UsersService.get(val)
+    if (!m)
+      throw new HttpError('NOT_FOUND', `id 为 '${ val }' 的用户不存在`)
+    return m
+  }
   export function search(key: string) {
     return Model.find({ username: new RegExp(`${key}.*`) })
   }
   export async function exist(uname: string) {
     return await UserModel.findOne({ username: uname }) !== null
+  }
+
+  export namespace Friends {
+    export interface Opts {
+      tags?: string[]
+      remark?: string
+    }
+    /**
+     * 给目标用户添加好友
+     *
+     * @param uid  - 目标用户
+     * @param fUid - 待被添加的用户
+     * @param opts - 好友配置信息
+     */
+    export async function add(uid: number, fUid: number, opts?: Opts) {
+      const [ user, friend ] = await Promise.all([UsersService.getOrThrow(uid), UsersService.getOrThrow(fUid)])
+      if (user.friends.findIndex(() => friend.id === fUid) !== -1)
+        throw new HttpError('CONFLICT', `${ friend.username }已经是你的好友`)
+
+      user.friends.push({ id: fUid, ...opts })
+      await user.save()
+    }
+    export async function del(uid: number, fUid: number) {
+      const [ user, friend ] = await Promise.all([UsersService.getOrThrow(uid), UsersService.getOrThrow(fUid)])
+      const index = user.friends.findIndex(() => friend.id === fUid)
+      if (index === -1)
+        throw new HttpError('NOT_FOUND', `${ friend.username }不是你的好友`)
+      user.friends.splice(index, 1)
+      await user.save()
+    }
   }
 }
