@@ -1,11 +1,10 @@
 import Koa from 'koa'
 import { AppContext } from './'
-import { HttpError } from './global/HttpError'
 
 export namespace Middlewares {
   export async function handleErrors(ctx: AppContext, next: Koa.Next) {
     try {
-      return await next()
+      await next()
     } catch (e) {
       if (e instanceof HttpError) {
         ctx.body = e.msg
@@ -14,5 +13,8 @@ export namespace Middlewares {
       }
       throw e
     }
+  }
+  export async function returnBody(ctx: AppContext, next: Koa.Next) {
+    ctx.body = await next()
   }
 }

@@ -22,6 +22,7 @@ app
   .use(bodyParser())
   .use(session(app))
   .use(Middlewares.handleErrors)
+  .use(Middlewares.returnBody)
   .use(UsersRouter.routes())
   .use(UsersRouter.allowedMethods())
   .use(ChannelsRouter.routes())
