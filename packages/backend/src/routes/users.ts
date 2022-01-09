@@ -5,6 +5,7 @@ import { App } from '../'
 import { UsersService } from '../services/users'
 import { Security } from '../utils'
 import usePagination from '../hooks/usePagination'
+import useCurUser from '../hooks/useCurUser'
 
 export const router = new Router<{}, App>({
   prefix: '/users'
@@ -38,9 +39,13 @@ export const router = new Router<{}, App>({
           throw new HttpError('NOT_FOUND', '用户不存在')
         if (!Security.match(password, u.passwordHash))
           throw new HttpError('UNAUTHORIZED', '密码错误')
+        const user = u.toJSON()
         // @ts-ignore
-        const user = delete u._doc.passwordHash && u
-        ctx.session && (ctx.session.curUser = user)
+        delete user.passwordHash
+        if (ctx.session)
+          ctx.session.curUser = <Users.Out><any>user
+        else
+          throw new HttpError('INTERNAL_SERVER_ERROR', '服务器内部错误')
         ctx.body = user
         break
       case 'offline':
@@ -50,9 +55,12 @@ export const router = new Router<{}, App>({
     }
   })
   .post('/:id/friends/:uid', async ctx => {
-    if (ctx.params.id === '@me')
-      ctx.params.id = ctx.session?.curUser.id
-    ctx.body = await UsersService.Friends.add(+ctx.params.id, +ctx.params.uid, { tags: ctx.request.body.tags, remark: ctx.request.body.remark })
+    let tId: number
+    const { id } = ctx.params
+    id === '@me'
+      ? (tId = useCurUser(ctx.session).id)
+      : (tId = +id)
+    ctx.body = await UsersService.Friends.add(tId, +ctx.params.uid, <Users.Friend>ctx.request.body)
   })
   .get('/:id/friends', async ctx => {
     ctx.body = []
