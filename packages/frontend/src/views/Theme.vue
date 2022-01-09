@@ -1,38 +1,40 @@
 <template>
-  <div class="directory">
-    <ul>
-      <li>色调</li>
-      <li>圆角与阴影</li>
-    </ul>
-  </div>
-  <el-scrollbar>
-    <h1>色调</h1>
-    <p>Boiling 当前主题色调。</p>
-    <h2>主色调</h2>
-    <p>主体颜色的基准色调。</p>
-    <colors-card title="Primary Color"
-                 :colors="primaryColors"/>
-    <colors-card style="margin-top: 10px;"
-                 title="Auxiliary Color"
-                 :colors="auxiliaryColors"/>
-    <div class="cards" style="margin-top: 10px;">
-      <colors-card title="Success Color"
-                   :colors="successColors"/>
-      <colors-card title="Warning Color"
-                   :colors="warningColors"/>
-      <colors-card title="Error Color"
-                   :colors="errorColors"/>
-      <colors-card title="Info Color"
-                   :colors="infoColors"/>
+  <div class="theme">
+    <div class="directory">
+      <ul>
+        <li>色调</li>
+        <li>圆角与阴影</li>
+      </ul>
     </div>
-    <h2>文字色调</h2>
-    <p>文字部分的基准色调。</p>
-    <colors-card title="Text Color"
-                 :colors="textColors"/>
-    <h1>圆角与阴影</h1>
-    <h2>圆角</h2>
-    <p>项目的圆角弧度。</p>
-  </el-scrollbar>
+    <el-scrollbar>
+      <h1>色调</h1>
+      <p>Boiling 当前主题色调。</p>
+      <h2>主色调</h2>
+      <p>主体颜色的基准色调。</p>
+      <colors-card title="Primary Color"
+                   :colors="primaryColors"/>
+      <colors-card style="margin-top: 10px;"
+                   title="Auxiliary Color"
+                   :colors="auxiliaryColors"/>
+      <div class="cards" style="margin-top: 10px;">
+        <colors-card title="Success Color"
+                     :colors="successColors"/>
+        <colors-card title="Warning Color"
+                     :colors="warningColors"/>
+        <colors-card title="Error Color"
+                     :colors="errorColors"/>
+        <colors-card title="Info Color"
+                     :colors="infoColors"/>
+      </div>
+      <h2>文字色调</h2>
+      <p>文字部分的基准色调。</p>
+      <colors-card title="Text Color"
+                   :colors="textColors"/>
+      <h1>圆角与阴影</h1>
+      <h2>圆角</h2>
+      <p>项目的圆角弧度。</p>
+    </el-scrollbar>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -67,35 +69,36 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-div.directory {
-  padding: 10px 20px;
-  width: 100px;
-  color: var(--color-text-regular);
-  background-color: var(--color-auxi-regular);
-  > ul {
-    display: flex;
-    flex-direction: column;
-    row-gap: 10px;
-    padding: 0;
-    margin: 0;
-    > li {
-      display: block;
+div.theme {
+  display: flex;
+  > div.directory {
+    padding: 10px 20px;
+    width: 100px;
+    color: var(--color-text-regular);
+    background-color: var(--color-auxi-regular);
+    > ul {
+      display: flex;
+      flex-direction: column;
+      row-gap: 10px;
+      padding: 0;
+      margin: 0;
+      > li {
+        display: block;
+      }
     }
   }
-}
-div.el-scrollbar {
-  flex-grow: 1;
-  padding-left: 20px;
-  color: var(--color-text-secondary);
-  background-color: var(--color-auxi-secondary);
-  :deep(div.el-scrollbar__view) {
-    padding-bottom: 20px;
-  }
-  &__view {
-    > div.cards {
-      display: flex;
-      justify-content: start;
-      column-gap: 10px;
+  > div.el-scrollbar {
+    flex-grow: 1;
+    padding-left: 20px;
+    color: var(--color-text-secondary);
+    background-color: var(--color-auxi-secondary);
+    :deep(div.el-scrollbar__view) {
+      padding-bottom: 20px;
+      > div.cards {
+        display: flex;
+        justify-content: start;
+        column-gap: 10px;
+      }
     }
   }
 }
