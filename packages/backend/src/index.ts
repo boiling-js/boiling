@@ -3,6 +3,7 @@ import session from 'koa-session'
 import websockify from 'koa-websocket'
 import bodyParser from 'koa-bodyparser'
 import staticMiddleware from 'koa-static'
+import logger from 'koa-logger'
 import { resolve } from 'path'
 
 import './global'
@@ -18,6 +19,7 @@ import { Middlewares } from './middlewares'
 
 app.ws.use(WSRouter)
 app
+  .use(logger())
   .use(staticMiddleware(resolve(__dirname, '../static')))
   .use(bodyParser())
   .use(session(app))
