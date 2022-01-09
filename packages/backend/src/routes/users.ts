@@ -1,13 +1,13 @@
 import Router from '@koa/router'
 import { SearchQuery, Users } from '@boiling/core'
 
-import { App } from '../'
+import { AppContext } from '../'
 import { UsersService } from '../services/users'
 import { Security } from '../utils'
 import usePagination from '../hooks/usePagination'
 import useCurUser from '../hooks/useCurUser'
 
-export const router = new Router<{}, App>({
+export const router = new Router<{}, AppContext>({
   prefix: '/users'
 })
   .post('/', async ctx => {
