@@ -28,7 +28,7 @@ const
 onMounted(() => {
   setTimeout(() => {
     isLoading.value = true
-  }, 4000)
+  }, process.env.NODE_ENV === 'development' ? 1000 : 4000)
 })
 </script>
 
