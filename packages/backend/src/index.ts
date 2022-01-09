@@ -4,6 +4,7 @@ import websockify from 'koa-websocket'
 import bodyParser from 'koa-bodyparser'
 import staticMiddleware from 'koa-static'
 import { resolve } from 'path'
+
 import './global'
 import DAOMain from './dao'
 
@@ -13,25 +14,14 @@ app.keys = ['hker92hjkugfkerbl.e[gewkg68']
 import { router as WSRouter } from './routes/ws'
 import { router as UsersRouter } from './routes/users'
 import { router as ChannelsRouter } from './routes/channels'
-import { HttpError } from './global/HttpError'
+import { Middlewares } from './middlewares'
 
 app.ws.use(WSRouter)
 app
   .use(staticMiddleware(resolve(__dirname, '../static')))
   .use(bodyParser())
   .use(session(app))
-  .use(async (ctx, next) => {
-    try {
-      return await next()
-    } catch (e) {
-      if (e instanceof HttpError) {
-        ctx.body = e.msg
-        ctx.status = e.code
-        return
-      }
-      throw e
-    }
-  })
+  .use(Middlewares.handleErrors)
   .use(UsersRouter.routes())
   .use(UsersRouter.allowedMethods())
   .use(ChannelsRouter.routes())
