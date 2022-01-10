@@ -13,7 +13,7 @@
         .then(() => {
           $router.push('/home')
           $message.success('登陆成功')
-        }, e => $message.error(`登录失败, ${ e }`))" v-text="'登录'"/>
+        })" v-text="'登录'"/>
       <div class="register">
         需要新的账号？
         <span class="ln" @click="$router.push('/register')">注册</span>
@@ -23,11 +23,11 @@
 </template>
 
 <script lang="ts" setup>
+import { useStore } from 'vuex'
 import { onMounted, onUnmounted, reactive } from 'vue'
 import { ElInput, ElButton } from 'element-plus'
-import { api } from '../api'
 import { Users } from '@boiling/core'
-import { useStore } from 'vuex'
+import { api } from '../api'
 
 type Account = Users.Status & {
   id: string
