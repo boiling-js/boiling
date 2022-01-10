@@ -32,6 +32,7 @@ module.exports = {
     'vue/html-closing-bracket-spacing': 'off',
     'vue/singleline-html-element-content-newline': 'off',
     'vue/max-attributes-per-line': 'off',
+    '@typescript-eslint/prefer-as-const': 'off',
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/ban-ts-ignore': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
