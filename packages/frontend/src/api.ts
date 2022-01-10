@@ -5,9 +5,12 @@ interface OfficialApi {
   users: QueryPromise<Pagination<Users.Out>, SearchQuery> & {
     add(d: Users.Register): Promise<Users.Out>
   }
-  user(id: number): {
+  user(id: number | '@me'): {
     status: {
       add(d: Users.Status): Promise<Users.Out>
+    }
+    friend(fUid: Pick<Users.Friend, 'id'>['id']): {
+      add(d: Omit<Users.Friend, 'id'>): Promise<void>
     }
   }
 }
