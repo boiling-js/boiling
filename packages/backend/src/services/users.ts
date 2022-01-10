@@ -70,15 +70,14 @@ export namespace UsersService {
      */
     export async function add(uid: number, fUid: number, opts?: Opts) {
       const [ user, friend ] = await Promise.all([UsersService.getOrThrow(uid), UsersService.getOrThrow(fUid)])
-      if (user.friends.findIndex(() => friend.id === fUid) !== -1)
+      if (user.friends.findIndex((item) => item.id === fUid) !== -1)
         throw new HttpError('CONFLICT', `${ friend.username }已经是你的好友`)
-
       user.friends.push({ id: fUid, ...opts })
       await user.save()
     }
     export async function del(uid: number, fUid: number) {
       const [ user, friend ] = await Promise.all([UsersService.getOrThrow(uid), UsersService.getOrThrow(fUid)])
-      const index = user.friends.findIndex(() => friend.id === fUid)
+      const index = user.friends.findIndex((item) => item.id === fUid)
       if (index === -1)
         throw new HttpError('NOT_FOUND', `${ friend.username }不是你的好友`)
       user.friends.splice(index, 1)
