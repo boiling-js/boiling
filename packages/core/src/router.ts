@@ -13,17 +13,17 @@ type OnlyOutRouterMethods<O extends Router.Options, Docs> = {
     P extends string, Res extends Schema,
     _P extends string = Router.ComputedPath<O, P>, _Res = From<Res>,
     Ctx = Router.Context<never, Router.ResolvePath<_P>>
-  >(out: Res, path: P, middleware: Router.MiddleWare<Ctx, _Res>) => R<O, extendObj<Docs, _P, { [K in Method]: Ctx }>>
+  >(out: Res, path: P, middleware: Router.MiddleWare<Ctx, _Res>) => Router<O, extendObj<
+    Docs, _P, { [K in Method]: Ctx }
+  >>
 }
 type WithInnRouterMethods<O extends Router.Options, Docs> = {
   [Method in Router.Methods]: <
     P extends string, Req extends Schema, Res extends Schema,
-    _P extends string = Router.ComputedPath<O, P>, _Res = From<Res>
-  >(
-    inn: Req, out: Res,
-    path: P, middleware: Router.MiddleWare<Router.Context<Req>, _Res>
-  ) => R<O, Router.ExtendDoc<
-    Docs, _P, Method, Router.Context<Req, Router.ResolveParam<_P>>
+    _P extends string = Router.ComputedPath<O, P>, _Res = From<Res>,
+    Ctx = Router.Context<never, Router.ResolvePath<_P>>
+  >(inn: Req, out: Res, path: P, middleware: Router.MiddleWare<Ctx, _Res>) => Router<O, extendObj<
+    Docs, _P, { [K in Method]: Ctx }
   >>
 }
 
@@ -46,6 +46,10 @@ export class Router<O extends Router.Options, Docs> {
     this.opts = Object.assign({}, opts)
     return Router.attach(this)
   }
+
+  dispatch(ctx: Koa.Context, next: Koa.Next) {
+    return next()
+  }
 }
 
 export namespace Router {
@@ -66,21 +70,24 @@ export namespace Router {
     })
   }
   export function attach<O extends Router.Options, Docs>(r: Router<O, Docs>) {
-    return new Proxy(r, {
+    const proxy: Router<O, Docs> = new Proxy(r, {
       get(target, p, receiver) {
         const method = p as Router.Methods
         if (Router.methods.includes(method))
           return proxyMiddleware((inn, out, path, middleware) => {
-            target.allowedMethods.push(method)
+            const params = resolvePath(path)
+            console.log(params)
             target.middlewares.push(middleware)
+            target.allowedMethods.push(method)
             target.docs = Object.assign(target.docs, {
               [path]: { [method]: inn }
             })
-            return target
+            return proxy
           })
         return Reflect.get(target, p, receiver)
       }
     })
+    return proxy
   }
   export type MiddleWare<CTX, Res> = (ctx: CTX) => Res | Promise<Res>
   export type Context<Body, Params = {}> = Koa.BaseContext & {
@@ -88,9 +95,8 @@ export namespace Router {
     body: Body
     params: Params
   }
-  export type ExtendDoc<O, K extends string, M extends string, Ctx extends Context<any>> = extendObj<O, K, { [m in M]: Ctx }>
-  export const methods = ['get', 'post', 'put', 'delete', 'patch', 'head']
   export type Methods = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head'
+  export const methods = ['get', 'post', 'put', 'delete', 'patch', 'head']
 
   export type Options = {
     prefix?: string
@@ -100,13 +106,19 @@ export namespace Router {
     number: Schema.number(),
     boolean: Schema.boolean()
   }
+  const paramTypesRegex = <Record<keyof PathParams, RegExp | undefined>>{
+    string: /[A-Za-z]+\w+/,
+    number: /(\-|\+)?\d+(\.\d+)?/,
+    boolean: /0|1|(F|false)|(T|true)/
+  }
   type innerParamTypes = typeof paramTypes
   export type InnerParamTypes = {
     [K in keyof innerParamTypes]: From<innerParamTypes[K]>
   }
-  export function extendParamTypes<T extends Schema>(name: keyof PathParams, paramType: T) {
+  export function extendParamTypes<T extends Schema>(name: keyof PathParams, paramType: T, r?: RegExp) {
     // @ts-ignore
     paramTypes[name] = paramType
+    paramTypesRegex[name] = r
   }
   export type ComputedPath<O extends Options, P extends string> = O['prefix'] extends undefined
     ? P : `${ O['prefix'] }${ P }`
@@ -118,8 +130,7 @@ export namespace Router {
         : {}
   export type ResolveParam<P extends string> =
     P extends `${ infer L }(${ infer Type })`
-      // @ts-ignore
-      ? extendObj<{}, L, Type extends keyof PathParams ? PathParams[Type] : PathParams[Type]>
+      ? extendObj<{}, L, Type extends keyof PathParams ? PathParams[Type] : never>
       : extendObj<{}, P, Schema<string>>
   function resolveDesc(desc?: string) {
     if (!desc)

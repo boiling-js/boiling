@@ -1,7 +1,8 @@
+import Koa from 'koa'
 import Schema from 'schemastery'
+import { expect } from 'chai'
 import { Router } from '@boiling/core'
 import resolvePath = Router.resolvePath
-import { expect } from 'chai'
 
 declare module '@boiling/core' {
   interface PathParams {
@@ -18,11 +19,12 @@ describe('Koa Router', () => {
     const r = new Router({
       prefix: '/users' as '/users'
     })
-      .get(StringOut, '/a/:name(number)', ctx => {
+      .get(StringOut, '/a/:name(string)', ctx => {
         ctx.params.name
       })
       .get(NumberOut, '/b', ctx => {
       })
+    r.dispatch(<Koa.Context>{  path: '/a/foo' }, async () => {})
   })
   it('should resolve path.', () => {
     const p0 = resolvePath('/foo/:foo')
@@ -42,7 +44,7 @@ describe('Koa Router', () => {
       .to.throw('expected number but got 1')
   })
   it('should extend path params.', function () {
-    Router.extendParamTypes('uid', Schema.union([Schema.number(), '@me']))
+    Router.extendParamTypes('uid', Schema.union([Schema.number(), '@me']), /(@me)|((\-|\+)?\d+(\.\d+)?)/)
     const p0 = resolvePath('/foo/:foo(uid)')
     p0.foo(1)
     p0.foo('@me')
