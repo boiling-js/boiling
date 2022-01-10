@@ -13,7 +13,7 @@
         .then(() => {
           $router.push('/home')
           $message.success('登陆成功')
-        }).catch(e => $message.error(`登录失败, ${ e }`))" v-text="'登录'"/>
+        }, e => $message.error(`登录失败, ${ e }`))" v-text="'登录'"/>
       <div class="register">
         需要新的账号？
         <span class="ln" @click="$router.push('/register')">注册</span>
