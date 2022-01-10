@@ -57,4 +57,5 @@ export namespace WS {
 }
 
 export * from './api'
+export * from './router'
 export { Utils } from './utils'
