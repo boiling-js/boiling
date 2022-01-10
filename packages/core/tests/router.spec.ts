@@ -12,13 +12,17 @@ declare module '@boiling/core' {
 describe('Koa Router', () => {
   it('should none.', () => {
     // const StringInn = Schema.string()
-    // const StringOut = Schema.string()
     // const NumberInn = Schema.number()
-    // const NumberOut = Schema.number()
-    // const r = new Router({
-    //   prefix: '/users' as '/users'
-    // }).get(StringOut, '/a/:name(number)', ctx => ctx)
-    //   .get(NumberOut, '/b', ctx => ctx)
+    const StringOut = Schema.string()
+    const NumberOut = Schema.number()
+    const r = new Router({
+      prefix: '/users' as '/users'
+    })
+      .get(StringOut, '/a/:name(number)', ctx => {
+        ctx.params.name
+      })
+      .get(NumberOut, '/b', ctx => {
+      })
   })
   it('should resolve path.', () => {
     const p0 = resolvePath('/foo/:foo')
