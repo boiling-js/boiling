@@ -25,7 +25,9 @@
         </div>
       </div>
     </div>
-    <div class="container"/>
+    <div class="container">
+      <Friend></Friend>
+    </div>
     <SearchFriend ref="searchFriend"/>
   </div>
 </template>
@@ -36,6 +38,7 @@ import { useStore } from 'vuex'
 import { ElTooltip, ElIcon } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
 import SearchFriend from '../components/SearchFriend.vue'
+import Friend from '../components/Friend.vue'
 
 const
   store = useStore(),
