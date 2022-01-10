@@ -49,16 +49,35 @@ export class Router<O extends Router.Options, Docs> {
 }
 
 export namespace Router {
+  function proxyMiddleware(
+    onApply: (inn: Schema<any>, out: Schema<any>, path: string, middleware: Router.MiddleWare<Context<any, any>, any>) => any
+  ) {
+    return new Proxy(() => {}, {
+      apply(_, __, args) {
+        let inn: Schema<any>, out: Schema<any>, path: string, middleware: Router.MiddleWare<Context<any, any>, any>
+        if (typeof args[1] === 'string') {
+          [out, path, middleware] = args
+          inn = Schema.any()
+        } else {
+          [inn, out, path, middleware] = args
+        }
+        return onApply(inn, out, path, middleware)
+      }
+    })
+  }
   export function attach<O extends Router.Options, Docs>(r: Router<O, Docs>) {
     return new Proxy(r, {
       get(target, p, receiver) {
-        if (Router.methods.includes(p as Router.Methods))
-          return new Proxy(() => {}, {
-            apply(_, __, args) {
-              target.allowedMethods.push(p as Router.Methods)
-            }
+        const method = p as Router.Methods
+        if (Router.methods.includes(method))
+          return proxyMiddleware((inn, out, path, middleware) => {
+            target.allowedMethods.push(method)
+            target.middlewares.push(middleware)
+            target.docs = Object.assign(target.docs, {
+              [path]: { [method]: inn }
+            })
+            return target
           })
-
         return Reflect.get(target, p, receiver)
       }
     })
