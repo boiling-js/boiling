@@ -20,13 +20,13 @@
           <div class="title">
             私信
             <span class="add material-icons md-light"
-                  @click="$refs.addFriend.show">add</span>
+                  @click="$refs.searchFriend.show">add</span>
           </div>
         </div>
       </div>
     </div>
     <div class="container"/>
-    <add-friend ref="addFriend"/>
+    <SearchFriend ref="searchFriend"/>
   </div>
 </template>
 
@@ -35,7 +35,7 @@ import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { ElTooltip, ElIcon } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
-import AddFriend from '../components/AddFriend.vue'
+import SearchFriend from '../components/SearchFriend.vue'
 
 const
   store = useStore(),

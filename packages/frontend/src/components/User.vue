@@ -35,7 +35,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="addUserDialog = false">取消</el-button>
-          <el-button type="primary" @click="add">确定</el-button>
+          <el-button type="primary" @click="add">下一步</el-button>
         </span>
       </template>
     </el-dialog>
