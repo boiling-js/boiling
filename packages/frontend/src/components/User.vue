@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import { Users } from '@boiling/core'
-import { ElDialog, ElInput, ElFormItem, ElSelect, ElOption, ElButton, ElMessageBox } from 'element-plus'
+import { ElDialog, ElInput, ElFormItem, ElSelect, ElOption, ElButton, ElMessageBox, ElMessage } from 'element-plus'
 import { api } from '../api'
 import { reactive, ref } from 'vue'
 
@@ -70,6 +70,7 @@ const
         tags: addUserForm.tags,
         remark: addUserForm.remark
       })
+      ElMessage.success('请求发送成功！')
     }).catch()
   }
 console.log(props.info)
