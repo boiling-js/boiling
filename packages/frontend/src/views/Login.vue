@@ -10,10 +10,10 @@
         <div class="bottom-word">记住密码</div>
       </div>
       <el-button type="primary" @click="login()
-        .then(() => Promise.all([
-          $message.success('登陆成功'),
+        .then(() => {
           $router.push('/home')
-        ])).catch(er => $message.error(`登录失败, ${ er }`))" v-text="'登录'"/>
+          $message.success('登陆成功')
+        }).catch(e => $message.error(`登录失败, ${ e }`))" v-text="'登录'"/>
       <div class="register">
         需要新的账号？
         <span class="ln" @click="$router.push('/register')">注册</span>
