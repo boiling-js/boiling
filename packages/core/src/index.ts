@@ -26,7 +26,9 @@ export namespace Users {
     /** 用户标签 */
     tags: string[]
   }
+  export type BaseOut = Omit<Base, 'passwordHash'>
   export type Out = Omit<Model, 'passwordHash'>
+  export type FriendOut = BaseOut & Friend
   export type Register = Omit<Base, 'id' | 'passwordHash' | 'avatar'> & {
     /** 用户密码 */
     password: string
