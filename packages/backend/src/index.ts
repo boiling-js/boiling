@@ -19,8 +19,8 @@ import { Middlewares } from './middlewares'
 
 app.ws.use(WSRouter)
 app
-  .use(logger())
   .use(staticMiddleware(resolve(__dirname, '../static')))
+  .use(logger())
   .use(bodyParser())
   .use(session(app))
   .use(Middlewares.handleErrors)
