@@ -1,5 +1,6 @@
 import { Utils } from './utils'
 import axios, { AxiosResponse, AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios'
+import qs from 'qs'
 
 type TwoParamsMethod = 'get' | 'delete' | 'head' | 'options'
 type ThreeParamsMethod = 'post' | 'put' | 'patch'
@@ -16,6 +17,9 @@ export type InnerAxiosInstance = Omit<AxiosInstance, 'request' | TwoParamsMethod
 } & {
   [K in ThreeParamsMethod]: ThreeParamsRequest
 }
+export type QueryPromise<T, Q> = Promise<T> & {
+  query(q: Q): Promise<T>
+}
 
 type promiseMethod = 'then' | 'catch' | 'finally'
 const promiseMethods = [ 'then', 'catch', 'finally' ]
@@ -28,13 +32,19 @@ const requestProxy = (a: Api, path: string, cPath = ''): Function => new Proxy((
       return getPromiseProp(
         a.$request.get(path + cPath), prop as promiseMethod)
     else {
-      switch (prop as 'add' | 'del' | 'upd') {
+      switch (prop as 'add' | 'del' | 'upd' | 'query') {
         case 'add':
           return (d: any) => a.$request.post(path + cPath, d)
         case 'del':
           return () => a.$request.delete(path + cPath)
         case 'upd':
           return (d: any) => a.$request.patch(path + cPath, d)
+        case 'query':
+          return new Proxy(() => {}, {
+            apply(target, thisArg, [ query ]): any {
+              return a.$request.get(`${path}${cPath}?${qs.stringify(query)}`)
+            }
+          })
       }
       return requestProxy(a, path, `/${prop}`)
     }

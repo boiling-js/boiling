@@ -1,7 +1,20 @@
 :root {
-  --bg-color-theme: #36393f;
-  --color-theme: #5865f2;
-  --border-radius-default: 5px;
-  --box-shadow-default: 5px 5px 15px #959598;
-  --color-title-default: white;
+  // 辅助色
+  --color-auxi-primary: #202225;
+  --color-auxi-regular: #282c34;
+  --color-auxi-secondary: #2c313a;
+  --color-auxi-placeholder: #333842;
+  // 文字色
+  --color-text-primary: var(--el-text-color-primary);
+  --color-text-regular: var(--el-text-color-regular);
+  --color-text-secondary: var(--el-text-color-secondary);
+  --color-text-placeholder: var(--el-text-color-placeholder);
+  // 主题色
+  --color-primary: var(--el-color-primary);
+
+  // 圆角
+  --border-radius: 5px;
+  // 阴影
+  --box-shadow: 0 0 16px #959598;
 }
+.material-icons.md-light { color: rgb(255 255 255 / 100%); }

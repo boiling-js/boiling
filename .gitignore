@@ -16,10 +16,12 @@ report.*.json
 
 .eslintcache
 .DS_Store
-.idea
 .vscode
 .yarn
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
+
+.idea/*
+!.idea/icon.png

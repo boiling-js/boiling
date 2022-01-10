@@ -1,11 +1,44 @@
-@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+@forward "element-plus/theme-chalk/src/common/var.scss" with (
   $colors: (
-    "primary": ("base": #5865f2)
+    "white": #202225,
+    "black": #ffffff,
+    "primary": (
+      "base": #5c6bc0
+    ),
+    "success": (
+      "base": #1abf73
+    ),
+    "warning": (
+      "base": #f5a623
+    ),
+    "danger": (
+      "base": #f55a4e
+    ),
+    "error": (
+      "base": #f55a4e
+    ),
+    "info": (
+      "base": #8f8f8f
+    )
+  ),
+  $text-color: (
+    "primary": #7f7f7f,
+    "regular": #afafaf,
+    "secondary": #dfdfdf,
+    "placeholder": #ffffff
   )
 );
 
 @use "element-plus/theme-chalk/src/index.scss" as *;
-
 .el-icon {
-  font-size: var(--font-size) !important;
+  font-size: var(--font-size);
+}
+.el-overlay {
+  top: 31px;
+  right: 5px;
+  bottom: 5px;
+  left: 5px;
+  height: calc(100% - 36px);
+  background-color: rgb(0 0 0 / 80%);
+  border-radius: 0 0 6px 6px;
 }

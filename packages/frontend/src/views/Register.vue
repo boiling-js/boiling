@@ -10,46 +10,43 @@
         class="demo-ruleForm"
         label-position="top"
         size="small">
-        <el-form-item label="用户名:" prop="nickname" required>
-          <el-input v-model="newAccount.nickname"></el-input>
+        <el-form-item label="用户名:" prop="username" required>
+          <el-input v-model="newAccount.username"/>
         </el-form-item>
         <el-form-item label="密码:" prop="password" required>
-          <el-input v-model="newAccount.password"  type="password"></el-input>
+          <el-input v-model="newAccount.password" type="password"/>
         </el-form-item>
         <el-form-item label="确认密码:" prop="confirmPassword" required>
-          <el-input v-model="newAccount.confirmPassword" type="password"></el-input>
+          <el-input v-model="newAccount.confirmPassword" type="password"/>
         </el-form-item>
       </el-form>
-      <el-button
-        class="btn"
-        type="primary"
-        @click="register">继续</el-button>
-      <div class="login">已有账号？ <span class="click" @click="login">直接登录</span></div>
+      <el-button type="primary" @click="register">确认</el-button>
+      <div class="login">已有账号？ <span class="ln" @click="login">直接登录</span></div>
     </div>
   </div>
-
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { onMounted, onUnmounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 import { ElForm, ElFormItem, ElInput, ElButton, ElMessageBox, ElMessage } from 'element-plus'
+import { api } from '../api'
+import { Users } from '@boiling/core'
+import store from '../store'
 
-interface NewAccount {
-  nickname: string,
-  password: string,
+type NewAccount =  Omit<Users.Register, 'avatar'> & {
   confirmPassword: string
 }
 
-const newAccount = reactive<NewAccount>({
-  nickname: '',
-  password: '',
-  confirmPassword: ''
-}),
+const
+  newAccount = reactive<NewAccount>({
+    username: '',
+    password: '',
+    confirmPassword: ''
+  }),
   router = useRouter(),
   rules = {
-    nickname: {
+    username: {
       required: true,
       message: '请输入用户名',
       trigger: 'blur'
@@ -76,30 +73,34 @@ const newAccount = reactive<NewAccount>({
       }
     })
   },
-  register = () => {
-    if (newAccount.password !== newAccount.confirmPassword) {
-      ElMessage.error('密码不一致，请保持密码与确认密码一致')
-      return
+  register = async () => {
+    try {
+      if (newAccount.password !== newAccount.confirmPassword)
+        throw new Error('密码不一致，请保持密码与确认密码一致')
+      const { confirmPassword: _, ...register } = newAccount
+      const resp = await api.users.add(register)
+      openMessageBox(resp.id)
+      ElMessage.success('账号注册成功！')
+    } catch (e) {
+      if (e instanceof Error)
+        ElMessage.error(e.toString())
+      else
+        throw e
     }
-    axios.post('/api/users', {
-      username: newAccount.nickname,
-      password: newAccount.password
-    })
-      .then(function (response) {
-        ElMessage.success('账号注册成功！')
-        openMessageBox(response.data.id)
-        console.log(response)
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
   }
+
+onMounted(() => {
+  store.commit('setLeftSelectorHidden', true)
+})
+onUnmounted(() => {
+  store.commit('toggleLeftSelector')
+})
 </script>
 
 <style lang="scss" scoped>
 .register-box {
   $w: 50vh;
-  $h: 55Vh;
+  $h: 55vh;
   $p: 40px;
   > .register {
     position: fixed;
@@ -108,23 +109,23 @@ const newAccount = reactive<NewAccount>({
     padding: $p;
     width: $w;
     height: $h;
-    color: var(--color-title-default);
-    background-color: var(--bg-color-theme);
-    border-radius: var(--border-radius-default);
-    box-shadow: var(--box-shadow-default);
+    color: var(--color-text-primary);
+    background-color: var(--color-auxi-primary);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
     > .title {
       text-align: center;
     }
-    > .btn {
+    > .el-button {
       margin: 10px 0;
       width: $w;
     }
-    >.login {
+    > .login {
       font-size: 10px;
-      > .click {
+      > .ln {
         cursor: pointer;
         &:hover {
-          color: var(--color-theme);
+          color: var(--color-primary);
         }
       }
     }

@@ -7,21 +7,23 @@ export interface HttpError {
   new(key: Status, msg: string): this
 }
 
+function genCode(key: any) {
+  switch (typeof key) {
+    case 'string':
+      return StatusCodes[key as Status]
+    case 'number':
+      return key as StatusCodes
+    default:
+      throw new Error('Not support type for key.')
+  }
+}
+
 export class HttpError extends Error {
   msg: string
   code: StatusCodes
   constructor(key: any, msg: string) {
-    super()
+    super(`[${ genCode(key) }] ${ msg }`)
     this.msg = msg
-    switch (typeof key) {
-      case 'string':
-        this.code = StatusCodes[key as Status]
-        break
-      case 'number':
-        this.code = key as StatusCodes
-        break
-      default:
-        throw new Error('Not support type for key.')
-    }
+    this.code = genCode(key)
   }
 }

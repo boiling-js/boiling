@@ -3,13 +3,13 @@ import { AxiosInstance } from 'axios'
 import { expect, use } from 'chai'
 import cap from 'chai-as-promised'
 
-import { Api, attachApi } from '../src/api'
+import { Api, attachApi, QueryPromise } from '../src/api'
 
 use(cap)
 
 describe('Api', function () {
   interface Foo {
-    get guilds(): Promise<any[]> & {
+    get guilds(): QueryPromise<any[], { key: string }> & {
       add(nGuild: string): Promise<string>
     }
     guild(id: string): Promise<any> & {
@@ -115,5 +115,13 @@ describe('Api', function () {
     await foo.guilds.catch(error => {
       expect(error.message).to.equal('test2-404event')
     })
+  })
+
+  it('should parse query string.', async () => {
+    new MockAdapter(foo.$request as AxiosInstance)
+      .onGet('/guilds?key=test')
+      .replyOnce(200, 'test')
+    expect(await foo.guilds.query({ key: 'test' }))
+      .to.equal('test')
   })
 })

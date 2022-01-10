@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 const router = createRouter({
   history: createWebHistory(),
   routes: [{
-    path: '/', redirect: '/login'
+    path: '/', redirect: '/home'
   }, {
     path: '/home',
     name: 'home',
@@ -16,6 +16,9 @@ const router = createRouter({
     path: '/register',
     name: 'register',
     component: () => import('./views/Register.vue')
+  }, {
+    path: '/theme',
+    component: () => import('./views/Theme.vue')
   }, {
     path: '/:pathMatch(.*)*',
     component: () => import('element-plus').then(({ ElEmpty }) => ElEmpty),
