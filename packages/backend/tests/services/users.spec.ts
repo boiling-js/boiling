@@ -75,4 +75,30 @@ describe('Users Service', function () {
     expect(addFriendUser?.friends[0].id).to.be.eq(fId)
     expect(addFriendUser?.friends[1].id).to.be.eq(fId1)
   })
+  it('should get friends', async function () {
+    const [ user, friend, friend1, friend2 ] = await Promise.all([
+      UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' }),
+      UsersService.add({ username: 'testFriend', passwordHash: 'testFriend', avatar: 'testFriend' }),
+      UsersService.add({ username: 'testFriend1', passwordHash: 'testFriend1', avatar: 'testFriend1' }),
+      UsersService.add({ username: 'testFriend2', passwordHash: 'testFriend2', avatar: 'testFriend2' })
+    ])
+    const id = user.id
+    await UsersService.Friends.add(id, friend.id, {
+      tags: ['tag0'],
+      remark: 'remark0'
+    })
+    await UsersService.Friends.add(id, friend1.id, {
+      tags: ['tag1'],
+      remark: 'remark1'
+    })
+    await UsersService.Friends.add(id, friend2.id, {
+      tags: ['tag2'],
+      remark: 'remark2'
+    })
+    const addFriend = await UsersService.Friends.get(id)
+    for (let i = 0; i < addFriend.length; i++) {
+      expect(addFriend[i].tags).to.be.deep.eq([`tag${i}`])
+      expect(addFriend[i].remark).to.be.eq(`remark${i}`)
+    }
+  })
 })

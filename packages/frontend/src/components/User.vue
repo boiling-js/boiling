@@ -50,7 +50,7 @@ import { reactive, ref } from 'vue'
 
 const
   props = defineProps<{
-    info: Users.Out
+    info: Users.Out | Users.FriendOut
   }>(),
   addUserDialog = ref(false),
   addUserForm = reactive<Omit<Users.Friend, 'id'>>({
@@ -73,7 +73,6 @@ const
       ElMessage.success('请求发送成功！')
     }).catch()
   }
-console.log(props.info)
 </script>
 
 <style lang="scss" scoped>

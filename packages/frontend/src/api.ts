@@ -9,6 +9,9 @@ interface OfficialApi {
     status: {
       add(d: Users.Status): Promise<Users.Out>
     }
+    friends: Promise<Users.FriendOut[]> & {
+      add(d: Omit<Users.Friend, 'id'>): Promise<void>
+    }
     friend(fUid: Pick<Users.Friend, 'id'>['id']): {
       add(d: Omit<Users.Friend, 'id'>): Promise<void>
     }

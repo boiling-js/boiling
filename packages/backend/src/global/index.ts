@@ -1,5 +1,6 @@
 import { Users } from '@boiling/core'
 import { HttpError as _HttpError } from './HttpError'
+import 'koa-session'
 
 declare global {
   const HttpError: _HttpError

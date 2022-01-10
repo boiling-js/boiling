@@ -52,16 +52,21 @@ export const router = new Router<{}, AppContext>({
         return
     }
   })
-  .post('/:id/friends/:uid', async ctx => {
+  .post('/:id/friends/:uid', ctx => {
     let tId: number
     const { id } = ctx.params
     id === '@me'
       ? (tId = useCurUser(ctx.session).id)
       : (tId = +id)
-    return await UsersService.Friends.add(tId, +ctx.params.uid, <Users.Friend>ctx.request.body)
+    return UsersService.Friends.add(tId, +ctx.params.uid, <Users.Friend>ctx.request.body)
   })
-  .get('/:id/friends', async ctx => {
-    return []
+  .get('/:id/friends', ctx => {
+    let tId: number
+    const { id } = ctx.params
+    id === '@me'
+      ? (tId = useCurUser(ctx.session).id)
+      : (tId = +id)
+    return UsersService.Friends.get(tId)
   })
   .get('/:id/channels', async ctx => {
     return []

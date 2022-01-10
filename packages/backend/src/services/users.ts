@@ -43,8 +43,10 @@ export namespace UsersService {
         throw new Error('Not support type.')
     }
   }
-  export async function getOrThrow(val: number | string) {
-    const m = await UsersService.get(val)
+  type GetReturnType = ReturnType<typeof get>
+  export async function getOrThrow(val: number | string, callback?: (user: GetReturnType) => void) {
+    const t = get(val)
+    const m = await (callback ? callback(t) : t)
     if (!m)
       throw new HttpError('NOT_FOUND', `id 为 '${ val }' 的用户不存在`)
     return m
@@ -82,6 +84,17 @@ export namespace UsersService {
         throw new HttpError('NOT_FOUND', `${ friend.username }不是你的好友`)
       user.friends.splice(index, 1)
       await user.save()
+    }
+    export async function get(uid: number) {
+      const target = await UsersService.getOrThrow(uid)
+      return Promise.all(target.friends.map(
+        async friend => Object.assign((
+          (await UsersService.getOrThrow(friend.id, m => m.select({ friends: 0 })))
+        )?.toJSON(), {
+          tags: friend.tags,
+          remark: friend.remark
+        }))
+      )
     }
   }
 }
