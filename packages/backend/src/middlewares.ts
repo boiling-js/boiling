@@ -15,6 +15,8 @@ export namespace Middlewares {
     }
   }
   export async function returnBody(ctx: AppContext, next: Koa.Next) {
-    ctx.body = await next()
+    const body = await next()
+    if (!ctx.body)
+      ctx.body = body
   }
 }
