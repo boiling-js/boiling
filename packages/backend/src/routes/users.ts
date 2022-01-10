@@ -17,16 +17,16 @@ export const router = new Router<{}, AppContext>({
       passwordHash: Security.encrypt(password),
       avatar: `/img/avatar/${ Math.floor(Math.random() * 10) }.jpg`
     })
-    ctx.body = { id: user.id, username: user.username, avatar: user.avatar }
+    return { id: user.id, username: user.username, avatar: user.avatar }
   })
   .get('/', async ctx => {
-    ctx.body = await usePagination(
+    return usePagination(
       UsersService, <SearchQuery>ctx.query
       // @ts-ignore
     )<Users.Out>(item => (delete item._doc.passwordHash) && item)
   })
   .get('/:id', async ctx => {
-    ctx.body = await UsersService.get(ctx.params.id)
+    return UsersService.get(ctx.params.id)
   })
   .post('/:id/status', async ctx => {
     const {
@@ -46,12 +46,10 @@ export const router = new Router<{}, AppContext>({
           ctx.session.curUser = <Users.Out><any>user
         else
           throw new HttpError('INTERNAL_SERVER_ERROR', '服务器内部错误')
-        ctx.body = user
-        break
+        return user
       case 'offline':
         ctx.session && delete ctx.session.curUser
-        ctx.body = 'you logout.'
-        break
+        return
     }
   })
   .post('/:id/friends/:uid', async ctx => {
@@ -60,13 +58,13 @@ export const router = new Router<{}, AppContext>({
     id === '@me'
       ? (tId = useCurUser(ctx.session).id)
       : (tId = +id)
-    ctx.body = await UsersService.Friends.add(tId, +ctx.params.uid, <Users.Friend>ctx.request.body)
+    return await UsersService.Friends.add(tId, +ctx.params.uid, <Users.Friend>ctx.request.body)
   })
   .get('/:id/friends', async ctx => {
-    ctx.body = []
+    return []
   })
   .get('/:id/channels', async ctx => {
-    ctx.body = []
+    return []
   })
   .del('/:id/channels/:cid', async ctx => {
     console.log(ctx.params)
