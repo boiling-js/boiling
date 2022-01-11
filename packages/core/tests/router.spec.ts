@@ -11,7 +11,23 @@ declare module '@boiling/core' {
 }
 
 describe('Koa Router', () => {
-  it('should none.', (done) => {
+  it('should reveal router middlewares.', (done) => {
+    const isReveal = {
+      b: false,
+      hhh: false,
+      aNameIsAhh: false,
+      cIdIs1001: false
+    }
+    const shouldDone = () => {
+      try {
+        Object.entries(isReveal).forEach(([k, v]) => {
+          expect(v, `isReveal.${k}`).to.be.eq(true)
+        })
+        done()
+      } catch (e) {
+        done(e)
+      }
+    }
     // const StringInn = Schema.string()
     // const NumberInn = Schema.number()
     const StringOut = Schema.string()
@@ -20,32 +36,26 @@ describe('Koa Router', () => {
       prefix: '/users' as '/users'
     })
       .get(StringOut, '/a/:name(string)', ctx => {
-        try {
-          expect(ctx.params.name).to.be.eq('ahh')
-          done()
-        } catch (e) {
-          done(e)
-        }
+        if (ctx.params.name === 'ahh')
+          isReveal.aNameIsAhh = true
       })
-      .get(NumberOut, '/b', ctx => {
-        try {
-          expect(true).to.be.true
-        } catch (e) {
-          done(e)
-        }
+      .get(NumberOut, '/b', () => {
+        isReveal.b = true
       })
-    const createCtx = (method: Router.Methods, path: string) =>  <Koa.Context>{
+      .get(StringOut, '/c/:id(number)', ctx => {
+        if (ctx.params.id === 1001)
+          isReveal.cIdIs1001 = true
+        shouldDone()
+      })
+    const createCtx = (method: Router.Methods, path: string) => <Koa.Context>{
       method, path
     }
     r.middleware(createCtx('get', '/hhh'), () => {
-      try {
-        expect(true).to.be.true
-      } catch (e) {
-        done(e)
-      }
+      isReveal.hhh = true
     })
-    r.middleware(createCtx('get', '/users/b'), () => {})
     r.middleware(createCtx('get', '/users/a/ahh'), () => {})
+    r.middleware(createCtx('get', '/users/b'), () => {})
+    r.middleware(createCtx('get', '/users/c/1001'), () => {})
   })
   describe('Path', () => {
     it('should resolve path.', () => {

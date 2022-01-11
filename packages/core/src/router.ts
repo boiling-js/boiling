@@ -24,11 +24,15 @@ type extendObj<O, K extends string, V> = O & { [key in K]: V }
 export interface PathParams extends Router.InnerParamTypes {
 }
 
+type Params2Record<O extends Record<string, Router.ParamType<Schema<any>>>> = {
+  [K in keyof O]: O[K] extends Router.ParamType<Schema<infer S>> ? S : never
+}
+
 type OnlyOutRouterMethods<O extends Router.Options, Docs> = {
   [Method in Router.Methods]: <
     P extends string, Res extends Schema,
     _P extends string = Router.ComputedPath<O, P>, _Res = From<Res>,
-    Ctx = Router.Context<never, Router.ResolvePath<_P>>
+    Ctx = Router.Context<never, Params2Record<Router.ResolvePath<_P>>>
   >(out: Res, path: P, middleware: Router.MiddleWare<Ctx, _Res>) => Router<O, extendObj<
     Docs, _P, { [K in Method]: Ctx }
   >>
@@ -59,6 +63,7 @@ export class Router<O extends Router.Options, Docs> {
   middlewareMapper = (<Router.Methods[]>Router.methods).reduce(
     (acc, method) => (acc[method] = []) && acc,
     {} as { [key in Router.Methods]: {
+      paramTypes: Record<string, Router.ParamType<Schema<any>>>
       pathRegexp: RegExp
       middlewares: Router.MiddleWare<Router.Context<From<Schema>>, From<Schema>>[]
     }[] }
@@ -78,7 +83,7 @@ export class Router<O extends Router.Options, Docs> {
     for (const item of this.middlewareMapper[method]) {
       if (item.pathRegexp.test(ctx.path)) {
         const ctx2 = Object.assign(ctx, {
-          params: {}
+          params: Router.resolveSource(ctx.path, item.paramTypes)
         })
         return item.middlewares.reduce(
           // @ts-ignore
@@ -120,6 +125,7 @@ export namespace Router {
             )}`)
             target.allowedMethods.push(method)
             target.middlewareMapper[method].push({
+              paramTypes: params,
               pathRegexp: regExp,
               middlewares: [middleware]
             })
@@ -172,7 +178,7 @@ export namespace Router {
     paramTypes[name] = paramType
     paramTypesRegex[name] = r
   }
-  type ParamType<S extends Schema> = {
+  export type ParamType<S extends Schema> = {
     pre: string
     type: keyof PathParams
     regex: RegExp
