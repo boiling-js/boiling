@@ -22,7 +22,11 @@ export const router = new Router<{}, AppContext>({
   })
   .get('/', async ctx => {
     return usePagination(
-      extendService(UsersService, 'search', m => m), <SearchQuery>ctx.query
+      extendService(UsersService, 'search', m => m.find({
+        id: {
+          $ne: ctx.session?.curUser?.id
+        }
+      })), <SearchQuery>ctx.query
       // @ts-ignore
     )<Users.Out>(item => (delete item._doc.passwordHash) && item)
   })
