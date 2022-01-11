@@ -6,6 +6,7 @@ import { UsersService } from '../services/users'
 import { Security } from '../utils'
 import usePagination from '../hooks/usePagination'
 import useCurUser from '../hooks/useCurUser'
+import extendService from '../hooks/extendService'
 
 export const router = new Router<{}, AppContext>({
   prefix: '/users'
@@ -21,7 +22,7 @@ export const router = new Router<{}, AppContext>({
   })
   .get('/', async ctx => {
     return usePagination(
-      UsersService, <SearchQuery>ctx.query
+      extendService(UsersService, 'search', m => m), <SearchQuery>ctx.query
       // @ts-ignore
     )<Users.Out>(item => (delete item._doc.passwordHash) && item)
   })
