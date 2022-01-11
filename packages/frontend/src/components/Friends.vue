@@ -15,20 +15,19 @@
       <el-tab-pane label="已屏蔽">已屏蔽</el-tab-pane>
     </el-tabs>
   </div>
-  <Chat
+  <chat-room
     v-else
     :friend="chatFriend"
-    @back="isChatting = false"
-  />
+    @back="isChatting = false"/>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { ElTabs, ElTabPane } from 'element-plus'
 import { Users } from '@boiling/core'
 import { api } from '../api'
 import User from './User.vue'
-import Chat from './Chat.vue'
+import ChatRoom from './ChatRoom.vue'
 
 const friends = ref<Users.FriendOut[]>([]),
   isChatting = ref<boolean>(false),
