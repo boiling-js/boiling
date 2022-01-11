@@ -19,7 +19,7 @@ export default function extendService<
     get(target, prop: M) {
       const pre = target[prop]
       if (prop === property && typeof pre === 'function') {
-        return callback(pre())
+        return (...args: Parameters<S[M]>) => callback(pre(...args))
       }
       return target[prop]
     }
