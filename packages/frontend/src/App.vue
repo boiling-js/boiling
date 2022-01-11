@@ -58,20 +58,18 @@ div.container {
   width: 100%;
   height: calc(100% - #{$h});
   justify-content: space-between;
+  background-color: var(--color-auxi-primary);
   &.loading {
     justify-content: center;
     align-items: center;
-    background-color: #202225;
   }
   > div.l {
     width: 70px;
     height: 100%;
-    background-color: #202225;
   }
   > div.r {
     flex-grow: 1;
     height: 100%;
-    background-color: #fff;
   }
 }
 </style>
