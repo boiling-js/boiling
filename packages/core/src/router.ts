@@ -128,17 +128,25 @@ export namespace Router {
       : P extends `${ infer _L }/:${ infer Param }`
         ? ResolveParam<Param>
         : {}
+  type ParamType<S extends Schema> = {
+    regex: RegExp
+    schema: S
+  }
   export type ResolveParam<P extends string> =
     P extends `${ infer L }(${ infer Type })`
-      ? extendObj<{}, L, Type extends keyof PathParams ? PathParams[Type] : never>
-      : extendObj<{}, P, Schema<string>>
+      ? extendObj<{}, L, ParamType<Type extends keyof PathParams ? PathParams[Type] : never>>
+      : extendObj<{}, P, ParamType<Schema<string>>>
   function resolveDesc(desc?: string) {
     if (!desc)
       desc = '(string)'
     const [, type] = desc.match(/^\((.*)\)$/) || []
     if (type in paramTypes)
-      // @ts-ignore
-      return paramTypes[type]
+      return {
+        // @ts-ignore
+        regex: paramTypesRegex[type],
+        // @ts-ignore
+        schema: paramTypes[type]
+      }
     else
       throw new Error(`Unsupported param type: ${ type }`)
   }
