@@ -58,9 +58,27 @@ describe('Koa Router', () => {
         .to.throw('expected string but got 1')
     })
     it('should resolve source.', () => {
-      console.log(
-        resolveSource('/foo/hi', resolvePath('/foo/:foo'))
-      )
+      expect(resolveSource('/foo/hi', resolvePath('/foo/:foo')).foo)
+        .to.be.eq('hi')
+      const n = resolvePath('/foo/:foo(number)')
+      Object.entries({
+        '/foo/123': 123,
+        '/foo/0.123': 0.123,
+        '/foo/+23': 23,
+        '/foo/-23': -23
+      }).forEach(([path, value]) => {
+        expect(resolveSource(path, n).foo)
+          .to.be.eq(value)
+      })
+      const b = resolvePath('/foo/:foo(boolean)')
+      Object.entries({
+        '/foo/true': true,
+        '/foo/false': false,
+        '/foo/0': false
+      }).forEach(([path, value]) => {
+        expect(resolveSource(path, b).foo)
+          .to.be.eq(value)
+      })
     })
     describe('Params', () => {
       it('should resolve path which param type is string.', () => {
@@ -82,6 +100,17 @@ describe('Koa Router', () => {
         // @ts-ignore
         expect(p0.foo.schema.bind(null, '1'))
           .to.throw('expected number but got 1')
+      })
+      it('should resolve path which param type is boolean.', () => {
+        const p0 = resolvePath('/foo/:foo(boolean)')
+        p0.foo.schema(true)
+        ;['true', 'false', '0'].forEach(v => {
+          expect(p0.foo.regex.test(v))
+            .to.be.eq(true)
+        })
+        // @ts-ignore
+        expect(p0.foo.schema.bind(null, '1'))
+          .to.throw('expected boolean but got 1')
       })
       it('should extend path params.', () => {
         Router.extendParamTypes('uid', Schema.union([Schema.number(), '@me']), /(@me)|((\-|\+)?\d+(\.\d+)?)/)

@@ -2,6 +2,22 @@ import Koa from 'koa'
 import Schema from 'schemastery'
 import From = Schema.From
 
+declare module 'schemastery' {
+  interface Schema<S = any, T = S> {
+    processor(processor: (o: any) => S): Schema<S, T>
+  }
+  namespace Schema {
+    interface Meta<T = any> {
+      processor: (o: any) => T
+    }
+  }
+}
+Schema.prototype.processor = function (processor) {
+  if (this.meta)
+    this.meta.processor = processor
+  return this
+}
+
 type extendObj<O, K extends string, V> = O & { [key in K]: V }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -131,8 +147,8 @@ export namespace Router {
   }
   const paramTypes = {
     string: Schema.string(),
-    number: Schema.number(),
-    boolean: Schema.boolean()
+    number: Schema.number().processor(Number),
+    boolean: Schema.boolean().processor(Boolean)
   }
   const paramTypesRegex = <Record<keyof PathParams, RegExp | undefined>>{
     string: /[A-Za-z]+\w+/,
@@ -196,13 +212,17 @@ export namespace Router {
     }
     return params as any as ResolvePath<P>
   }
-  export function resolveSource(source: string, rules: {
+  export function resolveSource<Rules extends {
     [name in string]: ParamType<Schema<any>>
-  }) {
+  }, R = {
+    [name in keyof Rules]: From<Rules[name]['schema']>
+  }>(source: string, rules: Rules): R {
     return Object.entries(rules).reduce((acc, [name, { pre, regex, schema }]) => {
       const param = new RegExp(`${ pre }/(${ regex.source })`).exec(source)?.[1] ?? undefined
-      schema(param)
-      acc[name] = param
+      acc[name] = schema(schema.meta
+        ? schema.meta.processor?.(param) ?? param
+        : param
+      )
       return acc
     }, {} as any)
   }
