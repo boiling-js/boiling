@@ -67,7 +67,7 @@
 
 <script setup lang="ts">
 import { Users } from '@boiling/core'
-import { ElDialog, ElInput, ElFormItem, ElSelect, ElOption, ElButton, ElMessageBox, ElMessage } from 'element-plus'
+import { ElDialog, ElInput, ElForm, ElFormItem, ElSelect, ElOption, ElButton, ElMessageBox, ElMessage } from 'element-plus'
 import { api } from '../api'
 import { nextTick, onMounted, reactive, ref } from 'vue'
 import { useStore } from 'vuex'
