@@ -2,7 +2,7 @@ import Koa from 'koa'
 import Schema from 'schemastery'
 import { expect } from 'chai'
 import { Router } from '@boiling/core'
-import resolvePath = Router.resolvePath
+const { resolvePath, resolveSource } = Router
 
 declare module '@boiling/core' {
   interface PathParams {
@@ -11,7 +11,7 @@ declare module '@boiling/core' {
 }
 
 describe('Koa Router', () => {
-  it('should none.', () => {
+  it('should none.', (done) => {
     // const StringInn = Schema.string()
     // const NumberInn = Schema.number()
     const StringOut = Schema.string()
@@ -20,50 +20,84 @@ describe('Koa Router', () => {
       prefix: '/users' as '/users'
     })
       .get(StringOut, '/a/:name(string)', ctx => {
-        ctx.params.name
+        try {
+          expect(ctx.params.name).to.be.eq('ahh')
+          done()
+        } catch (e) {
+          done(e)
+        }
       })
       .get(NumberOut, '/b', ctx => {
+        try {
+          expect(true).to.be.true
+        } catch (e) {
+          done(e)
+        }
       })
-    r.dispatch(<Koa.Context>{  path: '/a/foo' }, async () => {})
-  })
-  it('should resolve path.', () => {
-    const p0 = resolvePath('/foo/:foo')
-    p0.foo.schema('1')
-    expect(p0.foo.regex.test('ahhh'))
-      .to.be.eq(true)
-    // @ts-ignore
-    expect(p0.foo.schema.bind(null, 1))
-      .to.throw('expected string but got 1')
-    const p1 = resolvePath('/foo/:foo(string)')
-    p1.foo.schema('1')
-    expect(p1.foo.regex.test('ahhh'))
-      .to.be.eq(true)
-    // @ts-ignore
-    expect(p1.foo.schema.bind(null, 1))
-      .to.throw('expected string but got 1')
-    const p2 = resolvePath('/foo/:foo(number)')
-    p2.foo.schema(1)
-    ;['1', '1.111', '-10', '-10.01'].forEach(v => {
-      expect(p2.foo.regex.test(v))
-        .to.be.eq(true)
+    const createCtx = (method: Router.Methods, path: string) =>  <Koa.Context>{
+      method, path
+    }
+    r.middleware(createCtx('get', '/hhh'), () => {
+      try {
+        expect(true).to.be.true
+      } catch (e) {
+        done(e)
+      }
     })
-    // @ts-ignore
-    expect(p2.foo.schema.bind(null, '1'))
-      .to.throw('expected number but got 1')
+    r.middleware(createCtx('get', '/users/b'), () => {})
+    r.middleware(createCtx('get', '/users/a/ahh'), () => {})
   })
-  it('should extend path params.', function () {
-    Router.extendParamTypes('uid', Schema.union([Schema.number(), '@me']), /(@me)|((\-|\+)?\d+(\.\d+)?)/)
-    const p0 = resolvePath('/foo/:foo(uid)')
-    p0.foo.schema(1)
-    p0.foo.schema('@me')
-    ;['1', '1.111', '-10', '-10.01', '@me'].forEach(v => {
-      expect(p0.foo.regex.test(v))
+  describe('Path', () => {
+    it('should resolve path.', () => {
+      const p0 = resolvePath('/foo/:foo')
+      p0.foo.schema('1')
+      expect(p0.foo.regex.test('ahhh'))
         .to.be.eq(true)
+      // @ts-ignore
+      expect(p0.foo.schema.bind(null, 1))
+        .to.throw('expected string but got 1')
     })
-    expect(p0.foo.regex.test('foo'))
-      .to.be.eq(false)
-    // @ts-ignore
-    expect(p0.foo.schema.bind(null, '1'))
-      .to.throw('expected function () { [native code] } but got "1"')
+    it('should resolve source.', () => {
+      console.log(
+        resolveSource('/foo/hi', resolvePath('/foo/:foo'))
+      )
+    })
+    describe('Params', () => {
+      it('should resolve path which param type is string.', () => {
+        const p0 = resolvePath('/foo/:foo(string)')
+        p0.foo.schema('1')
+        expect(p0.foo.regex.test('ahhh'))
+          .to.be.eq(true)
+        // @ts-ignore
+        expect(p0.foo.schema.bind(null, 1))
+          .to.throw('expected string but got 1')
+      })
+      it('should resolve path which param type is number.', () => {
+        const p0 = resolvePath('/foo/:foo(number)')
+        p0.foo.schema(1)
+        ;['1', '1.111', '-10', '-10.01'].forEach(v => {
+          expect(p0.foo.regex.test(v))
+            .to.be.eq(true)
+        })
+        // @ts-ignore
+        expect(p0.foo.schema.bind(null, '1'))
+          .to.throw('expected number but got 1')
+      })
+      it('should extend path params.', () => {
+        Router.extendParamTypes('uid', Schema.union([Schema.number(), '@me']), /(@me)|((\-|\+)?\d+(\.\d+)?)/)
+        const p0 = resolvePath('/foo/:foo(uid)')
+        p0.foo.schema(1)
+        p0.foo.schema('@me')
+        ;['1', '1.111', '-10', '-10.01', '@me'].forEach(v => {
+          expect(p0.foo.regex.test(v))
+            .to.be.eq(true)
+        })
+        expect(p0.foo.regex.test('foo'))
+          .to.be.eq(false)
+        // @ts-ignore
+        expect(p0.foo.schema.bind(null, '1'))
+          .to.throw('expected function () { [native code] } but got "1"')
+      })
+    })
   })
 })
