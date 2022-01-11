@@ -5,8 +5,8 @@ import { AppContext } from '../'
 import { UsersService } from '../services/users'
 import { Security } from '../utils'
 import usePagination from '../hooks/usePagination'
-import useCurUser from '../hooks/useCurUser'
 import extendService from '../hooks/extendService'
+import useTarget from '../hooks/useTarget'
 
 export const router = new Router<{}, AppContext>({
   prefix: '/users'
@@ -58,20 +58,12 @@ export const router = new Router<{}, AppContext>({
     }
   })
   .post('/:id/friends/:uid', ctx => {
-    let tId: number
-    const { id } = ctx.params
-    id === '@me'
-      ? (tId = useCurUser(ctx.session).id)
-      : (tId = +id)
-    return UsersService.Friends.add(tId, +ctx.params.uid, <Users.Friend>ctx.request.body)
+    return UsersService.Friends.add(
+      useTarget(ctx.params, ctx.session,'id'),
+      +ctx.params.uid, <Users.Friend>ctx.request.body)
   })
   .get('/:id/friends', ctx => {
-    let tId: number
-    const { id } = ctx.params
-    id === '@me'
-      ? (tId = useCurUser(ctx.session).id)
-      : (tId = +id)
-    return UsersService.Friends.get(tId)
+    return UsersService.Friends.get(useTarget(ctx.params, ctx.session,'id'))
   })
   .get('/:id/channels', async ctx => {
     return []
