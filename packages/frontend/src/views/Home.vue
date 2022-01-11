@@ -13,9 +13,9 @@
         </el-tooltip>
       </div>
       <div class="chat-bar">
-        <section>好友</section>
-        <section>频道</section>
-        <section>讨论组</section>
+        <section @click="chatType = 'friend'">好友</section>
+        <section @click="chatType = 'channel'">频道</section>
+        <section @click="chatType = 'group'">讨论组</section>
         <div class="chats">
           <div class="title">
             私信
@@ -26,23 +26,27 @@
       </div>
     </div>
     <div class="container">
-      <Friend></Friend>
+      <Friend
+        v-if="chatType === 'friend'"/>
     </div>
     <SearchFriend ref="searchFriend"/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import { ElTooltip, ElIcon } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
 import SearchFriend from '../components/SearchFriend.vue'
 import Friend from '../components/Friend.vue'
 
+type ChatType = 'friend' | 'channel' | 'group'
+
 const
   store = useStore(),
-  user = computed(() => store.state.user)
+  user = computed(() => store.state.user),
+  chatType = ref<ChatType>('friend')
 </script>
 
 <style lang="scss" scoped>

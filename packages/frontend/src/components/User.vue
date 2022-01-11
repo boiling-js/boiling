@@ -6,16 +6,20 @@
     <div class="info">
       ID：{{ info.id }}
       <br>
-      昵称：{{ info.username }}
+      昵称：{{ info.remark || info.username }}
     </div>
     <div class="operate">
       <span
         v-if="!isFriend"
-        class="add material-icons"
+        class="icon material-icons"
         @click="addUserDialog = true">add</span>
       <span
-        v-else
-        class="add material-icons"
+        v-if="isFriend"
+        class="icon material-icons"
+        @click="$emit('chat')">chat_bubble_outline</span>
+      <span
+        v-if="isFriend"
+        class="icon material-icons"
         @click="addUserDialog = true">settings</span>
     </div>
     <el-dialog
@@ -72,6 +76,7 @@ import { api } from '../api'
 import { nextTick, onMounted, reactive, ref } from 'vue'
 import { useStore } from 'vuex'
 
+defineEmits(['chat'])
 const
   props = defineProps<{
     info: Users.Out | Users.FriendOut
@@ -140,7 +145,8 @@ const
     flex-grow: 1;
   }
   > div.operate {
-    > span {
+    > span.icon {
+      margin: 0 5px;
       cursor: pointer;
     }
   }
