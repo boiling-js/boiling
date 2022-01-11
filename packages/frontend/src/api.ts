@@ -32,6 +32,7 @@ api.on('resp.rejected', async error => {
   let msg = response?.data as string | undefined
 
   if (msg === undefined)
+    // TODO 处理全局异常
     switch (response?.status) {
       case 401:
         msg = '登陆过期'
