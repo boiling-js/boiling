@@ -40,15 +40,37 @@ export class Router<O extends Router.Options, Docs> {
   opts: O
   docs: Docs
   allowedMethods: Router.Methods[] = []
-  middlewares: Router.MiddleWare<Router.Context<From<Schema>>, From<Schema>>[] = []
+  middlewareMapper = (<Router.Methods[]>Router.methods).reduce(
+    (acc, method) => (acc[method] = []) && acc,
+    {} as { [key in Router.Methods]: {
+      pathRegexp: RegExp
+      middlewares: Router.MiddleWare<Router.Context<From<Schema>>, From<Schema>>[]
+    }[] }
+  )
   constructor(opts?: O) {
     this.docs = {} as Docs
     this.opts = Object.assign({}, opts)
     return Router.attach(this)
   }
 
-  dispatch(ctx: Koa.Context, next: Koa.Next) {
-    return next()
+  middleware(ctx: Koa.Context, next: () => Awaited<any>) {
+    const method = <Router.Methods>ctx.method
+    if (this.opts.prefix && !ctx.path.startsWith(this.opts.prefix))
+      return next()
+    if (!this.allowedMethods.includes(method))
+      return next()
+    for (const item of this.middlewareMapper[method]) {
+      if (item.pathRegexp.test(ctx.path)) {
+        const ctx2 = Object.assign(ctx, {
+          params: {}
+        })
+        return item.middlewares.reduce(
+          // @ts-ignore
+          (acc, middleware) => acc.then(() => middleware(ctx2, next)),
+          Promise.resolve()
+        )
+      }
+    }
   }
 }
 
@@ -76,9 +98,15 @@ export namespace Router {
         if (Router.methods.includes(method))
           return proxyMiddleware((inn, out, path, middleware) => {
             const params = resolvePath(path)
-            console.log(params)
-            target.middlewares.push(middleware)
+            const regExp = new RegExp(`^${Object.entries(params).reduce(
+              (acc, [name, param]) => acc.replace(new RegExp(`:${name}(\\(\\w+\\))?`), param.regex.source),
+              `${target.opts.prefix || ''}${path}`
+            )}`)
             target.allowedMethods.push(method)
+            target.middlewareMapper[method].push({
+              pathRegexp: regExp,
+              middlewares: [middleware]
+            })
             target.docs = Object.assign(target.docs, {
               [path]: { [method]: inn }
             })
@@ -120,6 +148,12 @@ export namespace Router {
     paramTypes[name] = paramType
     paramTypesRegex[name] = r
   }
+  type ParamType<S extends Schema> = {
+    pre: string
+    type: keyof PathParams
+    regex: RegExp
+    schema: S
+  }
   export type ComputedPath<O extends Options, P extends string> = O['prefix'] extends undefined
     ? P : `${ O['prefix'] }${ P }`
   export type ResolvePath<P extends string> =
@@ -127,21 +161,18 @@ export namespace Router {
       ? ResolveParam<Param>
       : P extends `${ infer _L }/:${ infer Param }`
         ? ResolveParam<Param>
-        : {}
-  type ParamType<S extends Schema> = {
-    regex: RegExp
-    schema: S
-  }
+        : Record<string, ParamType<Schema<any>>>
   export type ResolveParam<P extends string> =
     P extends `${ infer L }(${ infer Type })`
       ? extendObj<{}, L, ParamType<Type extends keyof PathParams ? PathParams[Type] : never>>
       : extendObj<{}, P, ParamType<Schema<string>>>
-  function resolveDesc(desc?: string) {
+  function resolveDesc(pre: string, desc?: string) {
     if (!desc)
       desc = '(string)'
     const [, type] = desc.match(/^\((.*)\)$/) || []
     if (type in paramTypes)
       return {
+        pre, type,
         // @ts-ignore
         regex: paramTypesRegex[type],
         // @ts-ignore
@@ -151,15 +182,28 @@ export namespace Router {
       throw new Error(`Unsupported param type: ${ type }`)
   }
   export function resolvePath<P extends string>(path: P): ResolvePath<P> {
+    let pre = ''
     const params = {}
-    for (const param of path.split('/')) {
-      if (!param.startsWith(':'))
+    for (const pathItem of path.split('/')) {
+      if (!pathItem.startsWith(':')) {
+        pathItem && (pre += `/${ pathItem }`)
         continue
+      }
 
-      const [, name, desc = '(string)'] = param.match(/^:(\w+)(\(\w+\))?/) || []
+      const [, name, desc = '(string)'] = pathItem.match(/^:(\w+)(\(\w+\))?/) || []
       // @ts-ignore
-      params[name] = resolveDesc(desc)
+      params[name] = resolveDesc(pre, desc)
     }
     return params as any as ResolvePath<P>
+  }
+  export function resolveSource(source: string, rules: {
+    [name in string]: ParamType<Schema<any>>
+  }) {
+    return Object.entries(rules).reduce((acc, [name, { pre, regex, schema }]) => {
+      const param = new RegExp(`${ pre }/(${ regex.source })`).exec(source)?.[1] ?? undefined
+      schema(param)
+      acc[name] = param
+      return acc
+    }, {} as any)
   }
 }
