@@ -148,7 +148,15 @@ export namespace Router {
   const paramTypes = {
     string: Schema.string(),
     number: Schema.number().processor(Number),
-    boolean: Schema.boolean().processor(Boolean)
+    boolean: Schema.boolean().processor((v) => {
+      if (typeof v === 'string') {
+        if (/1|(T|true)/.test(v))
+          return true
+        if (/0|(F|false)/.test(v))
+          return false
+      }
+      return v
+    })
   }
   const paramTypesRegex = <Record<keyof PathParams, RegExp | undefined>>{
     string: /[A-Za-z]+\w+/,

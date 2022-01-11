@@ -67,7 +67,7 @@ describe('Koa Router', () => {
         '/foo/+23': 23,
         '/foo/-23': -23
       }).forEach(([path, value]) => {
-        expect(resolveSource(path, n).foo)
+        expect(resolveSource(path, n).foo, path)
           .to.be.eq(value)
       })
       const b = resolvePath('/foo/:foo(boolean)')
@@ -76,7 +76,7 @@ describe('Koa Router', () => {
         '/foo/false': false,
         '/foo/0': false
       }).forEach(([path, value]) => {
-        expect(resolveSource(path, b).foo)
+        expect(resolveSource(path, b).foo, path)
           .to.be.eq(value)
       })
     })
