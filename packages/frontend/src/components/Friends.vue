@@ -48,9 +48,8 @@ onMounted(async () => {
 div.friend {
   padding: 20px;
   div.el-tab-pane {
-    > div.user-info-card {
-      margin: 10px 0;
-    }
+    display: flex;
+    row-gap: 10px;
   }
 }
 </style>

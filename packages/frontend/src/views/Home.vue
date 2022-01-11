@@ -26,10 +26,9 @@
       </div>
     </div>
     <div class="container">
-      <Friend
-        v-if="chatType === 'friend'"/>
+      <friends v-if="chatType === 'friend'"/>
     </div>
-    <SearchFriend ref="searchFriend"/>
+    <search-friend ref="searchFriend"/>
   </div>
 </template>
 
@@ -39,7 +38,7 @@ import { useStore } from 'vuex'
 import { ElTooltip, ElIcon } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
 import SearchFriend from '../components/SearchFriend.vue'
-import Friend from '../components/Friend.vue'
+import Friends from '../components/Friends.vue'
 
 type ChatType = 'friend' | 'channel' | 'group'
 
