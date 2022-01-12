@@ -63,6 +63,8 @@ export class Router<O extends Router.Options, Docs> {
   middlewareMapper = (<Router.Methods[]>Router.methods).reduce(
     (acc, method) => (acc[method] = []) && acc,
     {} as { [key in Router.Methods]: {
+      inn: Schema<any>
+      out: Schema<any>
       paramTypes: Record<string, Router.ParamType<Schema<any>>>
       pathRegexp: RegExp
       middlewares: Router.MiddleWare<Router.Context<From<Schema>>, From<Schema>>[]
@@ -77,21 +79,26 @@ export class Router<O extends Router.Options, Docs> {
   middleware(ctx: Koa.Context, next: () => Awaited<any>) {
     const method = <Router.Methods>ctx.method
     if (this.opts.prefix && !ctx.path.startsWith(this.opts.prefix))
-      return next()
+      return Promise.resolve(next())
     if (!this.allowedMethods.includes(method))
-      return next()
+      return Promise.resolve(next())
     for (const item of this.middlewareMapper[method]) {
       if (item.pathRegexp.test(ctx.path)) {
-        const ctx2 = Object.assign(ctx, {
-          params: Router.resolveSource(ctx.path, item.paramTypes)
+        const ctx2 = new Proxy(ctx, {
+          get(target, prop) {
+            if (prop === 'params')
+              return Router.resolveSource(ctx.path, item.paramTypes)
+            return Reflect.get(target, prop)
+          }
         })
-        return item.middlewares.reduce(
+        return item.middlewares.reduce<Promise<any>>(
           // @ts-ignore
-          (acc, middleware) => acc.then(() => middleware(ctx2, next)),
+          (acc, middleware) => acc.then(() => item.out(middleware(ctx2, next))),
           Promise.resolve()
         )
       }
     }
+    return Promise.resolve()
   }
 }
 
@@ -125,6 +132,7 @@ export namespace Router {
             )}`)
             target.allowedMethods.push(method)
             target.middlewareMapper[method].push({
+              inn, out,
               paramTypes: params,
               pathRegexp: regExp,
               middlewares: [middleware]

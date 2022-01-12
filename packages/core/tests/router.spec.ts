@@ -14,15 +14,14 @@ describe('Koa Router', () => {
   it('should reveal router middlewares.', () => new Promise<void>(async (resolve, reject) => {
     const isReveal = {
       b: false,
-      hhh: false,
       aNameIsAhh: false,
       cIdIs1001: false
     }
     const shouldDone = () => {
       try {
-        Object.entries(isReveal).forEach(([k, v]) => {
+        Object.entries(isReveal).forEach(([k, v]) =>
           expect(v, `isReveal.${k}`).to.be.eq(true)
-        })
+        )
         resolve()
       } catch (e) {
         reject(e)
@@ -49,18 +48,23 @@ describe('Koa Router', () => {
           isReveal.cIdIs1001 = true
         return '3'
       })
+      // @ts-ignore
+      .get(StringOut, '/d', () => 4)
     const createCtx = (method: Router.Methods, path: string) => <Koa.Context>{
       method, path
     }
-    r.middleware(createCtx('get', '/hhh'), () => {
-      isReveal.hhh = true
-    })
-    expect(await r.middleware(createCtx('get', '/users/a/ahh'), () => {}))
+    const next = () => {}
+    expect(await r.middleware(createCtx('get', '/hhh'), () => 'hhh'))
+      .to.be.eq('hhh')
+    expect(await r.middleware(createCtx('get', '/users/a/ahh'), next))
       .to.be.eq('1')
-    expect(await r.middleware(createCtx('get', '/users/b'), () => {}))
+    expect(await r.middleware(createCtx('get', '/users/b'), next))
       .to.be.eq(2)
-    expect(await r.middleware(createCtx('get', '/users/c/1001'), () => {}))
+    expect(await r.middleware(createCtx('get', '/users/c/1001'), next))
       .to.be.eq('3')
+    await r.middleware(createCtx('get', '/users/d'), next)
+      .catch(e => expect(e.message).to.be.eq('expected string but got 4'))
+      .catch(reject)
     shouldDone()
   }))
   describe('Path', () => {
@@ -95,6 +99,8 @@ describe('Koa Router', () => {
         expect(resolveSource(path, b).foo, path)
           .to.be.eq(value)
       })
+      expect(resolveSource('/foo/bar', resolvePath('/foo/bar')))
+        .to.be.empty
     })
     describe('Params', () => {
       it('should resolve path which param type is string.', () => {
