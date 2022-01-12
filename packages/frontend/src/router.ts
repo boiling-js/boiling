@@ -7,9 +7,13 @@ const router = createRouter({
   }, {
     path: '/home',
     name: 'home',
-    component: () => import('./views/Home.vue')
+    component: () => import('./views/home/Index.vue'),
     // TODO 好友、讨论组、频道 管理页面
     // TODO 好友聊天页面
+    children: [{
+      path: '/friends',
+      component: () => import('./views/home/Friend.vue')
+    }]
   }, {
     path: '/login',
     name: 'login',

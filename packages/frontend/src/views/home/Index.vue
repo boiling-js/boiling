@@ -13,7 +13,7 @@
         </el-tooltip>
       </div>
       <div class="chat-bar">
-        <section @click="chatType = 'friend'">好友</section>
+        <section @click="$router.push('/home/friends')">好友</section>
         <section @click="chatType = 'channel'">频道</section>
         <section @click="chatType = 'group'">讨论组</section>
         <div class="chats">
@@ -26,7 +26,7 @@
       </div>
     </div>
     <div class="container">
-      <friends v-if="chatType === 'friend'"/>
+      <router-view/>
     </div>
     <search-friend ref="searchFriend"/>
   </div>
@@ -37,8 +37,7 @@ import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import { ElTooltip, ElIcon } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
-import SearchFriend from '../components/SearchFriend.vue'
-import Friends from '../components/Friends.vue'
+import SearchFriend from '../../components/SearchFriend.vue'
 
 type ChatType = 'friend' | 'channel' | 'group'
 
