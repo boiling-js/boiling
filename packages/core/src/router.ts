@@ -30,10 +30,10 @@ type Params2Record<O extends Record<string, Router.ParamType<Schema<any>>>> = {
 
 type OnlyOutRouterMethods<O extends Router.Options, Docs> = {
   [Method in Router.Methods]: <
-    P extends string, Res extends Schema,
-    _P extends string = Router.ComputedPath<O, P>, _Res = From<Res>,
+    P extends string, Out extends Schema,
+    _P extends string = Router.ComputedPath<O, P>,
     Ctx = Router.Context<never, Params2Record<Router.ResolvePath<_P>>>
-  >(out: Res, path: P, middleware: Router.MiddleWare<Ctx, _Res>) => Router<O, extendObj<
+  >(out: Out, path: P, middleware: Router.MiddleWare<Ctx, Out extends Schema<infer S> ? S : never>) => Router<O, extendObj<
     Docs, _P, { [K in Method]: Ctx }
   >>
 }
@@ -139,7 +139,7 @@ export namespace Router {
     })
     return proxy
   }
-  export type MiddleWare<CTX, Res> = (ctx: CTX) => Res | Promise<Res>
+  export type MiddleWare<CTX, Res> = (ctx: CTX) => Awaited<Res>
   export type Context<Body, Params = {}> = Koa.BaseContext & {
     req: { body: Body }
     body: Body
