@@ -135,7 +135,7 @@ describe('Koa Router', () => {
           .to.throw('expected boolean but got 1')
       })
       it('should extend path params.', () => {
-        Router.extendParamTypes('uid', Schema.union([Schema.number(), '@me']), /(@me)|((\-|\+)?\d+(\.\d+)?)/)
+        Router.extendParamTypes('uid', Schema.union([Schema.number(), '@me']), /(@me)|(([-+])?\d+(\.\d+)?)/)
         const p0 = resolvePath('/foo/:foo(uid)')
         p0.foo.schema(1)
         p0.foo.schema('@me')
