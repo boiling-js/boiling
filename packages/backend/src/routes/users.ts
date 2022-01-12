@@ -65,8 +65,14 @@ export const router = new Router<{}, AppContext>({
   .get('/:id/friends', ctx => {
     return UsersService.Friends.get(useTarget(ctx.params, ctx.session,'id'))
   })
+  .post('/:id/tag', ctx => {
+    const { tag } = ctx.request.body
+    if (!tag)
+      throw new HttpError('BAD_REQUEST', '标签不能为空')
+    return UsersService.addTag(useTarget(ctx.params, ctx.session,'id'), tag)
+  })
   .get('/:id/channels', async ctx => {
-    return []
+    return ctx
   })
   .del('/:id/channels/:cid', async ctx => {
     console.log(ctx.params)
