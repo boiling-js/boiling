@@ -5,10 +5,12 @@ import CreatePersistedState from 'vuex-persistedstate'
 export default createStore({
   state: {
     isHiddenLeftSelector: false,
-    user: {
+    user: <Users.Out>{
       id: 0,
       username: '',
-      avatar: ''
+      avatar: '',
+      tags: [],
+      friends: []
     }
   },
   mutations: {

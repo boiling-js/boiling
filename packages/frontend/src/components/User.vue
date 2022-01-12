@@ -62,7 +62,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Users } from '@boiling/core'
 import { ElDialog, ElInput, ElForm, ElFormItem, ElSelect, ElOption, ElButton, ElMessageBox, ElMessage } from 'element-plus'
 import { api } from '../api'
@@ -94,25 +94,27 @@ const
     tagInputVisible.value = false
     tagInputValue.value = ''
   },
-  add = () => {
-    ElMessageBox.confirm(
-      `是否确认添加${ props.info.username }为好友？`,
-      '确认',
-      {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消'
-      }
-    ).then(async () => {
+  add = async () => {
+    try {
+      await ElMessageBox.confirm(
+        `是否确认添加${ props.info.username }为好友？`, '确认', {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消'
+        }
+      )
       await api.user('@me').friend(props.info.id).add({
         tags: addUserForm.tags,
         remark: addUserForm.remark
       })
       ElMessage.success('请求发送成功！')
-    }).catch()
+    } catch {}
   }
-  onMounted(() => {
-    isFriend.value = store.state.user.friends.findIndex((item: Users.Friend) => item.id === props.info.id) !== -1
-  })
+
+onMounted(() => {
+  isFriend.value = store.state.user.friends.findIndex(
+    (item: Users.Out['friends'][number]) => item.id === props.info.id
+  ) !== -1
+})
 </script>
 
 <style lang="scss" scoped>
