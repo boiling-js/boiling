@@ -20,7 +20,7 @@
           <div class="title">
             私信
             <span class="add material-icons md-light"
-                  @click="$refs.searchFriend.show">add</span>
+                  @click="$refs.searchUser.show">add</span>
           </div>
         </div>
       </div>
@@ -28,7 +28,7 @@
     <div class="container">
       <router-view/>
     </div>
-    <search-friend ref="searchFriend"/>
+    <search-user ref="searchUser"/>
   </div>
 </template>
 
@@ -37,7 +37,7 @@ import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import { ElTooltip, ElIcon } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
-import SearchFriend from '../../components/SearchFriend.vue'
+import SearchUser from '../../components/SearchUser.vue'
 
 type ChatType = 'friend' | 'channel' | 'group'
 
