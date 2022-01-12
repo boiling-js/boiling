@@ -10,25 +10,25 @@
     <div class="operates">
       <span v-if="!isFriend"
             class="material-icons"
-            @click="addUserDialog = true">add</span>
+            @click="settingUserDialog = true">add</span>
       <span v-if="isFriend"
             class="material-icons"
             @click="$emit('chat')">chat_bubble_outline</span>
       <span v-if="isFriend"
             class="material-icons"
-            @click="addUserDialog = true">settings</span>
+            @click="settingUserDialog = true">settings</span>
     </div>
     <el-dialog
-      v-model="addUserDialog"
+      v-model="settingUserDialog"
       title="好友设置"
       width="60%">
-      <el-form ref="formRef" :model="addUserForm" label-width="120px">
+      <el-form ref="formRef" :model="settingUserForm" label-width="120px">
         <el-form-item label="备注：">
-          <el-input v-model="addUserForm.remark"/>
+          <el-input v-model="settingUserForm.remark"/>
         </el-form-item>
         <el-form-item label="标签：">
-          <el-select v-model="addUserForm.tags" multiple placeholder="请选择标签">
-            <el-option v-for="item in addUserForm.tags" :key="item"
+          <el-select v-model="settingUserForm.tags" multiple placeholder="请选择标签">
+            <el-option v-for="item in tags" :key="item"
                        :label="item" :value="item"/>
           </el-select>
           <el-input
@@ -38,7 +38,7 @@
             class="ml-1 w-20"
             style="margin-left: 10px; width: 90px;"
             @keyup.enter="handleInputConfirm"
-            @blur="handleInputConfirm"/>
+            @blur="tagInputVisible = false"/>
           <el-button
             v-else
             class="button-new-tag" style="margin-left: 10px; width: 90px;" @click="showInput">
@@ -48,7 +48,7 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="addUserDialog = false">取消</el-button>
+          <el-button @click="settingUserDialog = false">取消</el-button>
           <el-button
             v-if="!isFriend"
             type="primary" @click="add">下一步</el-button>
@@ -77,8 +77,9 @@ const
   }>(), {
     type: 'inline'
   }),
-  addUserDialog = ref(false),
-  addUserForm = reactive<Omit<Users.Friend, 'id'>>({
+  tags = computed(() => store.state.user.tags),
+  settingUserDialog = ref(false),
+  settingUserForm = reactive<Omit<Users.Friend, 'id'>>({
     tags: [],
     remark: ''
   }),
@@ -92,7 +93,17 @@ const
       tagInputRef.value!.input!.focus()
     })
   },
-  handleInputConfirm = () => {
+  handleInputConfirm = async () => {
+    await ElMessageBox.confirm(
+      `是否确认新建标签${ tagInputValue.value }？`, '确认', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      }
+    )
+    await api.user('@me').tag.add({ tag: tagInputValue.value })
+    ElMessage.success('标签添加成功！')
+    settingUserForm.tags?.push(tagInputValue.value)
+    store.state.user.tags.push(tagInputValue.value)
     tagInputVisible.value = false
     tagInputValue.value = ''
   },
@@ -105,8 +116,8 @@ const
         }
       )
       await api.user('@me').friend(props.info.id).add({
-        tags: addUserForm.tags,
-        remark: addUserForm.remark
+        tags: settingUserForm.tags,
+        remark: settingUserForm.remark
       })
       ElMessage.success('请求发送成功！')
     } catch {}

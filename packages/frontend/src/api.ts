@@ -12,6 +12,9 @@ interface OfficialApi {
     friends: Promise<Users.FriendOut[]> & {
       add(d: Omit<Users.Friend, 'id'>): Promise<void>
     }
+    tag: {
+      add(d: { tag: string }): Promise<void>
+    }
     friend(fUid: Pick<Users.Friend, 'id'>['id']): {
       add(d: Omit<Users.Friend, 'id'>): Promise<void>
     }
