@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="!isChatting"
-    class="friend">
+    class="friends">
     <el-tabs tab-position="top" style="height: 200px;">
       <el-tab-pane label="在线">
         <user
@@ -34,7 +34,6 @@ const
   isChatting = ref<boolean>(false),
   chatFriend = ref<Users.FriendOut | null>(null),
   chat = (friend: Users.FriendOut) => {
-    console.log('chat', friend)
     chatFriend.value = friend
     isChatting.value = true
   }
@@ -45,10 +44,11 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
-div.friend {
+div.friends {
   padding: 20px;
   div.el-tab-pane {
     display: flex;
+    flex-direction: column;
     row-gap: 10px;
   }
 }
