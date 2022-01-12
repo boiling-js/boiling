@@ -129,7 +129,6 @@ div.user {
   overflow: hidden;
   color: var(--color-text-regular);
   background-color: var(--bg-color);
-  border-radius: 6px;
   > div.bg {
     position: absolute;
     top: 0;
@@ -201,6 +200,7 @@ div.user {
     justify-content: space-around;
     padding: 30px 10px 10px;
     height: 100px;
+    border-radius: 6px;
     > div.avatar {
       --size: 64px;
 

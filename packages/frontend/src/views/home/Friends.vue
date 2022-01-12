@@ -50,6 +50,18 @@ div.friends {
     display: flex;
     flex-direction: column;
     row-gap: 10px;
+    > div.user {
+      --bg-color: var(--color-auxi-placeholder);
+
+      cursor: pointer;
+      border-bottom: 1px solid var(--color-auxi-secondary);
+      transition: 0.3s;
+      &:hover {
+        --bg-color: var(--color-auxi-secondary);
+
+        border-radius: 6px;
+      }
+    }
   }
 }
 </style>
