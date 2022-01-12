@@ -1,23 +1,22 @@
 <template>
-  <div class="user">
-    <div class="bg">
-      <div class="operates">
-        <span v-if="!isFriend"
-              class="material-icons"
-              @click="addUserDialog = true">add</span>
-        <span v-if="isFriend"
-              class="material-icons"
-              @click="$emit('chat')">chat_bubble_outline</span>
-        <span v-if="isFriend"
-              class="material-icons"
-              @click="addUserDialog = true">settings</span>
-      </div>
-    </div>
+  <div class="user" :class="[ type ]">
+    <div class="bg"/>
     <div class="avatar" :style="{
       backgroundImage: `url(/api${info.avatar})`
     }"/>
     <div class="info">
       {{ info.remark || info.username }}<span class="id">#{{ info.id }}</span>
+    </div>
+    <div class="operates">
+      <span v-if="!isFriend"
+            class="material-icons"
+            @click="addUserDialog = true">add</span>
+      <span v-if="isFriend"
+            class="material-icons"
+            @click="$emit('chat')">chat_bubble_outline</span>
+      <span v-if="isFriend"
+            class="material-icons"
+            @click="addUserDialog = true">settings</span>
     </div>
     <el-dialog
       v-model="addUserDialog"
@@ -72,9 +71,12 @@ import { useStore } from 'vuex'
 defineEmits(['chat'])
 const
   store = useStore(),
-  props = defineProps<{
+  props = withDefaults(defineProps<{
     info: Users.Out | Users.FriendOut
-  }>(),
+    type?: 'inline' | 'popup'
+  }>(), {
+    type: 'inline'
+  }),
   addUserDialog = ref(false),
   addUserForm = reactive<Omit<Users.Friend, 'id'>>({
     tags: [],
@@ -123,11 +125,7 @@ div.user {
 
   position: relative;
   display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  padding: 30px 10px 10px;
   width: calc(100% - 20px);
-  height: 100px;
   overflow: hidden;
   color: var(--color-text-regular);
   background-color: var(--bg-color);
@@ -140,34 +138,13 @@ div.user {
     height: 60px;
     background-color: #fff;
     border-radius: 6px 6px 0 0;
-    > div.operates {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      > span.material-icons {
-        padding: 4px;
-        margin: 0 5px;
-        cursor: pointer;
-        background-color: var(--bg-color);
-        border-radius: 6px;
-        opacity: 0.5;
-        transition: 0.3s;
-        &:hover {
-          opacity: 1;
-        }
-      }
-    }
   }
   > div.avatar {
-    --size: 64px;
-
     z-index: 10;
     margin-right: 10px;
     width: var(--size);
     height: var(--size);
-    overflow: hidden;
     background-size: cover;
-    border: 6px solid var(--bg-color);
     border-radius: 50%;
   }
   > div.info {
@@ -177,6 +154,62 @@ div.user {
     font-weight: bold;
     > span.id {
       color: var(--color-text-secondary);
+    }
+  }
+  > div.operates > span.material-icons {
+    padding: 4px;
+    margin: 0 5px;
+    cursor: pointer;
+    background-color: var(--bg-color);
+    border-radius: 6px;
+    opacity: 0.5;
+    transition: 0.3s;
+    &:hover {
+      opacity: 1;
+    }
+  }
+  &.inline {
+    justify-content: space-between;
+    padding: 10px;
+    > div.bg {
+      display: none;
+    }
+    > div.avatar {
+      --size: 48px;
+    }
+    > div.info {
+      flex-grow: 1;
+      font-size: 16px;
+      > span.id {
+        color: var(--color-text-secondary);
+        opacity: 0;
+        transition: 0.3s;
+      }
+    }
+    > div.operates {
+      display: flex;
+      align-items: center;
+    }
+    &:hover {
+      > div.info > span.id {
+        opacity: 1;
+      }
+    }
+  }
+  &.popup {
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 30px 10px 10px;
+    height: 100px;
+    > div.avatar {
+      --size: 64px;
+
+      border: 6px solid var(--bg-color);
+    }
+    > div.operates {
+      position: absolute;
+      top: 10px;
+      right: 10px;
     }
   }
 }
