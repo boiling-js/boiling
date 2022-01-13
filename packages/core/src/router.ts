@@ -196,8 +196,8 @@ export namespace Router {
   export type ComputedPath<O extends Options, P extends string> = O['prefix'] extends undefined
     ? P : `${ O['prefix'] }${ P }`
   export type ResolvePath<P extends string> =
-    P extends `${ infer _L }/:${ infer Param }/${ infer _R }`
-      ? ResolveParam<Param>
+    P extends `${ infer _L }/:${ infer Param }/${ infer R }`
+      ? ResolveParam<Param> & ResolvePath<R>
       : P extends `${ infer _L }/:${ infer Param }`
         ? ResolveParam<Param>
         : Record<string, ParamType<Schema<any>>>
