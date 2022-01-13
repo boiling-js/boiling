@@ -192,7 +192,7 @@ export namespace Router {
   }
   type innerParamTypes = typeof paramTypes
   export type InnerParamTypes = {
-    [K in keyof innerParamTypes]: From<innerParamTypes[K]>
+    [K in keyof innerParamTypes]: innerParamTypes[K]
   }
   export function extendParamTypes<T extends Schema>(name: keyof PathParams, paramType: T, r?: RegExp) {
     // @ts-ignore
@@ -222,29 +222,16 @@ export namespace Router {
       : P extends `${ infer _L }:${ infer Param }`
         ? ResolveParam<Param>
         : Record<string, ParamType<any>>
+  export type ResolveType<T extends string> =
+    T extends keyof PathParams ? PathParams[T] : never
   export type ResolveQuery<Q extends string> =
     Q extends `${ infer L }&${ infer R }`
       ? ResolveParam<L> & ResolveQuery<R>
       : ResolveParam<Q>
   export type ResolveParam<P extends string> =
     P extends `${ infer L }(${ infer Type })`
-      ? extendObj<{}, L, ParamType<Type extends keyof PathParams ? PathParams[Type] : never>>
+      ? extendObj<{}, L, ParamType<ResolveType<Type>>>
       : extendObj<{}, P, ParamType<Schema<string>>>
-  function resolveDesc(desc?: string, pre?: string) {
-    if (!desc)
-      desc = '(string)'
-    const [, type] = desc.match(/^\((.*)\)$/) || []
-    if (type in paramTypes)
-      return {
-        pre, type,
-        // @ts-ignore
-        regex: paramTypesRegex[type],
-        // @ts-ignore
-        schema: paramTypes[type]
-      }
-    else
-      throw new Error(`Unsupported param type: ${ type }`)
-  }
   export function resolveURL<URL extends string>(url: URL) {
     const [path, query] = url.split('?')
     return {
@@ -262,9 +249,25 @@ export namespace Router {
       }
 
       const [, name, desc = '(string)'] = pathItem.match(/^:(\w+)(\(\w+\))?/) || []
-      params[name] = resolveDesc(desc, pre)
+      params[name] = resolveType(<`(${ keyof PathParams })`>desc, pre)
     }
     return params as any as ResolvePath<P>
+  }
+  export function resolveType<T extends keyof PathParams = 'string'>(desc: `(${ T })` | '', pre?: string) {
+    if (!desc)
+      // @ts-ignore
+      desc = '(string)'
+    const [, type] = desc.match(/^\((.*)\)$/) || []
+    if (type in paramTypes)
+      return <ParamType<ResolveType<T>>>{
+        pre, type,
+        // @ts-ignore
+        regex: paramTypesRegex[type],
+        // @ts-ignore
+        schema: paramTypes[type]
+      }
+    else
+      throw new Error(`Unsupported param type: ${ type }`)
   }
   export function resolveQuery<Q extends string>(query: Q) {
     const params = <Record<string, any>>{}
@@ -274,7 +277,7 @@ export namespace Router {
           continue
 
         const [, name, desc = '(string)'] = queryItem.match(/^(\w+)(\(\w+\))?/) || []
-        params[name] = resolveDesc(desc)
+        params[name] = resolveType(<`(${ keyof PathParams })`>desc)
       }
     return params as any as ResolveQuery<Q>
   }
