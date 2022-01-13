@@ -21,6 +21,7 @@ describe('Router', () => {
   describe('Middleware', () => {
     it('should reveal router middlewares.', async () => {
       const r = new Router()
+        .get('/0', () => 0)
         .get(Schema.number(), '/a', () => 2)
         // @ts-ignore
         .get(Schema.string(), '/b', () => 4)
@@ -30,6 +31,8 @@ describe('Router', () => {
         .to.be.eventually.eq('none')
       await expect(middleware(createCtx('get', '/h'), next))
         .to.be.eventually.eq(undefined)
+      await expect(middleware(createCtx('get', '/0'), next))
+        .to.be.eventually.eq(0)
       await expect(middleware(createCtx('get', '/a'), next))
         .to.be.eventually.eq(2)
       await expect(middleware(createCtx('get', '/b'), next))

@@ -28,6 +28,15 @@ type Params2Record<O extends Record<string, Router.ParamType<Schema<any>>>> = {
   [K in keyof O]: O[K] extends Router.ParamType<Schema<infer S>> ? S : never
 }
 
+type RouterMethods<O extends Router.Options, Docs> = {
+  [Method in Router.Methods]: <
+    P extends string,
+    _P extends string = Router.ComputedPath<O, P>,
+    Ctx = Router.Context<never, Params2Record<Router.ResolvePath<_P>>>
+  >(path: P, middleware: Router.MiddleWare<Ctx, any>) => Router<O, extendObj<
+    Docs, _P, { [K in Method]: Ctx }
+  >>
+}
 type OnlyOutRouterMethods<O extends Router.Options, Docs> = {
   [Method in Router.Methods]: <
     P extends string, Out extends Schema,
@@ -50,7 +59,9 @@ type WithInnRouterMethods<O extends Router.Options, Docs> = {
 type R<O extends Router.Options = {}, Docs = unknown> = {
   opts: O
   docs: Docs
-} & OnlyOutRouterMethods<O, Docs>
+}
+  & RouterMethods<O, Docs>
+  & OnlyOutRouterMethods<O, Docs>
   & WithInnRouterMethods<O, Docs>
 
 export interface Router<O extends Router.Options, Docs> extends R<O, Docs> {
@@ -122,7 +133,11 @@ export namespace Router {
     return new Proxy(() => {}, {
       apply(_, __, args) {
         let inn: Schema<any>, out: Schema<any>, path: string, middleware: Router.MiddleWare<Context<any, any>, any>
-        if (typeof args[1] === 'string') {
+        if (typeof args[0] === 'string') {
+          [path, middleware] = args
+          out = Schema.any()
+          inn = Schema.any()
+        } else if (typeof args[1] === 'string') {
           [out, path, middleware] = args
           inn = Schema.any()
         } else {
