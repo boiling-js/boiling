@@ -101,7 +101,7 @@ export namespace UsersService {
       const index = user.friends.findIndex((item) => item.id === fUid)
       if (index === -1)
         throw new HttpError('NOT_FOUND', `${ friend.username }不是你的好友`)
-      user.friends[index] = { ...user.friends[index], ...opts }
+      user.friends[index] = { ...user.toJSON().friends[index], ...opts }
       await user.save()
     }
   }
