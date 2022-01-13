@@ -62,6 +62,11 @@ export const router = new Router<{}, AppContext>({
       useTarget(ctx.params, ctx.session,'id'),
       +ctx.params.uid, <Users.Friend>ctx.request.body)
   })
+  .patch('/:id/friend/:uid', ctx => {
+    return UsersService.Friends.update(
+      useTarget(ctx.params, ctx.session,'id'),
+      +ctx.params.uid, <Users.Friend>ctx.request.body)
+  })
   .get('/:id/friends', ctx => {
     return UsersService.Friends.get(useTarget(ctx.params, ctx.session,'id'))
   })

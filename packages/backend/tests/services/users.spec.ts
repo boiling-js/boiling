@@ -115,4 +115,22 @@ describe('Users Service', function () {
       expect(addFriend[i].remark).to.be.eq(`remark${i}`)
     }
   })
+  it('should update friend', async function () {
+    const [ user, friend ] = await Promise.all([
+      UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' }),
+      UsersService.add({ username: 'testFriend', passwordHash: 'testFriend', avatar: 'testFriend' })])
+    const id = user.id
+    const fId = friend.id
+    await UsersService.Friends.add(id, fId, {
+      tags: ['tag'],
+      remark: 'remark'
+    })
+    await UsersService.Friends.update(id, fId, {
+      tags: ['tag-update'],
+      remark: 'remark-update'
+    })
+    const addFriend = await UsersService.get(id)
+    expect(addFriend?.friends[0].tags).to.be.deep.eq(['tag-update'])
+    expect(addFriend?.friends[0].remark).to.be.eq('remark-update')
+  })
 })

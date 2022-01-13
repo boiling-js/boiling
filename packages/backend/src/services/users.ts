@@ -96,5 +96,13 @@ export namespace UsersService {
         }))
       )
     }
+    export async function update(uid: number, fUid: number, opts: Opts) {
+      const [ user, friend ] = await Promise.all([UsersService.getOrThrow(uid), UsersService.getOrThrow(fUid)])
+      const index = user.friends.findIndex((item) => item.id === fUid)
+      if (index === -1)
+        throw new HttpError('NOT_FOUND', `${ friend.username }不是你的好友`)
+      user.friends[index] = { ...user.friends[index], ...opts }
+      await user.save()
+    }
   }
 }
