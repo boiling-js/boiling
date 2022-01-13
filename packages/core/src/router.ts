@@ -78,38 +78,40 @@ export class Router<O extends Router.Options, Docs> {
     return Router.attach(this)
   }
 
-  middleware(ctx: Koa.Context, next: () => Awaited<any>) {
-    const method = <Router.Methods>ctx.method
-    if (this.opts.prefix && !ctx.path.startsWith(this.opts.prefix))
-      return Promise.resolve(next())
-    if (!this.allowedMethods.includes(method))
-      return Promise.resolve(next())
-    for (const item of this.middlewareMapper[method]) {
-      if (item.pathRegexp.test(ctx.path)) {
-        if (ctx.body === undefined || ctx.body === null)
-          ctx.body = {}
-        item.inn(ctx.body)
-        const { param, query } = Router.resolveSource(ctx.path, {
-          query: item.queryTypes,
-          param: item.paramTypes
-        })
-        const ctx2 = new Proxy(ctx, {
-          get(target, prop) {
-            if (prop === 'params')
-              return param
-            if (prop === 'query')
-              return query
-            return Reflect.get(target, prop)
-          }
-        })
-        return item.middlewares.reduce<Promise<any>>(
-          // @ts-ignore
-          (acc, middleware) => acc.then(() => item.out(middleware(ctx2, next))),
-          Promise.resolve()
-        )
+  middleware() {
+    return ((ctx: Koa.Context, next: () => Awaited<any>) => {
+      const method = <Router.Methods>ctx.method.toLowerCase()
+      if (this.opts.prefix && !ctx.path.startsWith(this.opts.prefix))
+        return Promise.resolve(next())
+      // @ts-ignore
+      if (!this.allowedMethods.includes(method))
+        return Promise.resolve(next())
+      for (const item of this.middlewareMapper[method]) {
+        if (item.pathRegexp.test(ctx.path)) {
+          item.inn && item.inn(ctx.body)
+          const { param, query } = Router.resolveSource(ctx.path, {
+            query: item.queryTypes,
+            param: item.paramTypes
+          })
+          const ctx2 = new Proxy(ctx, {
+            get(target, prop) {
+              if (prop === 'params')
+                return param
+              if (prop === 'query')
+                return query
+              return Reflect.get(target, prop)
+            }
+          })
+          return item.middlewares.reduce<Promise<any>>(
+            (acc, middleware) => acc
+              // @ts-ignore
+              .then(() => Promise.resolve(middleware(ctx2, next)).then(item.out)),
+            Promise.resolve()
+          )
+        }
       }
-    }
-    return Promise.resolve(next())
+      return Promise.resolve(next())
+    }).bind(this)
   }
 }
 
@@ -133,8 +135,10 @@ export namespace Router {
   export function attach<O extends Router.Options, Docs>(r: Router<O, Docs>) {
     const proxy: Router<O, Docs> = new Proxy(r, {
       get(target, p, receiver) {
-        const method = p as Router.Methods
-        if (Router.methods.includes(method))
+        let method = p as Router.Methods
+        if (Router.methods.includes(method)) {
+          if (method === 'del')
+            method = 'delete'
           return proxyMiddleware((inn, out, url, middleware) => {
             const { param, query } = resolveURL(url)
             const regExp = new RegExp(`^${Object.entries(param).reduce(
@@ -154,20 +158,21 @@ export namespace Router {
             })
             return proxy
           })
+        }
         return Reflect.get(target, p, receiver)
       }
     })
     return proxy
   }
-  export type MiddleWare<CTX, Res> = (ctx: CTX) => Awaited<Res>
+  export type MiddleWare<CTX, Res> = (ctx: CTX) => Res | Promise<Res>
   export type Context<Body, Params = {}, Query = {}> = Koa.BaseContext & {
     req: { body: Body }
     body: Body
     query: Query
     params: Params
   }
-  export type Methods = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head'
-  export const methods = ['get', 'post', 'put', 'delete', 'patch', 'head']
+  export type Methods = 'get' | 'post' | 'put' | 'delete' | 'del' | 'patch' | 'head'
+  export const methods = ['get', 'post', 'put', 'delete', 'del', 'patch', 'head']
 
   export type Options = {
     prefix?: string
