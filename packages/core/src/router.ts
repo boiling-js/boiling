@@ -39,10 +39,10 @@ type OnlyOutRouterMethods<O extends Router.Options, Docs> = {
 }
 type WithInnRouterMethods<O extends Router.Options, Docs> = {
   [Method in Router.Methods]: <
-    P extends string, Req extends Schema, Res extends Schema,
-    _P extends string = Router.ComputedPath<O, P>, _Res = From<Res>,
+    P extends string, Req extends Schema, Out extends Schema,
+    _P extends string = Router.ComputedPath<O, P>,
     Ctx = Router.Context<never, Router.ResolvePath<_P>>
-  >(inn: Req, out: Res, path: P, middleware: Router.MiddleWare<Ctx, _Res>) => Router<O, extendObj<
+  >(inn: Req, out: Out, path: P, middleware: Router.MiddleWare<Ctx, Out extends Schema<infer S> ? S : never>) => Router<O, extendObj<
     Docs, _P, { [K in Method]: Ctx }
   >>
 }
@@ -51,6 +51,7 @@ type R<O extends Router.Options = {}, Docs = unknown> = {
   opts: O
   docs: Docs
 } & OnlyOutRouterMethods<O, Docs>
+  & WithInnRouterMethods<O, Docs>
 
 export interface Router<O extends Router.Options, Docs> extends R<O, Docs> {
   new(opts?: O): this

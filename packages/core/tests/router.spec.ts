@@ -1,8 +1,11 @@
 import Koa from 'koa'
 import Schema from 'schemastery'
-import { expect } from 'chai'
+import { expect, use } from 'chai'
+import cap from 'chai-as-promised'
 import { Router } from '@boiling/core'
 const { resolvePath, resolveSource } = Router
+
+use(cap)
 
 declare module '@boiling/core' {
   interface PathParams {
@@ -11,62 +14,37 @@ declare module '@boiling/core' {
 }
 
 describe('Koa Router', () => {
-  it('should reveal router middlewares.', () => new Promise<void>(async (resolve, reject) => {
-    const isReveal = {
-      b: false,
-      aNameIsAhh: false,
-      cIdIs1001: false
-    }
-    const shouldDone = () => {
-      try {
-        Object.entries(isReveal).forEach(([k, v]) =>
-          expect(v, `isReveal.${k}`).to.be.eq(true)
-        )
-        resolve()
-      } catch (e) {
-        reject(e)
-      }
-    }
-    // const StringInn = Schema.string()
-    // const NumberInn = Schema.number()
-    const StringOut = Schema.string()
-    const NumberOut = Schema.number()
-    const r = new Router({
-      prefix: '/users' as '/users'
-    })
-      .get(StringOut, '/a/:name(string)', ctx => {
-        if (ctx.params.name === 'ahh')
-          isReveal.aNameIsAhh = true
-        return '1'
-      })
-      .get(NumberOut, '/b', () => {
-        isReveal.b = true
-        return 2
-      })
-      .get(StringOut, '/c/:id(number)', ctx => {
-        if (ctx.params.id === 1001)
-          isReveal.cIdIs1001 = true
-        return '3'
-      })
+  const createCtx = (method: Router.Methods, path: string) => <Koa.Context>{
+    method, path
+  }
+  it('should reveal router middlewares.', async () => {
+    const r = new Router({ prefix: '/users' as '/users' })
+      .get(Schema.number(), '/a', () => 2)
       // @ts-ignore
-      .get(StringOut, '/d', () => 4)
+      .get(Schema.string(), '/b', () => 4)
+    const next = () => {}
+    await expect(r.middleware(createCtx('get', '/hhh'), () => 'hhh'))
+      .to.be.eventually.eq('hhh')
+    await expect(r.middleware(createCtx('get', '/hhhhhhh'), next))
+      .to.be.eventually.eq(undefined)
+    await expect(r.middleware(createCtx('get', '/users/a'), next))
+      .to.be.eventually.eq(2)
+    await expect(r.middleware(createCtx('get', '/users/b'), next))
+      .to.be.eventually.rejectedWith('expected string but got 4')
+  })
+  it('should reveal router middlewares with params.', async () => {
+    const r = new Router({ prefix: '/users' as '/users' })
+      .get(Schema.string(), '/a/:name(string)', ctx => ctx.params.name)
+      .get(Schema.number(), '/b/:id(number)', ctx => ctx.params.id)
     const createCtx = (method: Router.Methods, path: string) => <Koa.Context>{
       method, path
     }
     const next = () => {}
-    expect(await r.middleware(createCtx('get', '/hhh'), () => 'hhh'))
-      .to.be.eq('hhh')
-    expect(await r.middleware(createCtx('get', '/users/a/ahh'), next))
-      .to.be.eq('1')
-    expect(await r.middleware(createCtx('get', '/users/b'), next))
-      .to.be.eq(2)
-    expect(await r.middleware(createCtx('get', '/users/c/1001'), next))
-      .to.be.eq('3')
-    await r.middleware(createCtx('get', '/users/d'), next)
-      .catch(e => expect(e.message).to.be.eq('expected string but got 4'))
-      .catch(reject)
-    shouldDone()
-  }))
+    await expect(r.middleware(createCtx('get', '/users/a/ahh'), next))
+      .to.be.eventually.eq('ahh')
+    await expect(r.middleware(createCtx('get', '/users/b/100'), next))
+      .to.be.eventually.eq(100)
+  })
   describe('Path', () => {
     it('should resolve path.', () => {
       const p0 = resolvePath('/foo/:foo')
