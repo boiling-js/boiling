@@ -205,14 +205,14 @@ export namespace Router {
       }
       : {
         query: {}
-        params: ResolvePath<URL>
+        param: ResolvePath<URL>
       }
   export type ResolvePath<P extends string> =
-    P extends `${ infer _L }/:${ infer Param }/${ infer R }`
+    P extends `${ infer _L }:${ infer Param }/${ infer R }`
       ? ResolveParam<Param> & ResolvePath<R>
-      : P extends `${ infer _L }/:${ infer Param }`
+      : P extends `${ infer _L }:${ infer Param }`
         ? ResolveParam<Param>
-        : Record<string, ParamType<Schema<any>>>
+        : Record<string, ParamType<any>>
   export type ResolveQuery<Q extends string> =
     Q extends `${ infer L }&${ infer R }`
       ? ResolveParam<L> & ResolveQuery<R>
@@ -240,7 +240,7 @@ export namespace Router {
     const [path, query] = url.split('?')
     return {
       query: resolveQuery(query),
-      params: resolvePath(path)
+      param: resolvePath(path)
     } as any as ResolveURL<URL>
   }
   export function resolvePath<P extends string>(path: P) {

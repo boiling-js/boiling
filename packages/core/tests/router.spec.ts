@@ -3,6 +3,7 @@ import Schema from 'schemastery'
 import { expect, use } from 'chai'
 import cap from 'chai-as-promised'
 import { Router } from '@boiling/core'
+import resolveURL = Router.resolveURL
 const { resolvePath, resolveSource, resolveQuery } = Router
 
 use(cap)
@@ -81,6 +82,23 @@ describe('Router', () => {
       })
       expect(resolveSource('/foo/bar', resolvePath('/foo/bar')))
         .to.be.empty
+    })
+    it('should resolve url.', () => {
+      const url = resolveURL('/foo/:foo?bar')
+      url.query.bar.schema('hi')
+      url.param.foo.schema('hi')
+    })
+    it('should resolve url with type.', () => {
+      const url = resolveURL('/foo/:foo(number)?bar(number)')
+      url.query.bar.schema(1)
+      url.param.foo.schema(2)
+    })
+    it('should resolve multi param url.', () => {
+      const url = resolveURL('/foo/:foo(number)/:fuu?bar(number)&baz')
+      url.query.bar.schema(1)
+      url.query.baz.schema('1')
+      url.param.foo.schema(2)
+      url.param.fuu.schema('2')
     })
     describe('Path', () => {
       it('should resolve path.', () => {
