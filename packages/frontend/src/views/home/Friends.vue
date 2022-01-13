@@ -8,7 +8,8 @@
           v-for="friend in friends"
           :key="friend.id"
           :info="friend"
-          @chat="chat(friend)"/>
+          @chat="chat(friend)"
+          @update="refresh"/>
       </el-tab-pane>
       <el-tab-pane label="全部">全部</el-tab-pane>
       <el-tab-pane label="离线">离线</el-tab-pane>
@@ -36,10 +37,13 @@ const
   chat = (friend: Users.FriendOut) => {
     chatFriend.value = friend
     isChatting.value = true
+  },
+  refresh = async () => {
+    friends.value = await api.user('@me').friends
   }
 
 onMounted(async () => {
-  friends.value = await api.user('@me').friends
+  await refresh()
 })
 </script>
 

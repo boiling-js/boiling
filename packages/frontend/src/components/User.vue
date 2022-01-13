@@ -68,9 +68,9 @@ import { api } from '../api'
 import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import { useStore } from 'vuex'
 
-defineEmits(['chat'])
 const
   store = useStore(),
+  emit = defineEmits(['update', 'chat']),
   props = withDefaults(defineProps<{
     info: Users.Out | Users.FriendOut
     type?: 'inline' | 'popup'
@@ -87,6 +87,16 @@ const
   tagInputVisible = ref(false),
   tagInputValue = ref(''),
   tagInputRef = ref<InstanceType<typeof ElInput>>(),
+  init = () => {
+    isFriend.value = store.state.user.friends.findIndex(
+      (item: Users.Out['friends'][number]) => item.id === props.info.id
+    ) !== -1
+    if (isFriend.value) {
+      const f = props.info as Users.FriendOut
+      settingUserForm.tags = f.tags
+      settingUserForm.remark = f.remark || f.username
+    }
+  },
   showInput = () => {
     tagInputVisible.value = true
     nextTick(() => {
@@ -119,20 +129,22 @@ const
         tags: settingUserForm.tags,
         remark: settingUserForm.remark
       })
+      emit('update')
+      settingUserDialog.value = false
       ElMessage.success('请求发送成功！')
     } catch {}
   },
   settingFriend = async () => {
-    await api.user('@me').friend(props.info.id).update({
+    await api.user('@me').friend(props.info.id).upd({
       tags: settingUserForm.tags,
       remark: settingUserForm.remark
     })
+    emit('update')
+    settingUserDialog.value = false
     ElMessage.success('好友设置成功！')
   }
 onMounted(() => {
-  isFriend.value = store.state.user.friends.findIndex(
-    (item: Users.Out['friends'][number]) => item.id === props.info.id
-  ) !== -1
+  init()
 })
 </script>
 
