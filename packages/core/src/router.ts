@@ -39,10 +39,10 @@ type OnlyOutRouterMethods<O extends Router.Options, Docs> = {
 }
 type WithInnRouterMethods<O extends Router.Options, Docs> = {
   [Method in Router.Methods]: <
-    P extends string, Req extends Schema, Out extends Schema,
+    P extends string, Inn extends Schema, Out extends Schema,
     _P extends string = Router.ComputedPath<O, P>,
-    Ctx = Router.Context<never, Router.ResolvePath<_P>>
-  >(inn: Req, out: Out, path: P, middleware: Router.MiddleWare<Ctx, Out extends Schema<infer S> ? S : never>) => Router<O, extendObj<
+    Ctx = Router.Context<Inn extends Schema<infer S> ? S : never, Router.ResolvePath<_P>>
+  >(inn: Inn, out: Out, path: P, middleware: Router.MiddleWare<Ctx, Out extends Schema<infer S> ? S : never>) => Router<O, extendObj<
     Docs, _P, { [K in Method]: Ctx }
   >>
 }
@@ -85,6 +85,9 @@ export class Router<O extends Router.Options, Docs> {
       return Promise.resolve(next())
     for (const item of this.middlewareMapper[method]) {
       if (item.pathRegexp.test(ctx.path)) {
+        if (ctx.body === undefined || ctx.body === null)
+          ctx.body = {}
+        item.inn(ctx.body)
         const ctx2 = new Proxy(ctx, {
           get(target, prop) {
             if (prop === 'params')
