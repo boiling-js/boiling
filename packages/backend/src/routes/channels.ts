@@ -1,28 +1,29 @@
-import Router from '@koa/router'
+import { Router } from '@boiling/core'
+import Schema from 'schemastery'
 
 export const router = new Router({
   prefix: '/channels'
-}).post('/', async ctx => {
-    ctx.body = 'you are creating channel.'
+}).post(Schema.string(), '/', async ctx => {
+    return 'you are creating channel.'
   })
-  .del('/:id', async ctx => {
-    ctx.body = 'you are deleting channel'
+  .del(Schema.string(), '/:id', async ctx => {
+    return 'you are deleting channel'
   })
-  .patch('/:id', async ctx => {
-    ctx.body = 'you are patching channel'
+  .patch(Schema.string(), '/:id', async ctx => {
+    return 'you are patching channel'
   })
-  .get('/', async ctx => {
-    ctx.body = 'you are searching channels'
+  .get(Schema.string(), '/', async ctx => {
+    return 'you are searching channels'
   })
-  .get('/:id', async ctx => {
-    ctx.body = 'you are getting channel'
+  .get(Schema.string(), '/:id', async ctx => {
+    return 'you are getting channel'
   })
-  .get('/:id/members', async ctx => {
-    ctx.body = 'you are getting channel members.'
+  .get(Schema.string(), '/:id/members', async ctx => {
+    return 'you are getting channel members.'
   })
-  .post('/:id/members', async ctx => {
-    ctx.body = 'you join to channel.'
+  .post(Schema.string(), '/:id/members', async ctx => {
+    return 'you join to channel.'
   })
-  .post('/:id/messages', async ctx => {
-    ctx.body = 'you are posting message.'
+  .post(Schema.string(), '/:id/messages', async ctx => {
+    return 'you are posting message.'
   })
