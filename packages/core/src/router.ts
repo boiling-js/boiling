@@ -175,7 +175,7 @@ export namespace Router {
   }
   const paramTypesRegex = <Record<keyof PathParams, RegExp | undefined>>{
     string: /[A-Za-z]+\w+/,
-    number: /(\-|\+)?\d+(\.\d+)?/,
+    number: /([-+])?\d+(\.\d+)?/,
     boolean: /0|1|(F|false)|(T|true)/
   }
   type innerParamTypes = typeof paramTypes
