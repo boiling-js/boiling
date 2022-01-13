@@ -3,7 +3,7 @@ import Schema from 'schemastery'
 import { expect, use } from 'chai'
 import cap from 'chai-as-promised'
 import { Router } from '@boiling/core'
-const { resolvePath, resolveSource } = Router
+const { resolvePath, resolveSource, resolveQuery } = Router
 
 use(cap)
 
@@ -56,16 +56,7 @@ describe('Router', () => {
         .to.be.eventually.eq(100)
     })
   })
-  describe('Path', () => {
-    it('should resolve path.', () => {
-      const p0 = resolvePath('/foo/:foo')
-      p0.foo.schema('1')
-      expect(p0.foo.regex.test('ahhh'))
-        .to.be.eq(true)
-      // @ts-ignore
-      expect(p0.foo.schema.bind(null, 1))
-        .to.throw('expected string but got 1')
-    })
+  describe('URL', () => {
     it('should resolve source.', () => {
       expect(resolveSource('/foo/hi', resolvePath('/foo/:foo')).foo)
         .to.be.eq('hi')
@@ -91,7 +82,16 @@ describe('Router', () => {
       expect(resolveSource('/foo/bar', resolvePath('/foo/bar')))
         .to.be.empty
     })
-    describe('Params', () => {
+    describe('Path', () => {
+      it('should resolve path.', () => {
+        const p0 = resolvePath('/foo/:foo')
+        p0.foo.schema('1')
+        expect(p0.foo.regex.test('ahhh'))
+          .to.be.eq(true)
+        // @ts-ignore
+        expect(p0.foo.schema.bind(null, 1))
+          .to.throw('expected string but got 1')
+      })
       it('should resolve path which param type is string.', () => {
         const p0 = resolvePath('/foo/:foo(string)')
         p0.foo.schema('1')
@@ -153,6 +153,43 @@ describe('Router', () => {
         })
         // @ts-ignore
         expect(p0.bar.schema.bind(null, '1'))
+          .to.throw('expected number but got 1')
+      })
+    })
+    describe('Query', () => {
+      it('should resolve query.', () => {
+        const q0 = resolveQuery('foo')
+        q0.foo.schema('1')
+        expect(q0.foo.regex.test('ahhh'))
+          .to.be.eq(true)
+        // @ts-ignore
+        expect(q0.foo.schema.bind(null, 1))
+          .to.throw('expected string but got 1')
+      })
+      it('should resolve query with type.', () => {
+        const q0 = resolveQuery('foo(string)')
+        q0.foo.schema('1')
+        expect(q0.foo.regex.test('ahhh'))
+          .to.be.eq(true)
+        // @ts-ignore
+        expect(q0.foo.schema.bind(null, 1))
+          .to.throw('expected string but got 1')
+      })
+      it('should resolve multi query.', () => {
+        const q0 = resolveQuery('foo(string)&bar(number)')
+        q0.foo.schema('1')
+        expect(q0.foo.regex.test('ahhh'))
+          .to.be.eq(true)
+        // @ts-ignore
+        expect(q0.foo.schema.bind(null, 1))
+          .to.throw('expected string but got 1')
+        q0.bar.schema(1)
+        ;['1', '1.111', '-10', '-10.01'].forEach(v => {
+          expect(q0.bar.regex.test(v))
+            .to.be.eq(true)
+        })
+        // @ts-ignore
+        expect(q0.bar.schema.bind(null, '1'))
           .to.throw('expected number but got 1')
       })
     })

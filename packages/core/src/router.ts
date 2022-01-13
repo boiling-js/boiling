@@ -198,17 +198,30 @@ export namespace Router {
   }
   export type ComputedPath<O extends Options, P extends string> = O['prefix'] extends undefined
     ? P : `${ O['prefix'] }${ P }`
+  export type ResolveURL<URL extends string> =
+    URL extends `${ infer L }?${ infer R }`
+      ? ResolveURL<L> & {
+        query: ResolveQuery<R>
+      }
+      : {
+        query: {}
+        params: ResolvePath<URL>
+      }
   export type ResolvePath<P extends string> =
     P extends `${ infer _L }/:${ infer Param }/${ infer R }`
       ? ResolveParam<Param> & ResolvePath<R>
       : P extends `${ infer _L }/:${ infer Param }`
         ? ResolveParam<Param>
         : Record<string, ParamType<Schema<any>>>
+  export type ResolveQuery<Q extends string> =
+    Q extends `${ infer L }&${ infer R }`
+      ? ResolveParam<L> & ResolveQuery<R>
+      : ResolveParam<Q>
   export type ResolveParam<P extends string> =
     P extends `${ infer L }(${ infer Type })`
       ? extendObj<{}, L, ParamType<Type extends keyof PathParams ? PathParams[Type] : never>>
       : extendObj<{}, P, ParamType<Schema<string>>>
-  function resolveDesc(pre: string, desc?: string) {
+  function resolveDesc(desc?: string, pre?: string) {
     if (!desc)
       desc = '(string)'
     const [, type] = desc.match(/^\((.*)\)$/) || []
@@ -223,9 +236,16 @@ export namespace Router {
     else
       throw new Error(`Unsupported param type: ${ type }`)
   }
-  export function resolvePath<P extends string>(path: P): ResolvePath<P> {
+  export function resolveURL<URL extends string>(url: URL) {
+    const [path, query] = url.split('?')
+    return {
+      query: resolveQuery(query),
+      params: resolvePath(path)
+    } as any as ResolveURL<URL>
+  }
+  export function resolvePath<P extends string>(path: P) {
     let pre = ''
-    const params = {}
+    const params = <Record<string, any>>{}
     for (const pathItem of path.split('/')) {
       if (!pathItem.startsWith(':')) {
         pathItem && (pre += `/${ pathItem }`)
@@ -233,10 +253,20 @@ export namespace Router {
       }
 
       const [, name, desc = '(string)'] = pathItem.match(/^:(\w+)(\(\w+\))?/) || []
-      // @ts-ignore
-      params[name] = resolveDesc(pre, desc)
+      params[name] = resolveDesc(desc, pre)
     }
     return params as any as ResolvePath<P>
+  }
+  export function resolveQuery<Q extends string>(query: Q) {
+    const params = <Record<string, any>>{}
+    for (const queryItem of query.split('&')) {
+      if (!queryItem.startsWith(''))
+        continue
+
+      const [, name, desc = '(string)'] = queryItem.match(/^(\w+)(\(\w+\))?/) || []
+      params[name] = resolveDesc(desc)
+    }
+    return params as any as ResolveQuery<Q>
   }
   export function resolveSource<Rules extends {
     [name in string]: ParamType<Schema<any>>
