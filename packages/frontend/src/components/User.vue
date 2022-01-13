@@ -54,7 +54,7 @@
             type="primary" @click="add">下一步</el-button>
           <el-button
             v-else
-            type="primary">确定</el-button>
+            type="primary" @click="settingFriend">确定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -121,8 +121,14 @@ const
       })
       ElMessage.success('请求发送成功！')
     } catch {}
+  },
+  settingFriend = async () => {
+    await api.user('@me').friend(props.info.id).update({
+      tags: settingUserForm.tags,
+      remark: settingUserForm.remark
+    })
+    ElMessage.success('好友设置成功！')
   }
-
 onMounted(() => {
   isFriend.value = store.state.user.friends.findIndex(
     (item: Users.Out['friends'][number]) => item.id === props.info.id
