@@ -3,8 +3,7 @@ import Schema from 'schemastery'
 import { expect, use } from 'chai'
 import cap from 'chai-as-promised'
 import { Router } from '@boiling/core'
-import resolveURL = Router.resolveURL
-const { resolvePath, resolveSource, resolveQuery } = Router
+const { resolveURL, resolvePath, resolveSource, resolveQuery } = Router
 
 use(cap)
 
@@ -59,29 +58,32 @@ describe('Router', () => {
   })
   describe('URL', () => {
     it('should resolve source.', () => {
-      expect(resolveSource('/foo/hi', resolvePath('/foo/:foo')).foo)
+      expect(resolveSource('/foo/hi', resolveURL('/foo/:foo')))
+        .property('param').property('foo')
         .to.be.eq('hi')
-      const n = resolvePath('/foo/:foo(number)')
+      expect(resolveSource('/foo/bar', resolveURL('/foo/bar')))
+        .property('param').to.be.empty
+    })
+    it('should resolve source with types.', () => {
+      const n = resolveURL('/foo/:foo(number)')
       Object.entries({
         '/foo/123': 123,
         '/foo/0.123': 0.123,
         '/foo/+23': 23,
         '/foo/-23': -23
       }).forEach(([path, value]) => {
-        expect(resolveSource(path, n).foo, path)
+        expect(resolveSource(path, n).param.foo, path)
           .to.be.eq(value)
       })
-      const b = resolvePath('/foo/:foo(boolean)')
-      Object.entries({
-        '/foo/true': true,
-        '/foo/false': false,
-        '/foo/0': false
-      }).forEach(([path, value]) => {
-        expect(resolveSource(path, b).foo, path)
-          .to.be.eq(value)
-      })
-      expect(resolveSource('/foo/bar', resolvePath('/foo/bar')))
-        .to.be.empty
+    })
+    it('should resolve source with query.', () => {
+      const result = resolveSource('/foo/str?bar=str', resolveURL('/foo/:foo?bar'))
+      expect(result)
+        .property('param').property('foo')
+        .to.be.eq('str')
+      expect(result)
+        .property('query').property('bar')
+        .to.be.eq('str')
     })
     it('should resolve url.', () => {
       const url = resolveURL('/foo/:foo?bar')

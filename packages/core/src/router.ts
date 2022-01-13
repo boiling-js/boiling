@@ -66,6 +66,7 @@ export class Router<O extends Router.Options, Docs> {
     {} as { [key in Router.Methods]: {
       inn: Schema<any>
       out: Schema<any>
+      queryTypes: Record<string, Router.ParamType<Schema<any>>>
       paramTypes: Record<string, Router.ParamType<Schema<any>>>
       pathRegexp: RegExp
       middlewares: Router.MiddleWare<Router.Context<From<Schema>>, From<Schema>>[]
@@ -88,10 +89,16 @@ export class Router<O extends Router.Options, Docs> {
         if (ctx.body === undefined || ctx.body === null)
           ctx.body = {}
         item.inn(ctx.body)
+        const { param, query } = Router.resolveSource(ctx.path, {
+          query: item.queryTypes,
+          param: item.paramTypes
+        })
         const ctx2 = new Proxy(ctx, {
           get(target, prop) {
             if (prop === 'params')
-              return Router.resolveSource(ctx.path, item.paramTypes)
+              return param
+            if (prop === 'query')
+              return query
             return Reflect.get(target, prop)
           }
         })
@@ -128,21 +135,22 @@ export namespace Router {
       get(target, p, receiver) {
         const method = p as Router.Methods
         if (Router.methods.includes(method))
-          return proxyMiddleware((inn, out, path, middleware) => {
-            const params = resolvePath(path)
-            const regExp = new RegExp(`^${Object.entries(params).reduce(
+          return proxyMiddleware((inn, out, url, middleware) => {
+            const { param, query } = resolveURL(url)
+            const regExp = new RegExp(`^${Object.entries(param).reduce(
               (acc, [name, param]) => acc.replace(new RegExp(`:${name}(\\(\\w+\\))?`), param.regex.source),
-              `${target.opts.prefix || ''}${path}`
+              `${target.opts.prefix || ''}${url}`
             )}`)
             target.allowedMethods.push(method)
             target.middlewareMapper[method].push({
               inn, out,
-              paramTypes: params,
+              queryTypes: query,
+              paramTypes: param,
               pathRegexp: regExp,
               middlewares: [middleware]
             })
             target.docs = Object.assign(target.docs, {
-              [path]: { [method]: inn }
+              [url]: { [method]: inn }
             })
             return proxy
           })
@@ -152,9 +160,10 @@ export namespace Router {
     return proxy
   }
   export type MiddleWare<CTX, Res> = (ctx: CTX) => Awaited<Res>
-  export type Context<Body, Params = {}> = Koa.BaseContext & {
+  export type Context<Body, Params = {}, Query = {}> = Koa.BaseContext & {
     req: { body: Body }
     body: Body
+    query: Query
     params: Params
   }
   export type Methods = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head'
@@ -259,21 +268,25 @@ export namespace Router {
   }
   export function resolveQuery<Q extends string>(query: Q) {
     const params = <Record<string, any>>{}
-    for (const queryItem of query.split('&')) {
-      if (!queryItem.startsWith(''))
-        continue
+    if (query)
+      for (const queryItem of query.split('&')) {
+        if (!queryItem.startsWith(''))
+          continue
 
-      const [, name, desc = '(string)'] = queryItem.match(/^(\w+)(\(\w+\))?/) || []
-      params[name] = resolveDesc(desc)
-    }
+        const [, name, desc = '(string)'] = queryItem.match(/^(\w+)(\(\w+\))?/) || []
+        params[name] = resolveDesc(desc)
+      }
     return params as any as ResolveQuery<Q>
   }
   export function resolveSource<Rules extends {
-    [name in string]: ParamType<Schema<any>>
+    query: { [name in string]: ParamType<Schema<any>> }
+    param: { [name in string]: ParamType<Schema<any>> }
   }, R = {
-    [name in keyof Rules]: From<Rules[name]['schema']>
-  }>(source: string, rules: Rules): R {
-    return Object.entries(rules).reduce((acc, [name, { pre, regex, schema }]) => {
+    query: { [name in keyof Rules['query']]: From<Rules['query'][name]['schema']> }
+    param: { [name in keyof Rules['param']]: From<Rules['param'][name]['schema']> }
+  }>(source: string, rules: Rules) {
+    const result = <Record<string, any>>{}
+    result.param = Object.entries(rules.param).reduce((acc, [name, { pre, regex, schema }]) => {
       const param = new RegExp(`${ pre }/(${ regex.source })`).exec(source)?.[1] ?? undefined
       acc[name] = schema(schema.meta
         ? schema.meta.processor?.(param) ?? param
@@ -281,5 +294,14 @@ export namespace Router {
       )
       return acc
     }, {} as any)
+    result.query = Object.entries(rules.query).reduce((acc, [name, { regex, schema }]) => {
+      const param = new RegExp(`${name}=(${ regex.source })&?`).exec(source)?.[1] ?? undefined
+      acc[name] = schema(schema.meta
+        ? schema.meta.processor?.(param) ?? param
+        : param
+      )
+      return acc
+    }, {} as any)
+    return result as any as R
   }
 }
