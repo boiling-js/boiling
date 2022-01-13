@@ -24,15 +24,11 @@ type extendObj<O, K extends string, V> = O & { [key in K]: V }
 export interface PathParams extends Router.InnerParamTypes {
 }
 
-type Params2Record<O extends Record<string, Router.ParamType<Schema<any>>>> = {
-  [K in keyof O]: O[K] extends Router.ParamType<Schema<infer S>> ? S : never
-}
-
 type RouterMethods<O extends Router.Options, Docs> = {
   [Method in Router.Methods]: <
     P extends string,
     _P extends string = Router.ComputedPath<O, P>,
-    Ctx = Router.Context<never, Params2Record<Router.ResolvePath<_P>>>
+    Ctx = Router.Context<never, _P>
   >(path: P, middleware: Router.MiddleWare<Ctx, any>) => Router<O, extendObj<
     Docs, _P, { [K in Method]: Ctx }
   >>
@@ -41,7 +37,7 @@ type OnlyOutRouterMethods<O extends Router.Options, Docs> = {
   [Method in Router.Methods]: <
     P extends string, Out extends Schema,
     _P extends string = Router.ComputedPath<O, P>,
-    Ctx = Router.Context<never, Params2Record<Router.ResolvePath<_P>>>
+    Ctx = Router.Context<never, _P>
   >(out: Out, path: P, middleware: Router.MiddleWare<Ctx, Out extends Schema<infer S> ? S : never>) => Router<O, extendObj<
     Docs, _P, { [K in Method]: Ctx }
   >>
@@ -50,7 +46,7 @@ type WithInnRouterMethods<O extends Router.Options, Docs> = {
   [Method in Router.Methods]: <
     P extends string, Inn extends Schema, Out extends Schema,
     _P extends string = Router.ComputedPath<O, P>,
-    Ctx = Router.Context<Inn extends Schema<infer S> ? S : never, Router.ResolvePath<_P>>
+    Ctx = Router.Context<Inn extends Schema<infer S> ? S : never, _P>
   >(inn: Inn, out: Out, path: P, middleware: Router.MiddleWare<Ctx, Out extends Schema<infer S> ? S : never>) => Router<O, extendObj<
     Docs, _P, { [K in Method]: Ctx }
   >>
@@ -80,7 +76,7 @@ export class Router<O extends Router.Options, Docs> {
       queryTypes: Record<string, Router.ParamType<Schema<any>>>
       paramTypes: Record<string, Router.ParamType<Schema<any>>>
       pathRegexp: RegExp
-      middlewares: Router.MiddleWare<Router.Context<From<Schema>>, From<Schema>>[]
+      middlewares: Router.MiddleWare<Router.Context<From<Schema>, ''>, From<Schema>>[]
     }[] }
   )
   constructor(opts?: O) {
@@ -155,10 +151,11 @@ export namespace Router {
           if (method === 'del')
             method = 'delete'
           return proxyMiddleware((inn, out, url, middleware) => {
+            const [ path ] = url.split('?')
             const { param, query } = resolveURL(url)
             const regExp = new RegExp(`^${Object.entries(param).reduce(
               (acc, [name, param]) => acc.replace(new RegExp(`:${name}(\\(\\w+\\))?`), param.regex.source),
-              `${target.opts.prefix || ''}${url}`
+              `${target.opts.prefix || ''}${path}`
             )}`)
             target.allowedMethods.push(method)
             target.middlewareMapper[method].push({
@@ -180,11 +177,19 @@ export namespace Router {
     return proxy
   }
   export type MiddleWare<CTX, Res> = (ctx: CTX) => Res | Promise<Res>
-  export type Context<Body, Params = {}, Query = {}> = Koa.BaseContext & {
+  type Params2Record<O extends Record<string, Router.ParamType<Schema<any>>>> = {
+    [K in keyof O]: O[K] extends Router.ParamType<Schema<infer S>> ? S : never
+  }
+  export type Context<
+    Body, URL extends string,
+    R extends ResolveURL<URL> = ResolveURL<URL>,
+    Query = Params2Record<R['query']>,
+    Param = Params2Record<R['param']>
+  > = Koa.BaseContext & {
     req: { body: Body }
     body: Body
     query: Query
-    params: Params
+    params: Param
   }
   export type Methods = 'get' | 'post' | 'put' | 'delete' | 'del' | 'patch' | 'head'
   export const methods = ['get', 'post', 'put', 'delete', 'del', 'patch', 'head']

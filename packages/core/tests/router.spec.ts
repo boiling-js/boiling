@@ -61,6 +61,13 @@ describe('Router', () => {
       await expect(middleware(createCtx('get', '/users/b/100'), next))
         .to.be.eventually.eq(100)
     })
+    it('should reveal router middlewares with query.', async () => {
+      const r = new Router({ prefix: '/users' as '/users' })
+        .get(Schema.string(), '/a?name', ctx => ctx.query.name)
+      const middleware = r.middleware()
+      await expect(middleware(createCtx('get', '/users/a?name=ahh'), next))
+        .to.be.eventually.eq('ahh')
+    })
   })
   describe('URL', () => {
     it('should resolve source.', () => {
