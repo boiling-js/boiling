@@ -99,7 +99,7 @@ export class Router<O extends Router.Options, Docs> {
         )
       }
     }
-    return Promise.resolve()
+    return Promise.resolve(next())
   }
 }
 
