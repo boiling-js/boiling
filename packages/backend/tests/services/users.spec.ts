@@ -1,4 +1,7 @@
-import { expect } from 'chai'
+import { expect, use } from 'chai'
+import cap from 'chai-as-promised'
+
+use(cap)
 
 import { UsersService } from '../../src/services/users'
 
@@ -53,6 +56,17 @@ describe('Users Service', function () {
     // @ts-ignore
     expect(UsersService.get.bind(UsersService, null))
       .to.throw('Not support type.')
+  })
+  it('should get user or throw 404 error.', async function () {
+    const {
+      id, username
+    } = await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
+    await expect(UsersService.getOrThrow(id))
+      .to.be.eventually.property('username').eq(username)
+    await expect(UsersService.getOrThrow(id, m => m.select({ friends: 0 })))
+      .to.be.eventually.property('friends').eq(undefined)
+    await expect(UsersService.getOrThrow(0))
+      .to.be.eventually.rejectedWith('[404] id 为 \'0\' 的用户不存在')
   })
   it('should add tags', async function () {
     const { id } = await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
