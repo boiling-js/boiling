@@ -68,13 +68,13 @@ export const router = new Router<{}, AppContext>({
       +ctx.params.uid, <Users.Friend>ctx.request.body)
   })
   .get('/:id/friends', ctx => {
-    return UsersService.Friends.get(useTarget(ctx.params, ctx.session,'id'))
+    return UsersService.Friends.get(useTarget(ctx.params, ctx.session))
   })
   .post('/:id/tag', ctx => {
     const { tag } = ctx.request.body
     if (!tag)
       throw new HttpError('BAD_REQUEST', '标签不能为空')
-    return UsersService.addTag(useTarget(ctx.params, ctx.session,'id'), tag)
+    return UsersService.addTag(useTarget(ctx.params, ctx.session), tag)
   })
   .get('/:id/channels', async ctx => {
     return ctx

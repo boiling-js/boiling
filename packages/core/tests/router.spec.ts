@@ -14,8 +14,9 @@ declare module '@boiling/core' {
 }
 
 describe('Router', () => {
-  const createCtx = (method: Router.Methods, path: string) => <Koa.Context>{
-    method, path
+  const next = () => {}
+  const createCtx = (method: Router.Methods, path: string, body?: any) => <Koa.Context>{
+    method, path, body
   }
   describe('Middleware', () => {
     it('should reveal router middlewares.', async () => {
@@ -23,20 +24,23 @@ describe('Router', () => {
         .get(Schema.number(), '/a', () => 2)
         // @ts-ignore
         .get(Schema.string(), '/b', () => 4)
-      const next = () => {}
-      await expect(r.middleware(createCtx('get', '/hhh'), () => 'hhh'))
-        .to.be.eventually.eq('hhh')
-      await expect(r.middleware(createCtx('get', '/hhhhhhh'), next))
+        .get(Schema.number(), Schema.number(), '/c', ctx => ctx.body)
+      await expect(r.middleware(createCtx('get', '/h'), () => 'none'))
+        .to.be.eventually.eq('none')
+      await expect(r.middleware(createCtx('get', '/h'), next))
         .to.be.eventually.eq(undefined)
       await expect(r.middleware(createCtx('get', '/a'), next))
         .to.be.eventually.eq(2)
       await expect(r.middleware(createCtx('get', '/b'), next))
         .to.be.eventually.rejectedWith('expected string but got 4')
+      await expect(r.middleware(createCtx('get', '/c', 1), next))
+        .to.be.eventually.eq(1)
+      expect(r.middleware.bind(r, createCtx('get', '/c', '1'), next))
+        .to.be.throw('expected number but got 1')
     })
     it('should reveal router middlewares with router prefix.', async () => {
       const r = new Router({ prefix: '/users' as '/users' })
         .get(Schema.number(), '/a', () => 2)
-      const next = () => {}
       await expect(r.middleware(createCtx('get', '/n'), next))
         .to.be.eventually.eq(undefined)
       await expect(r.middleware(createCtx('get', '/users/a'), next))
@@ -46,10 +50,6 @@ describe('Router', () => {
       const r = new Router({ prefix: '/users' as '/users' })
         .get(Schema.string(), '/a/:name(string)', ctx => ctx.params.name)
         .get(Schema.number(), '/b/:id(number)', ctx => ctx.params.id)
-      const createCtx = (method: Router.Methods, path: string) => <Koa.Context>{
-        method, path
-      }
-      const next = () => {}
       await expect(r.middleware(createCtx('get', '/users/a/ahh'), next))
         .to.be.eventually.eq('ahh')
       await expect(r.middleware(createCtx('get', '/users/b/100'), next))
@@ -137,6 +137,23 @@ describe('Router', () => {
         // @ts-ignore
         expect(p0.foo.schema.bind(null, '1'))
           .to.throw('expected function () { [native code] } but got "1"')
+      })
+      it('should resolve multi params.', () => {
+        const p0 = resolvePath('/foo/:foo(string)/:bar(number)')
+        p0.foo.schema('1')
+        expect(p0.foo.regex.test('ahhh'))
+          .to.be.eq(true)
+        // @ts-ignore
+        expect(p0.foo.schema.bind(null, 1))
+          .to.throw('expected string but got 1')
+        p0.bar.schema(1)
+        ;['1', '1.111', '-10', '-10.01'].forEach(v => {
+          expect(p0.bar.regex.test(v))
+            .to.be.eq(true)
+        })
+        // @ts-ignore
+        expect(p0.bar.schema.bind(null, '1'))
+          .to.throw('expected number but got 1')
       })
     })
   })
