@@ -14,7 +14,7 @@
       <span class="material-icons"
             @click="$refs.configureFriend.show()">{{ isFriend ? 'settings' : 'add' }}</span>
     </div>
-    <configure-user ref="configureFriend" :info="info"/>
+    <configure-friend ref="configureFriend" :info="info"/>
   </div>
 </template>
 
@@ -22,7 +22,7 @@
 import { Users } from '@boiling/core'
 import { computed } from 'vue'
 import { useStore } from 'vuex'
-import ConfigureUser from './ConfigureUser.vue'
+import ConfigureFriend from './ConfigureFriend.vue'
 
 const
   store = useStore(),
