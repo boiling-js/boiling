@@ -15,8 +15,9 @@ declare module '@boiling/core' {
 
 describe('Router', () => {
   const next = () => {}
-  const createCtx = (method: Router.Methods, path: string, body?: any) => <Koa.Context>{
-    method, path, body
+  const createCtx = (method: Router.Methods, path: string, body?: any) => <Koa.Context><any>{
+    method, path,
+    req: { body }, request: { body }
   }
   describe('Middleware', () => {
     it('should reveal router middlewares.', async () => {
@@ -25,7 +26,7 @@ describe('Router', () => {
         .get(Schema.number(), '/a', () => 2)
         // @ts-ignore
         .get(Schema.string(), '/b', () => 4)
-        .get(Schema.number(), Schema.number(), '/c', ctx => ctx.body)
+        .get(Schema.number(), Schema.number(), '/c', ctx => ctx.request.body)
       const middleware = r.middleware()
       await expect(middleware(createCtx('get', '/h'), () => 'none'))
         .to.be.eventually.eq('none')

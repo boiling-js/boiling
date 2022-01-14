@@ -90,12 +90,12 @@ export class Router<O extends Router.Options, Docs> {
       const method = <Router.Methods>ctx.method.toLowerCase()
       if (this.opts.prefix && !ctx.path.startsWith(this.opts.prefix))
         return Promise.resolve(next())
-      // @ts-ignore
       if (!this.allowedMethods.includes(method))
         return Promise.resolve(next())
       for (const item of this.middlewareMapper[method]) {
         if (item.pathRegexp.test(ctx.path)) {
-          item.inn && item.inn(ctx.body)
+          // @ts-ignore
+          item.inn(ctx.request.body)
           const { param, query } = Router.resolveSource(ctx.path, {
             query: item.queryTypes,
             param: item.paramTypes
@@ -156,7 +156,7 @@ export namespace Router {
             const regExp = new RegExp(`^${Object.entries(param).reduce(
               (acc, [name, param]) => acc.replace(new RegExp(`:${name}(\\(\\w+\\))?`), param.regex.source),
               `${target.opts.prefix || ''}${path}`
-            )}`)
+            )}$`)
             target.allowedMethods.push(method)
             target.middlewareMapper[method].push({
               inn, out,
@@ -166,7 +166,7 @@ export namespace Router {
               middlewares: [middleware]
             })
             target.docs = Object.assign(target.docs, {
-              [url]: { [method]: inn }
+              [url]: { [method]: { inn, out } }
             })
             return proxy
           })
@@ -186,10 +186,10 @@ export namespace Router {
     Query = Params2Record<R['query']>,
     Param = Params2Record<R['param']>
   > = Koa.BaseContext & {
-    req: { body: Body }
-    body: Body
     query: Query
     params: Param
+  } & {
+    [r in 'req' | 'request']: { body: Body }
   }
   export type Methods = 'get' | 'post' | 'put' | 'delete' | 'del' | 'patch' | 'head'
   export const methods = ['get', 'post', 'put', 'delete', 'del', 'patch', 'head']
