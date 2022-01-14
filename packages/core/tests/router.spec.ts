@@ -15,8 +15,8 @@ declare module '@boiling/core' {
 
 describe('Router', () => {
   const next = () => {}
-  const createCtx = (method: Router.Methods, path: string, body?: any) => <Koa.Context><any>{
-    method, path,
+  const createCtx = (method: Router.Methods, url: string, body?: any) => <Koa.Context><any>{
+    method, url, path: url.split('?')[0],
     req: { body }, request: { body }
   }
   describe('Middleware', () => {
