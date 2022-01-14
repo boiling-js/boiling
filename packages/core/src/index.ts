@@ -9,6 +9,12 @@ export interface SearchQuery extends ParsedUrlQuery {
   page?: string
   num?: string
 }
+export interface ChatRoom {
+  id: number
+  members: Users.FriendOut[]
+  messages: {}[]
+}
+
 export namespace Users {
   export interface Base {
     /** 用户唯一 id */

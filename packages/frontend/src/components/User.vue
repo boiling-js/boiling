@@ -125,7 +125,8 @@ const
           cancelButtonText: '取消'
         }
       )
-      await api.user('@me').friend(props.info.id).add({
+      await store.dispatch('addFriend', {
+        id: props.info.id,
         tags: settingUserForm.tags,
         remark: settingUserForm.remark
       })
