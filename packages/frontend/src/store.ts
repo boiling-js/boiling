@@ -23,6 +23,9 @@ export default createStore({
     },
     setUser(state, user: Users.Out) {
       state.user = user
+    },
+    addFriend(state, friend: Users.Friend) {
+      state.user.friends.push(friend)
     }
   },
   actions: {

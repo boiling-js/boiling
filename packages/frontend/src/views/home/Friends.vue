@@ -4,8 +4,7 @@
       <el-tab-pane label="在线">
         <user
           v-for="friend in friends" :key="friend.id"
-          :info="friend"
-          @update="refresh"/>
+          :info="friend"/>
       </el-tab-pane>
       <el-tab-pane label="全部">全部</el-tab-pane>
       <el-tab-pane label="离线">离线</el-tab-pane>
@@ -15,21 +14,23 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
-import { ElTabs, ElTabPane } from 'element-plus'
 import { Users } from '@boiling/core'
+import { onMounted, ref, watch } from 'vue'
+import { useStore } from 'vuex'
+import { ElTabs, ElTabPane } from 'element-plus'
 import { api } from '../../api'
 import User from '../../components/User.vue'
 
 const
+  store = useStore(),
   friends = ref<Users.FriendOut[]>([]),
   refresh = async () => {
     friends.value = await api.user('@me').friends
   }
 
-onMounted(async () => {
-  await refresh()
-})
+watch(() => store.state.user.friends, refresh)
+
+onMounted(refresh)
 </script>
 
 <style scoped lang="scss">
