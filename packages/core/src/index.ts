@@ -1,4 +1,5 @@
 import { ParsedUrlQuery } from 'querystring'
+import './schemastery-interface'
 
 export interface Pagination<Item> {
   count: number

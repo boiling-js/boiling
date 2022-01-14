@@ -5,8 +5,6 @@ import cap from 'chai-as-promised'
 import { Router } from '@boiling/core'
 const { resolveURL, resolveType, resolvePath, resolveSource, resolveQuery } = Router
 
-import '../src/schemastry-interface'
-
 use(cap)
 
 declare module '@boiling/core' {
