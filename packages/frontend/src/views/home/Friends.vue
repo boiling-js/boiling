@@ -28,7 +28,7 @@ const
     friends.value = await api.user('@me').friends
   }
 
-watch(() => store.state.user.friends, refresh)
+watch(() => store.state.user.friends, refresh, { deep: true })
 
 onMounted(refresh)
 </script>
