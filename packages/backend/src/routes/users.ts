@@ -1,17 +1,24 @@
-import Router from '@koa/router'
-import { SearchQuery, Users } from '@boiling/core'
+import { Users, Router } from '@boiling/core'
+import Schema from 'schemastery'
 
-import { AppContext } from '../'
 import { UsersService } from '../services/users'
 import { Security } from '../utils'
 import usePagination from '../hooks/usePagination'
 import extendService from '../hooks/extendService'
 import useTarget from '../hooks/useTarget'
+import useCurUser from '../hooks/useCurUser'
 
-export const router = new Router<{}, AppContext>({
-  prefix: '/users'
+declare module '@boiling/core' {
+  interface PathParams {
+    uid: Schema<number | '@me'>
+  }
+}
+Router.extendParamTypes('uid', Schema.union([Schema.number(), '@me']), /(@me)|(([-+])?\d+(\.\d+)?)/)
+
+export const router = new Router({
+  prefix: '/users' as '/users'
 })
-  .post('/', async ctx => {
+  .post('', async ctx => {
     const { username, password } = <Users.Register>ctx.request.body
     const user = await UsersService.add({
       username,
@@ -20,20 +27,18 @@ export const router = new Router<{}, AppContext>({
     })
     return { id: user.id, username: user.username, avatar: user.avatar }
   })
-  .get('/', async ctx => {
+  .get('?key&page(number)&num(number)', async ctx => {
     return usePagination(
       extendService(UsersService, 'search', m => m.find({
-        id: {
-          $ne: ctx.session?.curUser?.id
-        }
-      })), <SearchQuery>ctx.query
+        id: { $ne: useCurUser(ctx.session).id }
+      })), ctx.query
       // @ts-ignore
     )<Users.Out>(item => (delete item._doc.passwordHash) && item)
   })
-  .get('/:id', async ctx => {
+  .get('/:id(number)', async ctx => {
     return UsersService.get(ctx.params.id)
   })
-  .post('/:id/status', async ctx => {
+  .post('/:id(number)/status', async ctx => {
     const {
       status, password
     } = <Users.Status>ctx.request.body
@@ -57,28 +62,30 @@ export const router = new Router<{}, AppContext>({
         return
     }
   })
-  .post('/:id/friends/:uid', ctx => {
+  .post('/:id(uid)/friends/:targetId(number)', ctx => {
     return UsersService.Friends.add(
-      useTarget(ctx.params, ctx.session,'id'),
-      +ctx.params.uid, <Users.Friend>ctx.request.body)
+      useTarget(ctx.session, ctx.params.id),
+      ctx.params.targetId, <Users.Friend>ctx.request.body
+    )
   })
-  .patch('/:id/friends/:uid', ctx => {
+  .patch('/:id(uid)/friends/:targetId(number)', ctx => {
     return UsersService.Friends.update(
-      useTarget(ctx.params, ctx.session,'id'),
-      +ctx.params.uid, <Users.Friend>ctx.request.body)
+      useTarget(ctx.session, ctx.params.id),
+      ctx.params.targetId, <Users.Friend>ctx.request.body
+    )
   })
-  .get('/:id/friends', ctx => {
-    return UsersService.Friends.get(useTarget(ctx.params, ctx.session))
+  .get('/:id(uid)/friends', ctx => {
+    return UsersService.Friends.get(useTarget(ctx.session, ctx.params.id))
   })
-  .post('/:id/tag', ctx => {
+  .post('/:id(uid)/tag', ctx => {
     const { tag } = ctx.request.body
     if (!tag)
       throw new HttpError('BAD_REQUEST', '标签不能为空')
-    return UsersService.addTag(useTarget(ctx.params, ctx.session), tag)
+    return UsersService.addTag(useTarget(ctx.session, ctx.params.id), tag)
   })
-  .get('/:id/channels', async ctx => {
+  .get('/:id(number)/channels', async ctx => {
     return ctx
   })
-  .del('/:id/channels/:cid', async ctx => {
+  .del('/:id(number)/channels/:cid', async ctx => {
     console.log(ctx.params)
   })
