@@ -13,6 +13,10 @@ const router = createRouter({
     children: [{
       path: '/home/friends',
       component: () => import('./views/home/Friends.vue')
+    }, {
+      path: '/home/chat-rooms/:id',
+      component: () => import('./views/ChatRoom.vue'),
+      props: true
     }]
   }, {
     path: '/login',

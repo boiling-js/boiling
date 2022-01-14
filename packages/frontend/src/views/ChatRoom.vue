@@ -1,35 +1,28 @@
 <template>
   <div class="chat">
     <div class="top-bar">
-      <span
-        class="icon material-icons"
-        @click="$emit('back')">arrow_back_ios_new</span>
-      <span>{{ props.friend.remark || props.friend.username }}</span>
+      <span class="icon material-icons"
+            @click="$router.back()">arrow_back_ios_new</span>
+      <span>{{ props.id }}</span>
     </div>
     <div class="room">
-      <div class="content">
-
-      </div>
+      <div class="content"/>
       <div class="message-input">
-        <el-input
-          v-model="editingMessage"
-          type="textarea"/>
+        <el-input v-model="editingMessage" type="textarea"/>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Users } from '@boiling/core'
 import { ElInput } from 'element-plus'
 import { ref } from 'vue'
 
-defineEmits(['back'])
 const
   props = defineProps<{
-    friend: Users.FriendOut
+    id: number
   }>(),
-  editingMessage = ref<string>('')
+  editingMessage = ref('')
 </script>
 
 <style scoped lang="scss">

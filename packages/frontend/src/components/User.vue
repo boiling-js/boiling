@@ -13,7 +13,7 @@
             @click="settingUserDialog = true">add</span>
       <span v-if="isFriend"
             class="material-icons"
-            @click="$emit('chat')">chat_bubble_outline</span>
+            @click="$router.push(`/home/chat-rooms/${ info.id }`)">chat_bubble_outline</span>
       <span v-if="isFriend"
             class="material-icons"
             @click="settingUserDialog = true">settings</span>
@@ -87,16 +87,6 @@ const
   tagInputVisible = ref(false),
   tagInputValue = ref(''),
   tagInputRef = ref<InstanceType<typeof ElInput>>(),
-  init = () => {
-    isFriend.value = store.state.user.friends.findIndex(
-      (item: Users.Out['friends'][number]) => item.id === props.info.id
-    ) !== -1
-    if (isFriend.value) {
-      const f = props.info as Users.FriendOut
-      settingUserForm.tags = f.tags
-      settingUserForm.remark = f.remark || f.username
-    }
-  },
   showInput = () => {
     tagInputVisible.value = true
     nextTick(() => {
@@ -144,8 +134,16 @@ const
     settingUserDialog.value = false
     ElMessage.success('好友设置成功！')
   }
+
 onMounted(() => {
-  init()
+  isFriend.value = store.state.user.friends.findIndex(
+    (item: Users.Out['friends'][number]) => item.id === props.info.id
+  ) !== -1
+  if (isFriend.value) {
+    const f = props.info as Users.FriendOut
+    settingUserForm.tags = f.tags
+    settingUserForm.remark = f.remark || f.username
+  }
 })
 </script>
 
