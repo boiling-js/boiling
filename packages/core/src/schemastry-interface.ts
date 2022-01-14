@@ -10,14 +10,11 @@ declare module 'schemastery' {
   }
   namespace Schema {
     type ObjectS<X extends Dict> = {
-      [K in keyof X]?:  Schema.TypeS<X[K]>
+      [K in keyof X]: Schema.TypeS<X[K]>
     } & Dict
     type ObjectT<X extends Dict> = {
-      [K in keyof X]?:  Schema.TypeT<X[K]>
+      [K in keyof X]: Schema.TypeT<X[K]>
     } & Dict
-    interface Meta<T = any> {
-      processor: (o: any) => T
-    }
     interface Static {
       interface<X extends Dict>(dict: X): Schema<Schema.ObjectS<X>, Schema.ObjectT<X>>
     }

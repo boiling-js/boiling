@@ -5,6 +5,8 @@ import cap from 'chai-as-promised'
 import { Router } from '@boiling/core'
 const { resolveURL, resolveType, resolvePath, resolveSource, resolveQuery } = Router
 
+import '../src/schemastry-interface'
+
 use(cap)
 
 declare module '@boiling/core' {
@@ -67,6 +69,16 @@ describe('Router', () => {
         .get(Schema.string(), '/a?name', ctx => ctx.query.name)
       const middleware = r.middleware()
       await expect(middleware(createCtx('get', '/users/a?name=ahh'), next))
+        .to.be.eventually.eq('ahh')
+    })
+    it('should reveal router middlewares by interface.', async () => {
+      const r = new Router({ prefix: '/users' as '/users' })
+        .get(Schema.interface({
+          name: Schema.string()
+        }), Schema.any(), '/a', ctx => {
+          return ctx.request.body.name
+        })
+      await expect(r.middleware()(createCtx('get', '/users/a', { name: 'ahh' }), next))
         .to.be.eventually.eq('ahh')
     })
   })
