@@ -39,7 +39,6 @@ export default createStore({
     delFriend(state, id: number) {
       const index = state.user.friends.findIndex(friend => friend.id === id)
       state.user.friends = state.user.friends.splice(index - 1, 1)
-      console.log('state.user.friends', state.user.friends)
     }
   },
   actions: {
