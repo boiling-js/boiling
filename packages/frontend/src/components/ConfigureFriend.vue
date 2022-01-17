@@ -28,8 +28,10 @@
         </el-button>
       </el-form-item>
     </el-form>
-    <el-divider content-position="left">危险操作</el-divider>
-    <div class="other-operate">
+    <div
+      v-if="props.isFriend"
+      class="other-operate">
+      <el-divider content-position="left">危险操作</el-divider>
       <div class="operate">
         <span class="bolder">删除好友</span>
         <br>
@@ -58,7 +60,7 @@
       <span class="dialog-footer">
         <el-button @click="isShow = false">取消</el-button>
         <el-button
-          v-if="!isFriend"
+          v-if="!props.isFriend"
           type="primary" @click="add">下一步</el-button>
         <el-button
           v-else
@@ -74,17 +76,14 @@ import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import { useStore } from 'vuex'
 import { ElDialog, ElInput, ElForm, ElFormItem, ElSelect, ElOption, ElButton, ElMessageBox, ElMessage, ElDivider } from 'element-plus'
 import { api } from '../api'
-import * as assert from 'assert'
 
 const
   store = useStore(),
   props = defineProps<{
-    info: Users.Out | Users.FriendOut
+    info: Users.Out | Users.FriendOut,
+    isFriend: boolean
   }>(),
   isShow = ref(false),
-  isFriend = computed(() => store.state.user.friends.findIndex(
-    (item: Users.Out['friends'][number]) => item.id === props.info.id
-  ) !== -1),
   tags = computed(() => store.state.user.tags),
   settingUserForm = reactive<Omit<Users.Friend, 'id'>>({
     tags: [],
@@ -154,7 +153,7 @@ const
   }
 
 onMounted(() => {
-  if (isFriend.value) {
+  if (props.isFriend) {
     const f = props.info as Users.FriendOut
     settingUserForm.tags = f.tags
     settingUserForm.remark = f.remark || f.username

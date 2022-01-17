@@ -14,7 +14,10 @@
       <span class="material-icons"
             @click="$refs.configureFriend.show()">{{ isFriend ? 'settings' : 'add' }}</span>
     </div>
-    <configure-friend ref="configureFriend" :info="info"/>
+    <configure-friend
+      ref="configureFriend"
+      :is-friend="isFriend"
+      :info="info"/>
   </div>
 </template>
 
