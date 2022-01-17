@@ -2,21 +2,28 @@ import { Api, attachApi, Pagination, QueryPromise, SearchQuery, Users } from '@b
 import { ElMessage } from 'element-plus'
 
 interface OfficialApi {
+  /** 搜索用户 */
   users: QueryPromise<Pagination<Users.Out>, SearchQuery> & {
+    /** 注册新用户 */
     add(d: Users.Register): Promise<Users.Out>
   }
+  /** 获取指定用户 */
   user(id: number | '@me'): {
     status: {
+      /** 登录用户并设置用户状态 */
       add(d: Users.Status): Promise<Users.Out>
     }
+    /** 获取好友列表 */
     friends: Promise<Users.FriendOut[]> & {
-      add(d: Omit<Users.Friend, 'id'>): Promise<void>
+      /** 添加好友 */
+      add(d: Users.Friend): Promise<void>
     }
     tag: {
+      /** 创建好友标签 */
       add(d: { tag: string }): Promise<void>
     }
     friend(fUid: Pick<Users.Friend, 'id'>['id']): {
-      add(d: Omit<Users.Friend, 'id'>): Promise<void>
+      del(): Promise<void>
       upd(d: Omit<Users.Friend, 'id'>): Promise<void>
     }
   }

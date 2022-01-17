@@ -62,16 +62,23 @@ export const router = new Router({
         return
     }
   })
-  .post('/:id(uid)/friends/:targetId(number)', ctx => {
+  .post('/:id(uid)/friends', ctx => {
+    const { id: fid, ...opts } = <Users.Friend>ctx.request.body
     return UsersService.Friends.add(
       useTarget(ctx.session, ctx.params.id),
-      ctx.params.targetId, <Users.Friend>ctx.request.body
+      +fid, <Users.Friend>ctx.request.body
     )
   })
   .patch('/:id(uid)/friends/:targetId(number)', ctx => {
     return UsersService.Friends.update(
       useTarget(ctx.session, ctx.params.id),
       ctx.params.targetId, <Users.Friend>ctx.request.body
+    )
+  })
+  .delete('/:id(uid)/friends/:targetId(number)', ctx => {
+    return UsersService.Friends.del(
+      useTarget(ctx.session, ctx.params.id),
+      ctx.params.targetId
     )
   })
   .get('/:id(uid)/friends', ctx => {

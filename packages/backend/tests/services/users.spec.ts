@@ -142,4 +142,18 @@ describe('Users Service', function () {
     expect(addFriend[0].tags).to.be.deep.eq(['tag-update'])
     expect(addFriend[0].remark).to.be.eq('remark-update')
   })
+  it('should delete friend', async function () {
+    const [ user, friend, friend1 ] = await Promise.all([
+      UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' }),
+      UsersService.add({ username: 'testFriend1', passwordHash: 'testFriend1', avatar: 'testFriend1' }),
+      UsersService.add({ username: 'testFriend', passwordHash: 'testFriend', avatar: 'testFriend' })
+    ])
+    const id = user.id
+    await UsersService.Friends.add(id, friend.id)
+    await UsersService.Friends.add(id, friend1.id)
+    await UsersService.Friends.del(id, friend.id)
+    const addFriend = await UsersService.Friends.get(id)
+    expect(addFriend.length).to.be.eq(1)
+    expect(addFriend[0].id).to.be.eq(friend1.id)
+  })
 })
