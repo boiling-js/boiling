@@ -5,6 +5,8 @@ import { api } from './api'
 
 export default createStore({
   state: {
+    chatRoom: <ChatRoom>{
+    },
     isHiddenLeftSelector: false,
     user: <Users.Out>{
       id: 0,
@@ -24,8 +26,20 @@ export default createStore({
     setUser(state, user: Users.Out) {
       state.user = user
     },
+    chatRoomPushUser(state, user: Users.Out) {
+      state.chatRoom.members.push(user)
+    },
     addFriend(state, friend: Users.Friend) {
       state.user.friends.push(friend)
+    },
+    updFriend(state, friend: Users.Friend) {
+      const index = state.user.friends.findIndex(iFriend => iFriend.id === friend.id)
+      state.user.friends[index] = friend
+    },
+    delFriend(state, id: number) {
+      const index = state.user.friends.findIndex(friend => friend.id === id)
+      state.user.friends = state.user.friends.splice(index - 1, 1)
+      console.log('state.user.friends', state.user.friends)
     }
   },
   actions: {
