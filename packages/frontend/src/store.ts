@@ -36,8 +36,9 @@ export default createStore({
       })
       context.commit('addFriend', friend)
     },
-    delFriend(context, id: number) {
+    async delFriend(context, id: number) {
       context.commit('delFriend', id)
+     await api.user(this.state.user.id).friend(id).del()
     },
     async updFriend(context, friend: Users.Friend) {
       await api.user(this.state.user.id).friend(friend.id).upd({

@@ -17,6 +17,7 @@ interface OfficialApi {
     }
     friend(fUid: Pick<Users.Friend, 'id'>['id']): {
       add(d: Omit<Users.Friend, 'id'>): Promise<void>
+      del(): Promise<void>
       upd(d: Omit<Users.Friend, 'id'>): Promise<void>
     }
   }
