@@ -88,6 +88,9 @@ div.user {
       opacity: 1;
     }
   }
+  > :deep(.el-overlay) {
+    cursor: default;
+  }
   &.inline {
     justify-content: space-between;
     padding: 10px;

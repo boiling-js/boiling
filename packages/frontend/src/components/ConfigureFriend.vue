@@ -4,7 +4,7 @@
     class="configure-friend"
     title="好友设置"
     width="60%">
-    <el-form ref="formRef" :model="settingUserForm" label-width="120px">
+    <el-form ref="formRef" :model="settingUserForm" label-width="60px">
       <el-form-item label="备注：">
         <el-input v-model="settingUserForm.remark"/>
       </el-form-item>
@@ -33,28 +33,24 @@
       class="other-operate">
       <el-divider content-position="left">危险操作</el-divider>
       <div class="operate">
-        <span class="bolder">删除好友</span>
-        <br>
-        删除好友后，对方将不在你的好友列表中。
-        <el-button
-          class="btn"
-          type="danger"
-          round
-          size="small"
-          @click="delFriend">确认</el-button>
-        <el-divider></el-divider>
+        <div class="desc">
+          <div class="title">删除好友</div>
+          删除好友后，对方将不在你的好友列表中。
+        </div>
+        <el-button type="danger"
+                   @click="delFriend"
+                   v-text="'确认'"/>
       </div>
+      <el-divider/>
       <div class="operate">
-        <span class="bolder">拉入黑名单</span>
-        <br>
-        拉入黑名单后，你将无法接收到对方的消息。
-        <el-button
-          class="btn"
-          type="danger"
-          round
-          size="small">确认</el-button>
-        <el-divider></el-divider>
+        <div class="desc">
+          <div class="title">拉入黑名单</div>
+          拉入黑名单后，你将无法接收到对方的消息。
+        </div>
+        <el-button type="danger"
+                   v-text="'确认'"/>
       </div>
+      <el-divider/>
     </div>
     <template #footer>
       <span class="dialog-footer">
@@ -165,11 +161,17 @@ defineExpose({ show })
 <style lang="scss" scoped>
 .other-operate {
   > div.operate {
-    > span.bolder {
-      font-size: 16px;
-      font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    > div.desc {
+      color: var(--color-text-secondary);
+      > div.title {
+        color: var(--el-text-color-regular);
+        font-size: 16px;
+        font-weight: bold;
+      }
     }
-    > .btn {
+    > div.el-button {
       float: right;
     }
   }
