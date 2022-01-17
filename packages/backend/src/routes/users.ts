@@ -67,6 +67,11 @@ export const router = new Router<{}, AppContext>({
       useTarget(ctx.params, ctx.session,'id'),
       +ctx.params.uid, <Users.Friend>ctx.request.body)
   })
+  .delete('/:id/friends/:uid', ctx => {
+    return UsersService.Friends.del(
+      useTarget(ctx.params, ctx.session,'id'),
+      +ctx.params.uid)
+  })
   .get('/:id/friends', ctx => {
     return UsersService.Friends.get(useTarget(ctx.params, ctx.session))
   })
