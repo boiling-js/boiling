@@ -1,6 +1,7 @@
 <template>
   <el-dialog
     v-model="isShow"
+    class="configure-friend"
     title="好友设置"
     width="60%">
     <el-form ref="formRef" :model="settingUserForm" label-width="120px">
@@ -27,6 +28,32 @@
         </el-button>
       </el-form-item>
     </el-form>
+    <el-divider content-position="left">危险操作</el-divider>
+    <div class="other-operate">
+      <div class="operate">
+        <span class="bolder">删除好友</span>
+        <br>
+        删除好友后，对方将不在你的好友列表中。
+        <el-button
+          class="btn"
+          type="danger"
+          round
+          size="small"
+          @click="delFriend">确认</el-button>
+        <el-divider></el-divider>
+      </div>
+      <div class="operate">
+        <span class="bolder">拉入黑名单</span>
+        <br>
+        拉入黑名单后，你将无法接收到对方的消息。
+        <el-button
+          class="btn"
+          type="danger"
+          round
+          size="small">确认</el-button>
+        <el-divider></el-divider>
+      </div>
+    </div>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="isShow = false">取消</el-button>
@@ -45,8 +72,9 @@
 import { Users } from '@boiling/core'
 import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import { useStore } from 'vuex'
-import { ElDialog, ElInput, ElForm, ElFormItem, ElSelect, ElOption, ElButton, ElMessageBox, ElMessage } from 'element-plus'
+import { ElDialog, ElInput, ElForm, ElFormItem, ElSelect, ElOption, ElButton, ElMessageBox, ElMessage, ElDivider } from 'element-plus'
 import { api } from '../api'
+import * as assert from 'assert'
 
 const
   store = useStore(),
@@ -112,6 +140,17 @@ const
   },
   show = () => {
     isShow.value = true
+  },
+  delFriend = async () => {
+    await ElMessageBox.confirm(
+      `是否确认删除${ props.info.username }？`, '确认', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      }
+    )
+    await store.dispatch('delFriend', props.info.id)
+    isShow.value = false
+    ElMessage.success('好友删除成功！')
   }
 
 onMounted(() => {
@@ -124,3 +163,16 @@ onMounted(() => {
 
 defineExpose({ show })
 </script>
+<style lang="scss" scoped>
+.other-operate {
+  > div.operate {
+    > span.bolder {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    > .btn {
+      float: right;
+    }
+  }
+}
+</style>
