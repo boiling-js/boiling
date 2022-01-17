@@ -30,10 +30,7 @@ export default createStore({
   },
   actions: {
     async addFriend(context, friend: Users.Friend) {
-      await api.user(this.state.user.id).friend(friend.id).add({
-        tags: friend.tags,
-        remark: friend.remark
-      })
+      await api.user(this.state.user.id).friends.add(friend)
       context.commit('addFriend', friend)
     },
     delFriend(context, id: number) {
