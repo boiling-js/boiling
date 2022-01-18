@@ -13,7 +13,15 @@ declare module '@boiling/core' {
     uid: Schema<number | '@me'>
   }
 }
-Router.extendParamTypes('uid', Schema.union([Schema.number(), '@me']), /(@me)|(([-+])?\d+(\.\d+)?)/)
+Router.extendParamTypes(
+  'uid', Schema.union([Schema.number(), '@me']).processor(v => {
+    const type = typeof v
+    if (type !== 'string' && type !== 'number')
+      throw new Error('uid must be a number or @me')
+    return v === '@me'
+      ? v
+      : Number(v)
+  }), /(@me)|(([-+])?\d+(\.\d+)?)/)
 
 export const router = new Router({
   prefix: '/users' as '/users'
