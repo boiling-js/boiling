@@ -69,6 +69,16 @@ describe('Router', () => {
       await expect(middleware(createCtx('get', '/users/a?name=ahh'), next))
         .to.be.eventually.eq('ahh')
     })
+    it('should reveal router middlewares by interface.', async () => {
+      const r = new Router({ prefix: '/users' as '/users' })
+        .get(Schema.interface({
+          name: Schema.string()
+        }), Schema.any(), '/a', ctx => {
+          return ctx.request.body.name
+        })
+      await expect(r.middleware()(createCtx('get', '/users/a', { name: 'ahh' }), next))
+        .to.be.eventually.eq('ahh')
+    })
   })
   describe('URL', () => {
     it('should resolve source.', () => {
@@ -91,13 +101,16 @@ describe('Router', () => {
       })
     })
     it('should resolve source with query.', () => {
-      const result = resolveSource('/foo/str?bar=str', resolveURL('/foo/:foo?bar'))
+      const result = resolveSource('/foo/str?bar=str', resolveURL('/foo/:foo?bar&baz'))
       expect(result)
         .property('param').property('foo')
         .to.be.eq('str')
       expect(result)
         .property('query').property('bar')
         .to.be.eq('str')
+      expect(result)
+        .property('query').property('baz')
+        .to.be.eq(undefined)
     })
     it('should resolve url.', () => {
       const url = resolveURL('/foo/:foo?bar')

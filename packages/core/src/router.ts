@@ -211,7 +211,7 @@ export namespace Router {
     })
   }
   const paramTypesRegex = <Record<keyof PathParams, RegExp | undefined>>{
-    string: /[A-Za-z]+\w+/,
+    string: /\w+/,
     number: /([-+])?\d+(\.\d+)?/,
     boolean: /0|1|(F|false)|(T|true)/
   }
@@ -315,18 +315,22 @@ export namespace Router {
   }>(source: string, rules: Rules) {
     const result = <Record<string, any>>{}
     result.param = Object.entries(rules.param).reduce((acc, [name, { pre, regex, schema }]) => {
-      const param = new RegExp(`${ pre }/(${ regex.source })`).exec(source)?.[1] ?? undefined
-      acc[name] = schema(schema.meta
-        ? schema.meta.processor?.(param) ?? param
-        : param
+      const param = new RegExp(`${ pre }/(${ regex.source })`)
+        .exec(source)?.[1] ?? undefined
+      acc[name] = schema(
+        schema.meta
+          ? schema.meta.processor?.(param) ?? param
+          : param
       )
       return acc
     }, {} as any)
     result.query = Object.entries(rules.query).reduce((acc, [name, { regex, schema }]) => {
-      const param = new RegExp(`${name}=(${ regex.source })&?`).exec(source)?.[1] ?? undefined
-      acc[name] = schema(schema.meta
-        ? schema.meta.processor?.(param) ?? param
-        : param
+      const param = new RegExp(`${name}=(${ regex.source })&?`)
+        .exec(source)?.[1] ?? undefined
+      acc[name] = schema(
+        param !== undefined
+          ? schema.meta?.processor?.(param) ?? param
+          : param
       )
       return acc
     }, {} as any)

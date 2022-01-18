@@ -25,9 +25,8 @@ app
   .use(session(app))
   .use(Middlewares.handleErrors)
   .use(Middlewares.returnBody)
+  .use(UsersRouter.middleware())
   .use(ChannelsRouter.middleware())
-  .use(UsersRouter.routes())
-  .use(UsersRouter.allowedMethods())
 
 const {
   PORT = '8080',

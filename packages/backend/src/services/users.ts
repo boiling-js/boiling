@@ -74,7 +74,10 @@ export namespace UsersService {
       const [ user, friend ] = await Promise.all([UsersService.getOrThrow(uid), UsersService.getOrThrow(fUid)])
       if (user.friends.findIndex((item) => item.id === fUid) !== -1)
         throw new HttpError('CONFLICT', `${ friend.username }已经是你的好友`)
-      user.friends.push({ id: fUid, ...opts })
+      user.friends.push({ id: fUid, ...Object.assign(<Required<Opts>>{
+        tags: [],
+        remark: ''
+      }, opts) })
       await user.save()
     }
     export async function del(uid: number, fUid: number) {
