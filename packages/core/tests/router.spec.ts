@@ -101,13 +101,16 @@ describe('Router', () => {
       })
     })
     it('should resolve source with query.', () => {
-      const result = resolveSource('/foo/str?bar=str', resolveURL('/foo/:foo?bar'))
+      const result = resolveSource('/foo/str?bar=str', resolveURL('/foo/:foo?bar&baz'))
       expect(result)
         .property('param').property('foo')
         .to.be.eq('str')
       expect(result)
         .property('query').property('bar')
         .to.be.eq('str')
+      expect(result)
+        .property('query').property('baz')
+        .to.be.eq(undefined)
     })
     it('should resolve url.', () => {
       const url = resolveURL('/foo/:foo?bar')
