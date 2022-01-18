@@ -2,7 +2,7 @@ import Schema from 'schemastery'
 import './schemastery-interface'
 
 declare module 'schemastery' {
-  interface Schema<S = any, T = S> {
+  interface Schema {
     or<X extends Schema>(x: X): Schema<
       Schema.TypeS<this> | Schema.TypeS<X>,
       Schema.TypeT<this> | Schema.TypeT<X>
