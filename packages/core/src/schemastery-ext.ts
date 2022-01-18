@@ -2,14 +2,14 @@ import Schema from 'schemastery'
 import './schemastery-interface'
 
 declare module 'schemastery' {
-  interface Schema {
-    or<S extends Schema>(s: S): Schema<
-      Schema.TypeT<this> | Schema.TypeT<S>,
-      Schema.TypeS<this> | Schema.TypeS<S>
+  interface Schema<S = any, T = S> {
+    or<X extends Schema>(x: X): Schema<
+      Schema.TypeS<this> | Schema.TypeS<X>,
+      Schema.TypeT<this> | Schema.TypeT<X>
     >
-    and<S extends Schema>(s: S): Schema<
-      Schema.TypeT<this> & Schema.TypeT<S>,
-      Schema.TypeS<this> & Schema.TypeS<S>
+    and<X extends Schema>(x: X): Schema<
+      Schema.TypeS<this> & Schema.TypeS<X>,
+      Schema.TypeT<this> & Schema.TypeT<X>
     >
   }
   namespace Schema {
@@ -23,22 +23,21 @@ declare module 'schemastery' {
     }
   }
 }
-// @ts-ignore
-Schema.prototype.and = function(s) {
+Schema.prototype.and = function(x) {
   const result = <Record<string, any>>{}
-  if (s.type !== 'interface' || !s.dict)
+  if (x.type !== 'interface' || !x.dict)
     throw new Error('Schema.and: s must be an interface')
   for (const key in this.dict) {
     result[key] = this.dict[key]
   }
-  for (const key in s.dict) {
+  for (const key in x.dict) {
     if (!result[key])
-      result[key] = s.dict[key]
+      result[key] = x.dict[key]
   }
   return Schema.interface(result)
 }
-Schema.prototype.or = function (s) {
-  return Schema.union([this, s])
+Schema.prototype.or = function (x) {
+  return Schema.union([this, x])
 }
 // @ts-ignore
 Schema.Pick = function(s, keys) {
