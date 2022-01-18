@@ -2,6 +2,17 @@ import Schema from 'schemastery'
 import { expect } from 'chai'
 import '../src/schemastery-interface'
 
+it('should use `optional` method.', function () {
+  const O = Schema.interface({
+    foo: Schema.string().optional(),
+    bar: Schema.string()
+  })
+  O({ bar: 'bar' })
+  // @ts-ignore
+  expect(O.bind(null, { }))
+    .to.be.throw(Error, 'bar is required but not exist')
+})
+
 it('should use schemastry interface.', () => {
   const UserOut = Schema.interface({
     name: Schema.string(),

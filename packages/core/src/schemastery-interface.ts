@@ -1,24 +1,51 @@
 import Schema from 'schemastery'
 
-declare type Dict<T = any, K extends string = string> = {
+type Dict<T = any, K extends string = string> = {
   [key in K]?: T
 }
+type KeysOfType<T, SelectedType> = {
+  [key in keyof T]: SelectedType extends T[key] ? key : never
+}[keyof T]
+type Optional<T> = Partial<Pick<T, KeysOfType<T, undefined>>>
+type Required<T> = Omit<T, KeysOfType<T, undefined>>
+export type OptionalUndefined<T> = Optional<T> & Required<T>
 
 declare module 'schemastery' {
   interface Schema<S = any, T = S> {
     processor(processor: (o: any) => S): Schema<S, T>
+    optional(): Schema<
+      Schema.TypeS<S> | undefined, Schema.TypeT<T> | undefined
+      >
+    default(value: T): Schema<S | undefined, T>
   }
   namespace Schema {
-    type InterfaceS<X extends Dict> = {
+    interface Meta {
+      optional?: boolean
+    }
+    type InterfaceS<X extends Dict> = OptionalUndefined<{
       [K in keyof X]: Schema.TypeS<X[K]>
-    }
-    type InterfaceT<X extends Dict> = {
+    }>
+    type InterfaceT<X extends Dict> = OptionalUndefined<{
       [K in keyof X]: Schema.TypeT<X[K]>
-    }
+    }>
     interface Static {
       interface<X extends Dict>(dict: X): Schema<Schema.InterfaceS<X>, Schema.InterfaceT<X>>
     }
   }
+}
+
+Schema.prototype.optional = function () {
+  if (this.meta === undefined)
+    this.meta = <Schema.Meta>{}
+  this.meta.optional = true
+  return this
+}
+const oldDefault = Schema.prototype.default
+Schema.prototype.default = function (value) {
+  if (this.meta === undefined)
+    this.meta = <Schema.Meta>{}
+  this.meta.optional = true
+  return oldDefault.call(this, value)
 }
 
 function isNullable(value: any) {
@@ -35,8 +62,10 @@ Schema.extend('interface', (data, schema, _strict) => {
     if (data[key] === undefined) {
       if (propSchema?.meta?.default !== undefined)
         result[key] = propSchema.meta.default
-      else
-        throw new Error(`${key} is required but not exist`)
+      else {
+        if (!propSchema?.meta?.optional)
+          throw new Error(`${key} is required but not exist`)
+      }
     } else
       result[key] = data[key]
 
