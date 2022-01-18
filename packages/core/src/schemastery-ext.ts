@@ -17,8 +17,8 @@ declare module 'schemastery' {
       Pick<S extends Schema, Keys extends keyof Schema.TypeT<S>>(s: S, keys: Keys[]): Schema<
         Pick<Schema.TypeS<S>, Keys>, Pick<Schema.TypeT<S>, Keys>
       >
-      Omit<S extends Schema, Keys extends keyof Schema.TypeS<S>>(s: S, keys: Keys[]): Schema<
-        Omit<Schema.TypeS<S>, Keys>, Omit<Schema.TypeT<S>, Keys>
+      Omit<S extends Schema, Keys extends keyof Schema.InferS<S>>(s: S, keys: Keys[]): Schema<
+        Omit<Schema.InferS<S>, Keys>, Omit<Schema.InferS<S>, Keys>
       >
     }
   }

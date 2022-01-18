@@ -8,11 +8,7 @@ interface SearchService<M extends mongoose.Model<any>> {
 
 export default function usePagination<
   M extends mongoose.Model<any>, S extends SearchService<M>
->(searchService: S, searchQuery: {
-  key: string
-  num?: number
-  page?: number
-}) {
+>(searchService: S, searchQuery: SearchQuery) {
   const { key, page = 0, num = 10 } = searchQuery
   const s = searchService.search(key)
   return async <T>(mapFun?: Parameters<Array<InstanceType<S['Model']>>['map']>[0]) => {

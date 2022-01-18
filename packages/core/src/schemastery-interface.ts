@@ -19,6 +19,8 @@ declare module 'schemastery' {
     default(value: T): Schema<S | undefined, T>
   }
   namespace Schema {
+    type InferS<X> = X extends Schema<infer S, unknown> ? S : never
+    type InferT<X> = X extends Schema<unknown, infer T> ? T : never
     interface Meta {
       optional?: boolean
     }
