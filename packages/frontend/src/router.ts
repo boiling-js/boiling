@@ -33,6 +33,9 @@ const router = createRouter({
     path: '/:pathMatch(.*)*',
     component: () => import('element-plus').then(({ ElEmpty }) => ElEmpty),
     props: { description: '访问到了不存在的页面' }
+  }, {
+    path: '/edit-personnel',
+    component: () => import('./components/EditPersonnel.vue')
   }]
 })
 
