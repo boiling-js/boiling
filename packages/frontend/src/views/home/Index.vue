@@ -3,13 +3,23 @@
     <div class="sidebar">
       <div class="self-bar">
         <div class="avatar">
-          <img width="48" :src="`/api/${ user.avatar }`" alt="">
+          <el-dropdown trigger="click">
+            <img width="48" :src="`/api/${ user.avatar }`" alt="">
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item><div class="circle green"/>在线</el-dropdown-item>
+                <el-dropdown-item><div class="circle red"/>勿扰</el-dropdown-item>
+                <el-dropdown-item><div class="circle yellow"/>隐身</el-dropdown-item>
+                <el-dropdown-item><div class="circle gray"/>退出</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </div>
         <div class="detail">
           <div class="name"> {{ user.username }} </div>
         </div>
         <el-tooltip content="用户设置">
-          <el-icon :size="24"><tools/></el-icon>
+          <el-icon @click="$router.push('/edit-personnel')" :size="24"><tools/></el-icon>
         </el-tooltip>
       </div>
       <div class="chat-bar">
@@ -35,7 +45,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
-import { ElTooltip, ElIcon } from 'element-plus'
+import { ElTooltip, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
 import SearchUser from '../../components/SearchUser.vue'
 
@@ -95,9 +105,13 @@ div.contain {
       > div.avatar {
         width: 48px;
         height: 48px;
-        > img {
-          background-color: #fff;
-          border-radius: 100%;
+        .el-dropdown {
+          > div {
+            > img {
+              background-color: #fff;
+              border-radius: 100%;
+            }
+          }
         }
       }
       > div.detail {
@@ -124,6 +138,26 @@ div.contain {
   > div.container {
     flex-grow: 1;
     background-color: var(--color-auxi-placeholder);
+  }
+}
+.el-dropdown-menu__item {
+  > .circle {
+    margin-right: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+    &.red {
+      background-color: #ed4245;
+    }
+    &.green {
+      background-color: #3ba55d;
+    }
+    &.yellow {
+      background-color: #faa81a;
+    }
+    &.gray {
+      background-color: #747f8d;
+    }
   }
 }
 </style>
