@@ -1,16 +1,32 @@
-import Router from '@koa/router'
-import { SearchQuery, Users } from '@boiling/core'
+import { Users, Router, Pagination } from '@boiling/core'
+import Schema from 'schemastery'
 
-import { AppContext } from '../'
 import { UsersService } from '../services/users'
 import { Security } from '../utils'
 import usePagination from '../hooks/usePagination'
+import extendService from '../hooks/extendService'
+import useTarget from '../hooks/useTarget'
 import useCurUser from '../hooks/useCurUser'
 
-export const router = new Router<{}, AppContext>({
-  prefix: '/users'
+declare module '@boiling/core' {
+  interface PathParams {
+    uid: Schema<number | '@me'>
+  }
+}
+Router.extendParamTypes(
+  'uid', Schema.union([Schema.number(), '@me']).processor(v => {
+    const type = typeof v
+    if (type !== 'string' && type !== 'number')
+      throw new Error('uid must be a number or @me')
+    return v === '@me'
+      ? v
+      : Number(v)
+  }), /(@me)|(([-+])?\d+(\.\d+)?)/)
+
+export const router = new Router({
+  prefix: '/users' as '/users'
 })
-  .post('/', async ctx => {
+  .post('', async ctx => {
     const { username, password } = <Users.Register>ctx.request.body
     const user = await UsersService.add({
       username,
@@ -19,19 +35,18 @@ export const router = new Router<{}, AppContext>({
     })
     return { id: user.id, username: user.username, avatar: user.avatar }
   })
-  .get('/', async ctx => {
+  .get(Pagination(Users.BaseOut), '?key&page(number)&num(number)', ctx => {
     return usePagination(
-      UsersService, <SearchQuery>ctx.query
-      // @ts-ignore
-    )<Users.Out>(item => (delete item._doc.passwordHash) && item)
+      extendService(UsersService, 'search', m => m.find({
+        id: { $ne: useCurUser(ctx.session).id }
+      })), ctx.query
+    )()
   })
-  .get('/:id', async ctx => {
+  .get('/:id(number)', async ctx => {
     return UsersService.get(ctx.params.id)
   })
-  .post('/:id/status', async ctx => {
-    const {
-      status, password
-    } = <Users.Status>ctx.request.body
+  .post(Users.Status, Users.Out.or(Schema.any()), '/:id(number)/status', async ctx => {
+    const { status, password } = ctx.request.body
     switch (status) {
       case 'online':
         const u = await UsersService.get(+ctx.params.id)
@@ -40,8 +55,6 @@ export const router = new Router<{}, AppContext>({
         if (!Security.match(password, u.passwordHash))
           throw new HttpError('UNAUTHORIZED', '密码错误')
         const user = u.toJSON()
-        // @ts-ignore
-        delete user.passwordHash
         if (ctx.session)
           ctx.session.curUser = <Users.Out><any>user
         else
@@ -52,25 +65,37 @@ export const router = new Router<{}, AppContext>({
         return
     }
   })
-  .post('/:id/friends/:uid', ctx => {
-    let tId: number
-    const { id } = ctx.params
-    id === '@me'
-      ? (tId = useCurUser(ctx.session).id)
-      : (tId = +id)
-    return UsersService.Friends.add(tId, +ctx.params.uid, <Users.Friend>ctx.request.body)
+  .post(Schema.any(), '/:id(uid)/friends', ctx => {
+    const { id: fid, ...opts } = <Users.Friend>ctx.request.body
+    return UsersService.Friends.add(
+      useTarget(ctx.session, ctx.params.id),
+      +fid, opts
+    )
   })
-  .get('/:id/friends', ctx => {
-    let tId: number
-    const { id } = ctx.params
-    id === '@me'
-      ? (tId = useCurUser(ctx.session).id)
-      : (tId = +id)
-    return UsersService.Friends.get(tId)
+  .patch(Schema.any(), '/:id(uid)/friends/:targetId(number)', ctx => {
+    return UsersService.Friends.update(
+      useTarget(ctx.session, ctx.params.id),
+      ctx.params.targetId, <Users.Friend>ctx.request.body
+    )
   })
-  .get('/:id/channels', async ctx => {
-    return []
+  .delete('/:id(uid)/friends/:targetId(number)', ctx => {
+    return UsersService.Friends.del(
+      useTarget(ctx.session, ctx.params.id),
+      ctx.params.targetId
+    )
   })
-  .del('/:id/channels/:cid', async ctx => {
+  .get('/:id(uid)/friends', ctx => {
+    return UsersService.Friends.get(useTarget(ctx.session, ctx.params.id))
+  })
+  .post('/:id(uid)/tag', ctx => {
+    const { tag } = ctx.request.body
+    if (!tag)
+      throw new HttpError('BAD_REQUEST', '标签不能为空')
+    return UsersService.addTag(useTarget(ctx.session, ctx.params.id), tag)
+  })
+  .get('/:id(number)/channels', async ctx => {
+    return ctx
+  })
+  .del('/:id(number)/channels/:cid', async ctx => {
     console.log(ctx.params)
   })

@@ -3,46 +3,58 @@
     <div class="sidebar">
       <div class="self-bar">
         <div class="avatar">
-          <img width="48" :src="`/api/${ user.avatar }`" alt="">
+          <el-dropdown trigger="click">
+            <img width="48" :src="`/api/${ user.avatar }`" alt="">
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item><div class="circle green"/>在线</el-dropdown-item>
+                <el-dropdown-item><div class="circle red"/>勿扰</el-dropdown-item>
+                <el-dropdown-item><div class="circle yellow"/>隐身</el-dropdown-item>
+                <el-dropdown-item><div class="circle gray"/>退出</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </div>
         <div class="detail">
           <div class="name"> {{ user.username }} </div>
         </div>
         <el-tooltip content="用户设置">
-          <el-icon :size="24"><tools/></el-icon>
+          <el-icon @click="$router.push('/edit-personnel')" :size="24"><tools/></el-icon>
         </el-tooltip>
       </div>
       <div class="chat-bar">
-        <section>好友</section>
-        <section>频道</section>
-        <section>讨论组</section>
+        <section @click="$router.push('/home/friends')">好友</section>
+        <section @click="chatType = 'channel'">频道</section>
+        <section @click="chatType = 'group'">讨论组</section>
         <div class="chats">
           <div class="title">
             私信
             <span class="add material-icons md-light"
-                  @click="$refs.searchFriend.show">add</span>
+                  @click="$refs.searchUser.show">add</span>
           </div>
         </div>
       </div>
     </div>
     <div class="container">
-      <Friend></Friend>
+      <router-view/>
     </div>
-    <SearchFriend ref="searchFriend"/>
+    <search-user ref="searchUser"/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
-import { ElTooltip, ElIcon } from 'element-plus'
+import { ElTooltip, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
-import SearchFriend from '../components/SearchFriend.vue'
-import Friend from '../components/Friend.vue'
+import SearchUser from '../../components/SearchUser.vue'
+
+type ChatType = 'friend' | 'channel' | 'group'
 
 const
   store = useStore(),
-  user = computed(() => store.state.user)
+  user = computed(() => store.state.user),
+  chatType = ref<ChatType>('friend')
 </script>
 
 <style lang="scss" scoped>
@@ -93,9 +105,14 @@ div.contain {
       > div.avatar {
         width: 48px;
         height: 48px;
-        > img {
-          background-color: #fff;
-          border-radius: 100%;
+        .el-dropdown {
+          > div {
+            > img {
+              background-color: #fff;
+              border-radius: 100%;
+              cursor: pointer;
+            }
+          }
         }
       }
       > div.detail {
@@ -122,6 +139,26 @@ div.contain {
   > div.container {
     flex-grow: 1;
     background-color: var(--color-auxi-placeholder);
+  }
+}
+.el-dropdown-menu__item {
+  > .circle {
+    margin-right: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+    &.red {
+      background-color: #ed4245;
+    }
+    &.green {
+      background-color: #3ba55d;
+    }
+    &.yellow {
+      background-color: #faa81a;
+    }
+    &.gray {
+      background-color: #747f8d;
+    }
   }
 }
 </style>

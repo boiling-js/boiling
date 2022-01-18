@@ -1,105 +1,156 @@
 <template>
-  <div class="user-info-card">
-    <div class="avatar">
-      <img :src="`/api/${info.avatar}`" alt="">
-    </div>
+  <div class="user" :class="[ type ]">
+    <div class="bg"/>
+    <div
+      v-if="isMe"
+      class="avatar is-me" :style="{
+        backgroundImage: `url(/api${info.avatar})`
+      }"
+      @click="$refs.avatar.show()"/>
+    <div
+      v-else
+      class="avatar" :style="{
+        backgroundImage: `url(/api${info.avatar})`
+      }"/>
     <div class="info">
-      ID：{{ info.id }}
-      <br>
-      昵称：{{ info.username }}
+      {{ info.remark || info.username }}<span class="id">#{{ info.id }}</span>
     </div>
-    <div class="operate">
-      <span
-        class="add material-icons"
-        @click="addUserDialog = true">add</span>
+    <div
+      v-if="!isMe"
+      class="operates">
+      <span v-if="isFriend"
+            class="material-icons"
+            @click="$router.push(`/home/chat-rooms/${ info.id }`)">chat_bubble_outline</span>
+      <span class="material-icons"
+            @click="$refs.configureFriend.show()">{{ isFriend ? 'settings' : 'add' }}</span>
     </div>
-    <el-dialog
-      v-model="addUserDialog"
-      title="好友设置"
-      width="60%">
-      <el-form ref="formRef" :model="addUserForm" label-width="120px">
-        <el-form-item label="备注：">
-          <el-input v-model="addUserForm.remark"></el-input>
-        </el-form-item>
-        <el-form-item label="标签：">
-          <el-select v-model="addUserForm.tags" multiple placeholder="请选择标签">
-            <el-option
-              v-for="item in addUserForm.tags"
-              :key="item"
-              :label="item"
-              :value="item" >
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="addUserDialog = false">取消</el-button>
-          <el-button type="primary" @click="add">下一步</el-button>
-        </span>
-      </template>
-    </el-dialog>
+    <configure-friend
+      ref="configureFriend"
+      :is-friend="isFriend"
+      :info="info"/>
+    <avatar
+      ref="avatar"/>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Users } from '@boiling/core'
-import { ElDialog, ElInput, ElFormItem, ElSelect, ElOption, ElButton, ElMessageBox, ElMessage } from 'element-plus'
-import { api } from '../api'
-import { reactive, ref } from 'vue'
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import ConfigureFriend from './ConfigureFriend.vue'
+import Avatar from './Avatar.vue'
 
 const
-  props = defineProps<{
+  store = useStore(),
+  props = withDefaults(defineProps<{
     info: Users.Out | Users.FriendOut
-  }>(),
-  addUserDialog = ref(false),
-  addUserForm = reactive<Omit<Users.Friend, 'id'>>({
-    tags: [],
-    remark: ''
+    type?: 'inline' | 'popup'
+  }>(), {
+    type: 'inline'
   }),
-  add = () => {
-    ElMessageBox.confirm(
-      `是否确认添加${ props.info.username }为好友？`,
-      '确认',
-      {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消'
-      }
-    ).then(async () => {
-      await api.user('@me').friend(props.info.id).add({
-        tags: addUserForm.tags,
-        remark: addUserForm.remark
-      })
-      ElMessage.success('请求发送成功！')
-    }).catch()
-  }
+  isFriend = computed(() => store.state.user.friends.findIndex(
+    (item: Users.Out['friends'][number]) => item.id === props.info.id
+  ) !== -1),
+  isMe = computed(() => store.state.user.id === props.info.id)
 </script>
 
 <style lang="scss" scoped>
-.user-info-card {
+div.user {
+  --bg-color: var(--color-auxi-regular);
+
+  position: relative;
   display: flex;
-  padding: 10px;
   width: calc(100% - 20px);
-  height: 50px;
-  background-color: var(--color-auxi-regular);
-  border-radius: 6px;
+  overflow: hidden;
+  color: var(--color-text-regular);
+  background-color: var(--bg-color);
+  > div.bg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 60px;
+    background-color: #fff;
+    border-radius: 6px 6px 0 0;
+  }
   > div.avatar {
+    z-index: 10;
     margin-right: 10px;
-    width: 50px;
-    height: 50px;
-    overflow: hidden;
+    width: var(--size);
+    height: var(--size);
+    background-size: cover;
     border-radius: 50%;
-    > img {
-      width: 100%;
-      height: 100%;
-    }
   }
   > div.info {
-    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    font-weight: bold;
+    > span.id {
+      color: var(--color-text-secondary);
+    }
   }
-  > div.operate {
-    > span {
-      cursor: pointer;
+  > div.operates > span.material-icons {
+    padding: 4px;
+    margin: 0 5px;
+    cursor: pointer;
+    background-color: var(--bg-color);
+    border-radius: 6px;
+    opacity: 0.5;
+    transition: 0.3s;
+    &:hover {
+      opacity: 1;
+    }
+  }
+  > :deep(.el-overlay) {
+    cursor: default;
+  }
+  &.inline {
+    justify-content: space-between;
+    padding: 10px;
+    > div.bg {
+      display: none;
+    }
+    > div.avatar {
+      --size: 48px;
+    }
+    > div.info {
+      flex-grow: 1;
+      font-size: 16px;
+      > span.id {
+        color: var(--color-text-secondary);
+        opacity: 0;
+        transition: 0.3s;
+      }
+    }
+    > div.operates {
+      display: flex;
+      align-items: center;
+    }
+    &:hover {
+      > div.info > span.id {
+        opacity: 1;
+      }
+    }
+  }
+  &.popup {
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 30px 10px 10px;
+    height: 100px;
+    border-radius: 6px;
+    > div.avatar {
+      --size: 64px;
+
+      border: 6px solid var(--bg-color);
+      &.is-me {
+        cursor: pointer;
+      }
+    }
+    > div.operates {
+      position: absolute;
+      top: 10px;
+      right: 10px;
     }
   }
 }

@@ -4,12 +4,16 @@
       <h3 class="title">欢迎回来~</h3>
       <div class="login-input">
         <div class="label">账号：</div>
-        <el-input v-model="account.id" placeholder="请输入账号"/>
+        <el-input v-model="account.id"
+                  placeholder="请输入账号"/>
         <div class="label">密码：</div>
-        <el-input v-model="account.password" placeholder="请输入密码" show-password/>
+        <el-input v-model="account.password"
+                  placeholder="请输入密码"
+                  show-password
+                  @keydown.enter="$refs.loginBtn.$el.click()"/>
         <div class="bottom-word">记住密码</div>
       </div>
-      <el-button type="primary" @click="login()
+      <el-button ref="loginBtn" type="primary" @click="login()
         .then(() => {
           $router.push('/home')
           $message.success('登陆成功')
