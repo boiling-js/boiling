@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus'
 
 interface OfficialApi {
   /** 搜索用户 */
-  users: QueryPromise<Pagination<Users.Out>, SearchQuery> & {
+  users: QueryPromise<Pagination<Users.BaseOut>, SearchQuery> & {
     /** 注册新用户 */
     add(d: Users.Register): Promise<Users.Out>
   }
