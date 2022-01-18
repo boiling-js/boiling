@@ -1,13 +1,23 @@
 <template>
   <div class="user" :class="[ type ]">
     <div class="bg"/>
-    <div class="avatar" :style="{
-      backgroundImage: `url(/api${info.avatar})`
-    }"/>
+    <div
+      v-if="isMe"
+      class="avatar is-me" :style="{
+        backgroundImage: `url(/api${info.avatar})`
+      }"
+      @click="$refs.avatar.show()"/>
+    <div
+      v-else
+      class="avatar" :style="{
+        backgroundImage: `url(/api${info.avatar})`
+      }"/>
     <div class="info">
       {{ info.remark || info.username }}<span class="id">#{{ info.id }}</span>
     </div>
-    <div class="operates">
+    <div
+      v-if="!isMe"
+      class="operates">
       <span v-if="isFriend"
             class="material-icons"
             @click="$router.push(`/home/chat-rooms/${ info.id }`)">chat_bubble_outline</span>
@@ -18,6 +28,8 @@
       ref="configureFriend"
       :is-friend="isFriend"
       :info="info"/>
+    <avatar
+      ref="avatar"/>
   </div>
 </template>
 
@@ -26,6 +38,7 @@ import { Users } from '@boiling/core'
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import ConfigureFriend from './ConfigureFriend.vue'
+import Avatar from './Avatar.vue'
 
 const
   store = useStore(),
@@ -37,7 +50,8 @@ const
   }),
   isFriend = computed(() => store.state.user.friends.findIndex(
     (item: Users.Out['friends'][number]) => item.id === props.info.id
-  ) !== -1)
+  ) !== -1),
+  isMe = computed(() => store.state.user.id === props.info.id)
 </script>
 
 <style lang="scss" scoped>
@@ -129,6 +143,9 @@ div.user {
       --size: 64px;
 
       border: 6px solid var(--bg-color);
+      &.is-me {
+        cursor: pointer;
+      }
     }
     > div.operates {
       position: absolute;

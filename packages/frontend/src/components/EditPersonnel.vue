@@ -23,6 +23,9 @@
         <el-input v-model="form.desc" type="textarea"></el-input>
       </el-form-item>
     </el-form>
+    <user
+      :info="$store.state.user"
+      :type="'popup'"/>
     <div class="bottom">
       <el-button type="primary" @click="onSubmit">确认</el-button>
       <el-button>取消</el-button>
@@ -34,6 +37,7 @@
 import { ElPageHeader, ElForm,ElFormItem, ElSelect, ElOption, ElDatePicker, ElInput, ElButton } from 'element-plus'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import { reactive } from 'vue'
+import User from './User.vue'
 
 // do not use same name with ref
 const form = reactive({
@@ -64,6 +68,9 @@ const onSubmit = () => {
     position: absolute;
     right: 40px;
     bottom: 60px;
+  }
+  > .user {
+    width: 50%;
   }
 }
 </style>

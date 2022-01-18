@@ -110,6 +110,7 @@ div.contain {
             > img {
               background-color: #fff;
               border-radius: 100%;
+              cursor: pointer;
             }
           }
         }
