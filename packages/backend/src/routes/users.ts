@@ -1,4 +1,4 @@
-import { Users, Router } from '@boiling/core'
+import { Users, Router, Pagination } from '@boiling/core'
 import Schema from 'schemastery'
 
 import { UsersService } from '../services/users'
@@ -27,21 +27,18 @@ export const router = new Router({
     })
     return { id: user.id, username: user.username, avatar: user.avatar }
   })
-  .get('?key&page(number)&num(number)', async ctx => {
+  .get(Pagination(Users.Out), '?key&page(number)&num(number)', async ctx => {
     return usePagination(
       extendService(UsersService, 'search', m => m.find({
         id: { $ne: useCurUser(ctx.session).id }
       })), ctx.query
-      // @ts-ignore
-    )<Users.Out>(item => (delete item._doc.passwordHash) && item)
+    )()
   })
   .get('/:id(number)', async ctx => {
     return UsersService.get(ctx.params.id)
   })
-  .post('/:id(number)/status', async ctx => {
-    const {
-      status, password
-    } = <Users.Status>ctx.request.body
+  .post(Users.Status, Schema.any(), '/:id(number)/status', async ctx => {
+    const { status, password } = ctx.request.body
     switch (status) {
       case 'online':
         const u = await UsersService.get(+ctx.params.id)
@@ -50,8 +47,6 @@ export const router = new Router({
         if (!Security.match(password, u.passwordHash))
           throw new HttpError('UNAUTHORIZED', '密码错误')
         const user = u.toJSON()
-        // @ts-ignore
-        delete user.passwordHash
         if (ctx.session)
           ctx.session.curUser = <Users.Out><any>user
         else
@@ -62,14 +57,14 @@ export const router = new Router({
         return
     }
   })
-  .post('/:id(uid)/friends', ctx => {
+  .post(Schema.any(), '/:id(uid)/friends', ctx => {
     const { id: fid, ...opts } = <Users.Friend>ctx.request.body
     return UsersService.Friends.add(
       useTarget(ctx.session, ctx.params.id),
-      +fid, <Users.Friend>ctx.request.body
+      +fid, opts
     )
   })
-  .patch('/:id(uid)/friends/:targetId(number)', ctx => {
+  .patch(Schema.any(), '/:id(uid)/friends/:targetId(number)', ctx => {
     return UsersService.Friends.update(
       useTarget(ctx.session, ctx.params.id),
       ctx.params.targetId, <Users.Friend>ctx.request.body

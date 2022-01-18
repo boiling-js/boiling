@@ -1,7 +1,11 @@
 import { ParsedUrlQuery } from 'querystring'
 import Schema from 'schemastery'
-import './schemastery-interface'
+import './schemastery-ext'
 
+export const Pagination = <Item extends Schema>(item: Item) => Schema.interface({
+  count: Schema.number(),
+  items: Schema.array(item)
+})
 export interface Pagination<Item> {
   count: number
   items: Item[]
