@@ -9,14 +9,14 @@ declare module 'schemastery' {
     processor(processor: (o: any) => S): Schema<S, T>
   }
   namespace Schema {
-    type ObjectS<X extends Dict> = {
+    type InterfaceS<X extends Dict> = {
       [K in keyof X]: Schema.TypeS<X[K]>
-    } & Dict
-    type ObjectT<X extends Dict> = {
+    }
+    type InterfaceT<X extends Dict> = {
       [K in keyof X]: Schema.TypeT<X[K]>
-    } & Dict
+    }
     interface Static {
-      interface<X extends Dict>(dict: X): Schema<Schema.ObjectS<X>, Schema.ObjectT<X>>
+      interface<X extends Dict>(dict: X): Schema<Schema.InterfaceS<X>, Schema.InterfaceT<X>>
     }
   }
 }
@@ -31,13 +31,23 @@ Schema.extend('interface', (data, schema, _strict) => {
 
   const { dict = {} } = schema
   const result = <Record<string, any>>{}
-  Object.entries(dict).forEach(([key, schema]) => {
-    if (data[key] === undefined)
-      return
+  Object.entries(dict).forEach(([key, propSchema]) => {
+    if (data[key] === undefined) {
+      if (propSchema?.meta?.default !== undefined)
+        result[key] = propSchema.meta.default
+      else
+        throw new Error(`${key} is required but not exist`)
+    } else
+      result[key] = data[key]
 
-    const [value, adapted] = Schema.resolve(data[key], schema)
-    if (!isNullable(adapted)) data[key] = adapted
-    result[key] = value
+    try {
+      const [value, adapted] = Schema.resolve(data[key], propSchema)
+      if (!isNullable(adapted))
+        data[key] = adapted
+      result[key] = value
+    } catch (e) {
+      throw new Error(`${key}.${ e }`)
+    }
   })
   return [result]
 })
@@ -55,7 +65,6 @@ Object.assign(Schema, {
       }).join(', ')} }`
     }).bind(null, schema)
     schema.dict = inn
-    schema.meta && (schema.meta.default = {})
     return schema
   }
 })

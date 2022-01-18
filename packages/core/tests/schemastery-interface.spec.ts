@@ -10,19 +10,26 @@ it('should use schemastry interface.', () => {
       name: Schema.string()
     })
   })
+  // @ts-ignore
   expect(UserOut({
     id: 1, name: 'John', tags: [],
     friend: { name: 'John' }
-  })).to.not.have.property('id')
+  })).to.be.not.have.property('id')
+  // @ts-ignore
   expect(UserOut({
     id: 1, name: 'John', tags: ['John'],
     friend: { name: 'John' }
   })).property('tags').to.be.contain('John')
+  // @ts-ignore
   expect(UserOut({
     id: 1, name: 'John', tags: ['John'],
     friend: {
       id: 1,
       name: 'John'
     }
-  })).property('friend').to.not.have.property('id')
+  })).property('friend').to.be.not.have.property('id')
+  // @ts-ignore
+  expect(UserOut.bind(null, {
+    id: 1, name: 'John', tags: ['John']
+  })).to.be.throw('friend is required but not exist')
 })
