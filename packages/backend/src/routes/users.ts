@@ -27,7 +27,7 @@ export const router = new Router({
     })
     return { id: user.id, username: user.username, avatar: user.avatar }
   })
-  .get(Pagination(Users.Out), '?key&page(number)&num(number)', async ctx => {
+  .get(Pagination(Users.BaseOut), '?key&page(number)&num(number)', ctx => {
     return usePagination(
       extendService(UsersService, 'search', m => m.find({
         id: { $ne: useCurUser(ctx.session).id }
