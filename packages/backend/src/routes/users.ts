@@ -99,3 +99,6 @@ export const router = new Router({
   .del('/:id(number)/channels/:cid', async ctx => {
     console.log(ctx.params)
   })
+  .get('/avatars', async () =>{
+    return UsersService.getAvatar()
+  })

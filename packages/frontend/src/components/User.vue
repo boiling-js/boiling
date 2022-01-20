@@ -1,13 +1,25 @@
 <template>
   <div class="user" :class="[ type ]">
     <div class="bg"/>
-    <div class="avatar" :style="{
-      backgroundImage: `url(/api${info.avatar})`
-    }"/>
+    <div
+      v-if="isMe"
+      class="avatar is-me" :style="{
+        backgroundImage: `url(/api${info.avatar})`
+      }"
+      @click="$refs.avatar.show()">
+      <div class="avatar-shadow"> 更换头像 </div>
+    </div>
+    <div
+      v-else
+      class="avatar" :style="{
+        backgroundImage: `url(/api${info.avatar})`
+      }"/>
     <div class="info">
       {{ info.remark || info.username }}<span class="id">#{{ info.id }}</span>
     </div>
-    <div class="operates">
+    <div
+      v-if="!isMe"
+      class="operates">
       <span v-if="isFriend"
             class="material-icons"
             @click="$router.push(`/home/chat-rooms/${ info.id }`)">chat_bubble_outline</span>
@@ -18,6 +30,8 @@
       ref="configureFriend"
       :is-friend="isFriend"
       :info="info"/>
+    <avatar
+      ref="avatar"/>
   </div>
 </template>
 
@@ -26,6 +40,7 @@ import { Users } from '@boiling/core'
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import ConfigureFriend from './ConfigureFriend.vue'
+import Avatar from './Avatar.vue'
 
 const
   store = useStore(),
@@ -37,7 +52,8 @@ const
   }),
   isFriend = computed(() => store.state.user.friends.findIndex(
     (item: Users.Out['friends'][number]) => item.id === props.info.id
-  ) !== -1)
+  ) !== -1),
+  isMe = computed(() => store.state.user.id === props.info.id)
 </script>
 
 <style lang="scss" scoped>
@@ -61,11 +77,28 @@ div.user {
   }
   > div.avatar {
     z-index: 10;
+    position: relative;
     margin-right: 10px;
     width: var(--size);
     height: var(--size);
+    line-height: var(--size);
+    text-align: center;
     background-size: cover;
     border-radius: 50%;
+    > div.avatar-shadow {
+      position: absolute;
+      width: var(--size);
+      height: var(--size);
+      font-size: 11px;
+      background-color: #2f3237;
+      border-radius: 50%;
+      opacity: 0;
+    }
+    &:hover {
+      > div.avatar-shadow {
+        opacity: 0.8;
+      }
+    }
   }
   > div.info {
     display: flex;
@@ -129,6 +162,9 @@ div.user {
       --size: 64px;
 
       border: 6px solid var(--bg-color);
+      &.is-me {
+        cursor: pointer;
+      }
     }
     > div.operates {
       position: absolute;

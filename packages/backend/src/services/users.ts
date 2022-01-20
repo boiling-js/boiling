@@ -1,6 +1,7 @@
 import { Users } from '@boiling/core'
 import { UserModel } from '../dao/user'
 import { Seq } from '../utils'
+import fs from 'fs-extra'
 
 export namespace UsersService {
   export const Model = UserModel
@@ -57,7 +58,10 @@ export namespace UsersService {
   export async function exist(uname: string) {
     return await UserModel.findOne({ username: uname }) !== null
   }
-
+  export async function getAvatar() {
+    const files = (await fs.readdir('./static/img/avatar')).map(f => `/img/avatar/${ f }`)
+    return files
+  }
   export namespace Friends {
     export interface Opts {
       tags?: string[]
