@@ -27,6 +27,28 @@ class Sender {
   }
 }
 
+const resolveData = <T>(data: Websocket.RawData) => {
+  try {
+    return <T>JSON.parse(data.toString())
+  } catch (e) {
+    throw new HttpError('BAD_REQUEST', '错误的请求')
+  }
+}
+
+const waitIdentify = <T extends Message.PickTarget<Message.Opcodes.IDENTIFY, Message.Client>>(
+  ws: Websocket
+) => new Promise<T['d']>((resolve, reject) => {
+  // 只接受一次
+  ws.once('message', data => {
+    const m = resolveData<T>(data)
+    if (m.op !== Message.Opcodes.IDENTIFY) {
+      reject(new HttpError('BAD_REQUEST', '你必须先发送一个 IDENTIFY 消息'))
+    }
+    resolve(m.d)
+    return
+  })
+})
+
 /**
  * 基础流程：
  * 服务端发送 hello 数据包给客户端，其中包含了心跳包的间隔时间
@@ -46,35 +68,21 @@ export const router: Middleware = async (context, next) => {
   const { websocket: ws } = context
   const sender = new Sender(ws)
   sender.hello()
-  new Promise(((resolve, reject) => {
+  new Promise(async (resolve, reject) => {
     let isIdentified = false
     // 五秒内发送鉴权
     setTimeout(() => {
       if (!isIdentified)
         reject(new HttpError('REQUEST_TIMEOUT', '超时未发送鉴权'))
     }, 5000)
-    ws.on('message', data => {
-      try {
-        const m = <Message.Client>JSON.parse(data.toString())
-        switch (m.op) {
-          case Message.Opcodes.HEARTBEAT:
-            sender.ping()
-            break
-          case Message.Opcodes.IDENTIFY:
-            const { d } = m
-            if (d.token === 'Basic hhhhhhh')
-              isIdentified = true
-            else {
-              reject(new HttpError('UNAUTHORIZED', '鉴权失败'))
-              return
-            }
-            break
-        }
-      } catch (e) {
-        reject(new HttpError('BAD_REQUEST', '错误的请求'))
-      }
-    })
-  })).catch(e => {
+    const { token } = await waitIdentify(ws).catch(reject) || {}
+    if (token !== 'Basic hhhhhhh') {
+      reject(new HttpError('UNAUTHORIZED', '鉴权失败'))
+      return
+    }
+
+    isIdentified = true
+  }).catch(e => {
     if (e instanceof HttpError)
       ws.close(e.code + 4000, e.msg)
     else {
