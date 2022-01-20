@@ -2,8 +2,8 @@ import Schema from 'schemastery'
 import { Users } from './index'
 
 export namespace Message {
-  /** 基础数据 */
-  export const Base = Schema.interface({
+  /** 储存在数据库的消息 */
+  export const Model = Schema.interface({
     /** id */
     id: Schema.string(),
     /** 发送者 */
@@ -13,7 +13,7 @@ export namespace Message {
     /** 发送时间 */
     createdAt: Schema.string()
   })
-  export type Base = Schema.InferS<typeof Base>
+  export type Model = Schema.InferS<typeof Model>
   export enum Opcodes {
     /**
      * Server
@@ -73,7 +73,7 @@ export namespace Message {
       // 用户停止输入
       DP<'USER_INPUT_END', Users.BaseOut> |
       // 聊天室接收到新消息
-      DP<'MESSAGE', Base>
+      DP<'MESSAGE', Model>
   }
   export type Server = {
     op: Opcodes.HELLO
