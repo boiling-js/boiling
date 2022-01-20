@@ -2,76 +2,53 @@
   <el-dialog
     v-model="showDialog"
     title="更换头像"
-    width="60%">
-    <el-upload
-      class="avatar-uploader"
-      action="https://jsonplaceholder.typicode.com/posts/"
-      :show-file-list="false"
-      :on-success="handleAvatarSuccess"
-      :before-upload="beforeAvatarUpload"
-    >
-      <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-      <el-icon v-else class="avatar-uploader-icon"><plus /></el-icon>
-    </el-upload>
+    width="80%">
+    <div class="avatar">
+      <img
+        v-for="(item, index) in avatars"
+        :key="index"
+        :src="`/api/${item}`"
+        @click="selAvatar(item)">
+    </div>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
+import { onMounted, ref } from 'vue'
 import { ElDialog } from 'element-plus'
-
-import type {
-  UploadFile,
-  ElUploadProgressEvent,
-  ElFile
-} from 'element-plus/es/components/upload/src/upload.type'
+import { api } from '../api'
 
 const showDialog = ref<Boolean>(false),
+  avatars = ref<string[]>([]),
   show = () => {
     showDialog.value = true
+  },
+  selAvatar = (avatar: string) => {
+    console.log(avatar)
+    showDialog.value = false
   }
-const imageUrl = ref('')
-const handleAvatarSuccess = (res: ElUploadProgressEvent, file: UploadFile) => {
-  imageUrl.value = URL.createObjectURL(file.raw)
-}
-const beforeAvatarUpload = (file: ElFile) => {
-  const isJPG = file.type === 'image/jpeg'
-  const isLt2M = file.size / 1024 / 1024 < 2
 
-  if (!isJPG) {
-    ElMessage.error('Avatar picture must be JPG format!')
-  }
-  if (!isLt2M) {
-    ElMessage.error('Avatar picture size can not exceed 2MB!')
-  }
-  return isJPG && isLt2M
-}
+  onMounted(async () => {
+    avatars.value = await api.users.avatars
+  })
 defineExpose({ show })
 </script>
 
 <style scoped lang="scss">
-.avatar-uploader .el-upload {
-  position: relative;
-  border: 1px dashed #d9d9d9;
-  overflow: hidden;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.avatar-uploader .el-upload:hover {
-  border-color: #409eff;
-}
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 178px;
-  height: 178px;
-  text-align: center;
-}
 .avatar {
-  width: 178px;
-  height: 178px;
-  display: block;
+  display: flex;
+  justify-content: start;
+  flex-wrap: wrap;
+  > img {
+    margin: 10px;
+    width: 160px;
+    height: 160px;
+    cursor: pointer;
+    border: 4px solid var(--color-auxi-placeholder);
+    border-radius: var(--border-radius);
+    &:hover {
+      border: 4px solid var(--color-primary);
+    }
+  }
 }
 </style>

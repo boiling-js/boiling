@@ -6,6 +6,8 @@ interface OfficialApi {
   users: QueryPromise<Pagination<Users.BaseOut>, SearchQuery> & {
     /** 注册新用户 */
     add(d: Users.Register): Promise<Users.Out>
+    /** 获取头像*/
+    avatars: Promise<string[]>
   }
   /** 获取指定用户 */
   user(id: number | '@me'): {
