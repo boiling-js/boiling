@@ -1,5 +1,6 @@
 import Schema from 'schemastery'
 import './schemastery-ext'
+import { Message } from './message'
 
 export const Pagination = <Item extends Schema>(item: Item) => Schema.interface({
   count: Schema.number(),
@@ -13,11 +14,6 @@ export interface SearchQuery {
   key: string
   num?: number
   page?: number
-}
-export interface ChatRoom {
-  id: number
-  members: Users.FriendOut[]
-  messages: {}[]
 }
 
 export namespace Users {
@@ -75,6 +71,30 @@ export namespace Users {
     password: Schema.string()
   })
   export type Status = Schema.InferS<typeof Status>
+}
+
+export namespace ChatRoom {
+  export const Model = Schema.interface({
+    /**
+     * id
+     *
+     * 当聊天室为私聊、讨论组时，该结构 id 为成员 id 以 '-' 分隔
+     * 当聊天室为 channel 时，该结构 id 为 channel id
+     */
+    id: Schema.string(),
+    /**
+     * 头像
+     *
+     * 当聊天室为私聊、讨论组时，该结构 avatar 为成员头像组合
+     * 当聊天室为 channel 时，该结构 avatar 为 guild 头像
+     */
+    avatar: Schema.string(),
+    /** 成员列表 */
+    members: Schema.array(Users.BaseOut),
+    /** 消息列表 */
+    messages: Schema.array(Message.Model)
+  })
+  export type Model = Schema.InferS<typeof Model>
 }
 
 export * from './message'
