@@ -157,6 +157,7 @@ describe('Users Service', function () {
     expect(addFriend[0].id).to.be.eq(friend1.id)
   })
   it('should get all avatar', async function () {
+    // TODO 使用 mock-fs 模拟文件系统进行测试
     const files = await UsersService.getAvatar()
     expect(files[0]).to.be.deep.eq('/img/avatar/0.jpg')
   })
