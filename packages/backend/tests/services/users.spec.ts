@@ -156,4 +156,8 @@ describe('Users Service', function () {
     expect(addFriend.length).to.be.eq(1)
     expect(addFriend[0].id).to.be.eq(friend1.id)
   })
+  it('should get all avatar', async function () {
+    const files = await UsersService.getAvatar()
+    expect(files[0]).to.be.deep.eq('/img/avatar/0.jpg')
+  })
 })
