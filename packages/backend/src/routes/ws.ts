@@ -40,12 +40,15 @@ const waitIdentify = <T extends Message.PickTarget<Message.Opcodes.IDENTIFY, Mes
 ) => new Promise<T['d']>((resolve, reject) => {
   // 只接受一次
   ws.once('message', data => {
-    const m = resolveData<T>(data)
-    if (m.op !== Message.Opcodes.IDENTIFY) {
-      reject(new HttpError('BAD_REQUEST', '你必须先发送一个 IDENTIFY 消息'))
+    try {
+      const m = resolveData<T>(data)
+      if (m.op !== Message.Opcodes.IDENTIFY) {
+        reject(new HttpError('BAD_REQUEST', '你必须先发送一个 IDENTIFY 消息'))
+      }
+      resolve(m.d)
+    } catch (e) {
+      reject(e)
     }
-    resolve(m.d)
-    return
   })
 })
 
@@ -61,6 +64,7 @@ const waitIdentify = <T extends Message.PickTarget<Message.Opcodes.IDENTIFY, Mes
  * 1. 鉴权不通过，服务端会主动断开连接
  * 2. 多次未发送心跳包，服务端会主动断开连接
  * 3. 鉴权不通过不会下发其他数据包
+ * 4. 错误的数据包，服务端会主动断开连接
  */
 export const router: Middleware = async (context, next) => {
   if (!context.url.startsWith('/ws'))
