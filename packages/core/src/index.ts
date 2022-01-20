@@ -76,18 +76,8 @@ export namespace Users {
   })
   export type Status = Schema.InferS<typeof Status>
 }
-export namespace Message {
-  export interface Resp {
-    id: number
-  }
-}
-export namespace WS {
-  export type Event = {
-    t: 'MESSAGE'
-    p: Message.Resp
-  }
-}
 
+export * from './message'
 export * from './api'
 export * from './router'
 export { Utils } from './utils'
