@@ -6,7 +6,7 @@ import { api } from './api'
 export default createStore({
   state: {
     isHiddenLeftSelector: false,
-    chatRoom: <ChatRoom.Model>{
+    chatRoom: <ChatRoom.Base>{
     },
     user: <Users.Out>{
       id: 0,
