@@ -12,7 +12,7 @@ class Sender {
   hello() {
     this.do({
       op: Messages.Opcodes.HELLO,
-      d: { heartbeatInterval: 600000 }
+      d: { heartbeatInterval: Number(process.env.HEARTBEAT_INTERVAL || 600000) }
     })
   }
   ping() {
@@ -79,13 +79,24 @@ export const router: Middleware = async (context, next) => {
       if (!isIdentified)
         reject(new HttpError('REQUEST_TIMEOUT', '超时未发送鉴权'))
     }, 5000)
-    const { token } = await waitIdentify(ws).catch(reject) || {}
-    if (token !== 'Basic hhhhhhh') {
-      reject(new HttpError('UNAUTHORIZED', '鉴权失败'))
-      return
+    try {
+      const { token } = await waitIdentify(ws) || {}
+      const [ type, content ] = token?.split(' ') ?? []
+      switch (type) {
+        case 'Basic':
+          const [uid, pwd] = Buffer.from(content, 'base64').toString().split(':')
+          // TODO 鉴权 返回 ready 包
+          break
+        default:
+          throw new HttpError('UNAUTHORIZED', '不支持的协议')
+      }
+    } catch (e) {
+      reject(e)
     }
 
     isIdentified = true
+    // TODO 要求客户端按照 hello 包中的心跳包间隔时间，发送心跳包给服务端，服务端收到心跳包后，发送心跳包响应给客户端
+    //      如果多次未发送心跳包，服务端会主动断开连接
   }).catch(e => {
     if (e instanceof HttpError)
       ws.close(e.code + 4000, e.msg)

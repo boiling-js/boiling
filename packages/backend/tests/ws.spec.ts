@@ -3,20 +3,23 @@ import Koa from 'koa'
 import websockify from 'koa-websocket'
 import { expect } from 'chai'
 import { Messages } from '@boiling/core'
-import DAOMain from '../src/dao'
 import { router as WSRouter } from '../src/routes/ws'
+import DAOMain from '../src/dao'
 import { UserModel } from '../src/dao/user'
+import { Security } from '../src/utils'
+
+process.env.HEARTBEAT_INTERVAL = '5000'
 
 after(() => process.exit(0))
 
 describe('WS', function () {
-  const users = <Record<string, InstanceType<typeof UserModel>>>{
-    default: new UserModel({
+  const users = <Record<string, [InstanceType<typeof UserModel>, string]>>{
+    default: [new UserModel({
       id: 1001,
       username: 'default',
       avatar: 'default',
-      passwordHash: 'default'
-    })
+      passwordHash: Security.encrypt('default')
+    }), `Basic ${ Buffer.from('1001:default').toString('base64')}`]
   }
   const {
     PORT = '19849',
@@ -34,35 +37,113 @@ describe('WS', function () {
       DAOMain().then(resolve).catch(reject)
     )
   }).then(async () => {
-    await users.default.save()
+    await users.default[0].save()
   }))
 
   it('should connect ws server.', function () {
+    const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
+    return new Promise<void>((resolve, reject) => {
+      ws.once('message', d => {
+        try {
+          const m = <Messages.PickTarget<
+            Messages.Opcodes.HELLO
+          >>JSON.parse(d.toString())
+          expect(m.op).to.equal(Messages.Opcodes.HELLO)
+          resolve()
+        } catch (e) {
+          reject(e)
+        }
+      })
+      ws.on('close', code => {
+        reject(new Error(`ws close: ${ code }`))
+      })
+    }).then(() => new Promise<void>((resolve, reject) => {
+      ws.send(JSON.stringify({
+        op: Messages.Opcodes.IDENTIFY,
+        d: {
+          token: users.default[1]
+        }
+      }))
+      ws.once('message', d => {
+        try {
+          const m = <Messages.PickTarget<
+            Messages.Opcodes.DISPATCH
+            >>JSON.parse(d.toString())
+          expect(m.op).to.equal(Messages.Opcodes.DISPATCH)
+          expect(m.t).to.equal('READY')
+          expect(m.d).property('user').to.deep.equal({
+            id: 1001,
+            username: 'default',
+            avatar: 'default'
+          })
+          resolve()
+        } catch (e) {
+          reject(e)
+        }
+      })
+    }))
+  })
+  it('should connect ws server and throw `BAD_REQUEST` error.', function (done) {
+    const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
+    ws.on('open', () => {
+      ws.send('*>:"219u0dosqndon')
+      ws.on('close', code => {
+        expect(code).to.be.eq(4400)
+        done()
+      })
+    })
+  })
+  it('should connect ws server and throw `UNAUTHORIZED` error.', function (done) {
+    const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
+    ws.on('open', () => {
+      ws.send(JSON.stringify({
+        op: Messages.Opcodes.IDENTIFY,
+        d: {
+          token: 'Basic none'
+        }
+      }))
+      ws.on('close', code => {
+        expect(code).to.be.eq(4401)
+        done()
+      })
+    })
+  })
+  it('should connect ws server and throw `REQUEST_TIMEOUT` error when long time no send ident message.', function () {
+    this.timeout(5500)
+    return new Promise<void>((resolve, reject) => {
+      const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
+      ws.on('close', (code, msg) => {
+        try {
+          expect(code).to.be.eq(4408)
+          expect(msg.toString())
+            .to.be.eq('超时未发送鉴权')
+          resolve()
+        } catch (e) {
+          reject(e)
+        }
+      })
+    })
+  })
+  it('should connect ws server and throw `REQUEST_TIMEOUT` error when long time no heart beat.', function () {
+    this.timeout((process.env?.HEARTBEAT_INTERVAL ?? '5000') + 500)
     return new Promise<void>((resolve, reject) => {
       const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
       ws.on('open', () => {
         ws.send(JSON.stringify({
           op: Messages.Opcodes.IDENTIFY,
-          d: {
-            token: 'Basic hhhhhhh'
-          }
+          d: { token: 'Basic hhhhhhh' }
         }))
       })
-      ws.on('message', m => {
-        console.log(m)
-        resolve()
+      ws.on('close', (code, msg) => {
+        try {
+          expect(code).to.be.eq(4408)
+          expect(msg.toString())
+            .to.be.eq('超时未发送心跳包')
+          resolve()
+        } catch (e) {
+          reject(e)
+        }
       })
-      ws.on('close', code => {
-        reject(new Error(`ws close: ${ code }`))
-      })
-    })
-  })
-  it('should connect ws server and throw `REQUEST_TIMEOUT` error.', function (done) {
-    this.timeout(5500)
-    const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
-    ws.on('close', code => {
-      expect(code).to.be.eq(4408)
-      done()
     })
   })
 })
