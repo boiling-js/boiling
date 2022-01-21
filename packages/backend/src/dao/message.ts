@@ -1,8 +1,8 @@
 import { Schema, model } from 'mongoose'
-import { Message } from '@boiling/core'
+import { Messages } from '@boiling/core'
 import { UserModel } from './user'
 
-const messageSchema = new Schema<Message.Model>({
+const messageSchema = new Schema<Messages.Model>({
   id: {
     type: String,
     unique: true,

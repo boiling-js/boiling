@@ -1,12 +1,12 @@
 import { createStore } from 'vuex'
-import { Users, ChatRoom } from '@boiling/core'
+import { Users, ChatRooms } from '@boiling/core'
 import CreatePersistedState from 'vuex-persistedstate'
 import { api } from './api'
 
 export default createStore({
   state: {
     isHiddenLeftSelector: false,
-    chatRoom: <ChatRoom.Base>{
+    chatRoom: <ChatRooms.Base>{
     },
     user: <Users.Out>{
       id: 0,

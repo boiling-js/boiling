@@ -1,9 +1,9 @@
-import { Message } from '@boiling/core'
+import { Messages } from '@boiling/core'
 import { MessageModel } from '../dao/message'
 
 export namespace ChatRoomsService {
   export const Model = MessageModel
-  export type M = Omit<Message.Model, 'id' | 'sender'>
+  export type M = Omit<Messages.Model, 'id' | 'sender'>
   /**
    * 获取聊天室数据
    */

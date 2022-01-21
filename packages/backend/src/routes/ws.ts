@@ -1,26 +1,26 @@
 import Websocket from 'ws'
 import { Middleware } from 'koa-websocket'
-import { Message } from '@boiling/core'
+import { Messages } from '@boiling/core'
 
 class Sender {
   constructor(public ws: Websocket) {
     this.ws = ws
   }
-  do(m: Message.Server) {
+  do(m: Messages.Server) {
     this.ws.send(JSON.stringify(m))
   }
   hello() {
     this.do({
-      op: Message.Opcodes.HELLO,
+      op: Messages.Opcodes.HELLO,
       d: { heartbeatInterval: 600000 }
     })
   }
   ping() {
-    this.do({ op: Message.Opcodes.HEARTBEAT_ACK })
+    this.do({ op: Messages.Opcodes.HEARTBEAT_ACK })
   }
-  dispatch<M extends Message.PickTarget<Message.Opcodes.DISPATCH>>(t: M['t'], d: M['d']) {
+  dispatch<M extends Messages.PickTarget<Messages.Opcodes.DISPATCH>>(t: M['t'], d: M['d']) {
     this.do({
-      op: Message.Opcodes.DISPATCH,
+      op: Messages.Opcodes.DISPATCH,
       // @ts-ignore
       t, d
     })
@@ -35,14 +35,14 @@ const resolveData = <T>(data: Websocket.RawData) => {
   }
 }
 
-const waitIdentify = <T extends Message.PickTarget<Message.Opcodes.IDENTIFY, Message.Client>>(
+const waitIdentify = <T extends Messages.PickTarget<Messages.Opcodes.IDENTIFY, Messages.Client>>(
   ws: Websocket
 ) => new Promise<T['d']>((resolve, reject) => {
   // 只接受一次
   ws.once('message', data => {
     try {
       const m = resolveData<T>(data)
-      if (m.op !== Message.Opcodes.IDENTIFY) {
+      if (m.op !== Messages.Opcodes.IDENTIFY) {
         reject(new HttpError('BAD_REQUEST', '你必须先发送一个 IDENTIFY 消息'))
       }
       resolve(m.d)

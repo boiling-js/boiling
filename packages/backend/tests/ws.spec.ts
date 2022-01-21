@@ -2,7 +2,7 @@ import Websocket from 'ws'
 import Koa from 'koa'
 import websockify from 'koa-websocket'
 import { expect } from 'chai'
-import { Message } from '@boiling/core'
+import { Messages } from '@boiling/core'
 import DAOMain from '../src/dao'
 import { router as WSRouter } from '../src/routes/ws'
 import { UserModel } from '../src/dao/user'
@@ -42,7 +42,7 @@ describe('WS', function () {
       const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
       ws.on('open', () => {
         ws.send(JSON.stringify({
-          op: Message.Opcodes.IDENTIFY,
+          op: Messages.Opcodes.IDENTIFY,
           d: {
             token: 'Basic hhhhhhh'
           }
