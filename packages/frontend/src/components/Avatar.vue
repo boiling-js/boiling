@@ -14,18 +14,25 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { ElDialog, ElScrollbar } from 'element-plus'
+import { computed, onMounted, ref } from 'vue'
+import { ElDialog, ElMessageBox, ElScrollbar } from 'element-plus'
 import { api } from '../api'
+import store from '../store'
 
+computed(() => store.state.user.avatar)
 const showDialog = ref<Boolean>(false),
   avatars = ref<string[]>([]),
   show = () => {
     showDialog.value = true
   },
   selAvatar = async (avatar: string) => {
-    console.log(avatar)
-    await api.user('@me').avatar.upd({ avatar })
+    await ElMessageBox.confirm(
+      '是否确认更换头像？', '确认', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      }
+    )
+    await store.dispatch('updAvatar', avatar)
     showDialog.value = false
   }
 

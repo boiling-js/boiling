@@ -13,7 +13,8 @@ export default createStore({
       username: '',
       avatar: '',
       tags: [],
-      friends: []
+      friends: [],
+      chatRooms: []
     }
   },
   mutations: {
@@ -36,6 +37,9 @@ export default createStore({
     delFriend(state, id: number) {
       const index = state.user.friends.findIndex(friend => friend.id === id)
       state.user.friends = state.user.friends.splice(index - 1, 1)
+    },
+    updAvatar(state, avatar: string) {
+      state.user.avatar = avatar
     }
   },
   actions: {
@@ -53,6 +57,12 @@ export default createStore({
         remark: friend.remark
       })
       context.commit('updFriend', friend)
+    },
+    async updAvatar(context, avatar: string) {
+      await api.user('@me').avatar.upd({
+        avatar
+      })
+      context.commit('updAvatar', avatar)
     }
   },
   plugins: [CreatePersistedState()]
