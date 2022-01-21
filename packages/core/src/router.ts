@@ -154,7 +154,7 @@ export namespace Router {
             const [ path ] = url.split('?')
             const { param, query } = resolveURL(url)
             const regExp = new RegExp(`^${Object.entries(param).reduce(
-              (acc, [name, param]) => acc.replace(new RegExp(`:${name}(\\(\\w+\\))?`), param.regex.source),
+              (acc, [name, param]) => acc.replace(new RegExp(`:${name}(\\(\\w+\\))?`), `(${param.regex.source})`),
               `${target.opts.prefix || ''}${path}`
             )}$`)
             target.allowedMethods.push(method)
