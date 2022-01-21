@@ -28,6 +28,9 @@ interface OfficialApi {
       del(): Promise<void>
       upd(d: Omit<Users.Friend, 'id'>): Promise<void>
     }
+    avatar: {
+      upd(d: { avatar: string }): Promise<void>
+    }
   }
 }
 

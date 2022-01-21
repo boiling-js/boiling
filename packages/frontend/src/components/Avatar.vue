@@ -2,20 +2,20 @@
   <el-dialog
     v-model="showDialog"
     title="更换头像"
-    width="80%">
-    <div class="avatar">
+    width="920px">
+    <el-scrollbar height="500px">
       <img
         v-for="(item, index) in avatars"
         :key="index"
         :src="`/api/${item}`"
         @click="selAvatar(item)">
-    </div>
+    </el-scrollbar>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { ElDialog } from 'element-plus'
+import { ElDialog, ElScrollbar } from 'element-plus'
 import { api } from '../api'
 
 const showDialog = ref<Boolean>(false),
@@ -23,8 +23,9 @@ const showDialog = ref<Boolean>(false),
   show = () => {
     showDialog.value = true
   },
-  selAvatar = (avatar: string) => {
+  selAvatar = async (avatar: string) => {
     console.log(avatar)
+    await api.user('@me').avatar.upd({ avatar })
     showDialog.value = false
   }
 
@@ -35,14 +36,15 @@ defineExpose({ show })
 </script>
 
 <style scoped lang="scss">
-.avatar {
+.el-scrollbar__view {
   display: flex;
+  width: 100%;
   justify-content: start;
   flex-wrap: wrap;
   > img {
-    margin: 10px;
-    width: 160px;
-    height: 160px;
+    margin: 13px;
+    width: 175px;
+    height: 175px;
     cursor: pointer;
     border: 4px solid var(--color-auxi-placeholder);
     border-radius: var(--border-radius);
