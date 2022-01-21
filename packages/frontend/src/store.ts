@@ -1,19 +1,20 @@
 import { createStore } from 'vuex'
-import { Users, ChatRoom } from '@boiling/core'
+import { Users, ChatRooms } from '@boiling/core'
 import CreatePersistedState from 'vuex-persistedstate'
 import { api } from './api'
 
 export default createStore({
   state: {
-    chatRoom: <ChatRoom>{
-    },
     isHiddenLeftSelector: false,
+    chatRoom: <ChatRooms.Base>{
+    },
     user: <Users.Out>{
       id: 0,
       username: '',
       avatar: '',
       tags: [],
-      friends: []
+      friends: [],
+      chatRooms: []
     }
   },
   mutations: {
@@ -26,9 +27,6 @@ export default createStore({
     setUser(state, user: Users.Out) {
       state.user = user
     },
-    chatRoomPushUser(state, user: Users.Out) {
-      state.chatRoom.members.push(user)
-    },
     addFriend(state, friend: Users.Friend) {
       state.user.friends.push(friend)
     },
@@ -39,23 +37,32 @@ export default createStore({
     delFriend(state, id: number) {
       const index = state.user.friends.findIndex(friend => friend.id === id)
       state.user.friends = state.user.friends.splice(index - 1, 1)
+    },
+    updAvatar(state, avatar: string) {
+      state.user.avatar = avatar
     }
   },
   actions: {
     async addFriend(context, friend: Users.Friend) {
-      await api.user(this.state.user.id).friends.add(friend)
+      await api.user('@me').friends.add(friend)
       context.commit('addFriend', friend)
     },
     async delFriend(context, id: number) {
+      await api.user('@me').friend(id).del()
       context.commit('delFriend', id)
-     await api.user(this.state.user.id).friend(id).del()
     },
     async updFriend(context, friend: Users.Friend) {
-      await api.user(this.state.user.id).friend(friend.id).upd({
+      await api.user('@me').friend(friend.id).upd({
         tags: friend.tags,
         remark: friend.remark
       })
       context.commit('updFriend', friend)
+    },
+    async updAvatar(context, avatar: string) {
+      await api.user('@me').avatar.upd({
+        avatar
+      })
+      context.commit('updAvatar', avatar)
     }
   },
   plugins: [CreatePersistedState()]

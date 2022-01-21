@@ -156,4 +156,15 @@ describe('Users Service', function () {
     expect(addFriend.length).to.be.eq(1)
     expect(addFriend[0].id).to.be.eq(friend1.id)
   })
+  it('should get all avatar', async function () {
+    // TODO 使用 mock-fs 模拟文件系统进行测试
+    const files = await UsersService.getAvatar()
+    expect(files[0]).to.be.deep.eq('/img/avatar/0.jpg')
+  })
+  it('should update user\'s avatar', async function () {
+    const user = await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
+    await UsersService.updateAvatar(user.id, '/img/avatar/3.jpg')
+    const newUser = await UsersService.get(user.id)
+    expect(newUser?.avatar).to.be.eq('/img/avatar/3.jpg')
+  })
 })

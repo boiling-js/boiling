@@ -65,8 +65,8 @@ export const router = new Router({
         return
     }
   })
-  .post(Schema.any(), '/:id(uid)/friends', ctx => {
-    const { id: fid, ...opts } = <Users.Friend>ctx.request.body
+  .post(Users.Friend, Schema.any(), '/:id(uid)/friends', ctx => {
+    const { id: fid, ...opts } = ctx.request.body
     return UsersService.Friends.add(
       useTarget(ctx.session, ctx.params.id),
       +fid, opts
@@ -98,4 +98,13 @@ export const router = new Router({
   })
   .del('/:id(number)/channels/:cid', async ctx => {
     console.log(ctx.params)
+  })
+  .get('/avatars', async () => {
+    return UsersService.getAvatar()
+  })
+  .patch('/:id(uid)/avatar', async ctx => {
+    const { avatar } = ctx.request.body
+    if (!avatar)
+      throw new HttpError('BAD_REQUEST', '头像不能为空')
+    return UsersService.updateAvatar(useTarget(ctx.session, ctx.params.id), avatar)
   })

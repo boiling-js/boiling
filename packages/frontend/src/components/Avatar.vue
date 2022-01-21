@@ -2,76 +2,62 @@
   <el-dialog
     v-model="showDialog"
     title="更换头像"
-    width="60%">
-    <el-upload
-      class="avatar-uploader"
-      action="https://jsonplaceholder.typicode.com/posts/"
-      :show-file-list="false"
-      :on-success="handleAvatarSuccess"
-      :before-upload="beforeAvatarUpload"
-    >
-      <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-      <el-icon v-else class="avatar-uploader-icon"><plus /></el-icon>
-    </el-upload>
+    width="920px">
+    <el-scrollbar height="500px">
+      <img
+        v-for="(item, index) in avatars"
+        :key="index"
+        :src="`/api/${item}`"
+        @click="selAvatar(item)">
+    </el-scrollbar>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
-import { ElDialog } from 'element-plus'
+import { computed, onMounted, ref } from 'vue'
+import { ElDialog, ElMessageBox, ElScrollbar } from 'element-plus'
+import { api } from '../api'
+import store from '../store'
 
-import type {
-  UploadFile,
-  ElUploadProgressEvent,
-  ElFile
-} from 'element-plus/es/components/upload/src/upload.type'
-
+computed(() => store.state.user.avatar)
 const showDialog = ref<Boolean>(false),
+  avatars = ref<string[]>([]),
   show = () => {
     showDialog.value = true
+  },
+  selAvatar = async (avatar: string) => {
+    await ElMessageBox.confirm(
+      '是否确认更换头像？', '确认', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      }
+    )
+    await store.dispatch('updAvatar', avatar)
+    showDialog.value = false
   }
-const imageUrl = ref('')
-const handleAvatarSuccess = (res: ElUploadProgressEvent, file: UploadFile) => {
-  imageUrl.value = URL.createObjectURL(file.raw)
-}
-const beforeAvatarUpload = (file: ElFile) => {
-  const isJPG = file.type === 'image/jpeg'
-  const isLt2M = file.size / 1024 / 1024 < 2
 
-  if (!isJPG) {
-    ElMessage.error('Avatar picture must be JPG format!')
-  }
-  if (!isLt2M) {
-    ElMessage.error('Avatar picture size can not exceed 2MB!')
-  }
-  return isJPG && isLt2M
-}
+  onMounted(async () => {
+    avatars.value = await api.users.avatars
+  })
 defineExpose({ show })
 </script>
 
 <style scoped lang="scss">
-.avatar-uploader .el-upload {
-  position: relative;
-  border: 1px dashed #d9d9d9;
-  overflow: hidden;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.avatar-uploader .el-upload:hover {
-  border-color: #409eff;
-}
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 178px;
-  height: 178px;
-  text-align: center;
-}
-.avatar {
-  width: 178px;
-  height: 178px;
-  display: block;
+.el-scrollbar__view {
+  display: flex;
+  width: 100%;
+  justify-content: start;
+  flex-wrap: wrap;
+  > img {
+    margin: 13px;
+    width: 175px;
+    height: 175px;
+    cursor: pointer;
+    border: 4px solid var(--color-auxi-placeholder);
+    border-radius: var(--border-radius);
+    &:hover {
+      border: 4px solid var(--color-primary);
+    }
+  }
 }
 </style>

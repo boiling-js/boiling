@@ -23,6 +23,10 @@ const userSchema = new Schema<Users.Model>({
     type: [String],
     default: []
   },
+  chatRooms: {
+    type: [String],
+    default: []
+  },
   friends: {
     type: [{
       id: Number,

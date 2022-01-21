@@ -6,7 +6,9 @@
       class="avatar is-me" :style="{
         backgroundImage: `url(/api${info.avatar})`
       }"
-      @click="$refs.avatar.show()"/>
+      @click="$refs.avatar.show()">
+      <div class="avatar-shadow"> 更换头像 </div>
+    </div>
     <div
       v-else
       class="avatar" :style="{
@@ -75,11 +77,28 @@ div.user {
   }
   > div.avatar {
     z-index: 10;
+    position: relative;
     margin-right: 10px;
     width: var(--size);
     height: var(--size);
+    line-height: var(--size);
+    text-align: center;
     background-size: cover;
     border-radius: 50%;
+    > div.avatar-shadow {
+      position: absolute;
+      width: var(--size);
+      height: var(--size);
+      font-size: 11px;
+      background-color: #2f3237;
+      border-radius: 50%;
+      opacity: 0;
+    }
+    &:hover {
+      > div.avatar-shadow {
+        opacity: 0.8;
+      }
+    }
   }
   > div.info {
     display: flex;
