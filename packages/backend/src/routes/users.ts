@@ -65,8 +65,8 @@ export const router = new Router({
         return
     }
   })
-  .post(Schema.any(), '/:id(uid)/friends', ctx => {
-    const { id: fid, ...opts } = <Users.Friend>ctx.request.body
+  .post(Users.Friend, Schema.any(), '/:id(uid)/friends', ctx => {
+    const { id: fid, ...opts } = ctx.request.body
     return UsersService.Friends.add(
       useTarget(ctx.session, ctx.params.id),
       +fid, opts
