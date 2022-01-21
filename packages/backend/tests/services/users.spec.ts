@@ -161,4 +161,10 @@ describe('Users Service', function () {
     const files = await UsersService.getAvatar()
     expect(files[0]).to.be.deep.eq('/img/avatar/0.jpg')
   })
+  it('should update user\'s avatar', async function () {
+    const user = await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
+    await UsersService.updateAvatar(user.id, '/img/avatar/3.jpg')
+    const newUser = await UsersService.get(user.id)
+    expect(newUser?.avatar).to.be.eq('/img/avatar/3.jpg')
+  })
 })

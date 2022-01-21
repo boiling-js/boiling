@@ -62,6 +62,11 @@ export namespace UsersService {
     const files = (await fs.readdir('./static/img/avatar')).map(f => `/img/avatar/${ f }`)
     return files
   }
+  export async function updateAvatar(id: number, avatar: string) {
+    const user = await UsersService.getOrThrow(id)
+    user.avatar = avatar
+    await user.save()
+  }
   export namespace Friends {
     export interface Opts {
       tags?: string[]
