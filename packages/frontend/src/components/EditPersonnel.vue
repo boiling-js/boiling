@@ -1,6 +1,9 @@
 <template>
   <div class="edit-personnel">
     <el-page-header :icon="ArrowLeft" title="返回" content="编辑个人信息" @back="$router.push('/home')" />
+    <user
+      :info="$store.state.user"
+      :type="'popup'"/>
     <el-form ref="editPersonnelForm" :model="form" label-width="90px">
       <el-form-item label="用户名">
         <el-input
@@ -20,15 +23,12 @@
         ></el-date-picker>
       </el-form-item>
       <el-form-item label="个人简介">
-        <el-input v-model="form.desc" type="textarea"></el-input>
+        <el-input v-model="form.desc" type="textarea" rows="6"/>
       </el-form-item>
     </el-form>
-    <user
-      :info="$store.state.user"
-      :type="'popup'"/>
     <div class="bottom">
       <el-button type="primary" @click="onSubmit">确认</el-button>
-      <el-button>取消</el-button>
+      <el-button @click="$router.push('/home')">取消</el-button>
     </div>
   </div>
 </template>
@@ -70,7 +70,9 @@ const onSubmit = () => {
     bottom: 60px;
   }
   > .user {
-    width: 50%;
+    float: right;
+    margin: 0 40px;
+    width: 40%;
   }
 }
 </style>
