@@ -67,6 +67,13 @@ export namespace UsersService {
     user.avatar = avatar
     await user.save()
   }
+  export async function addChatRoom(id: number, room: string) {
+    const user = await UsersService.getOrThrow(id)
+    if (user.chatRooms.includes(room))
+      throw new HttpError('CONFLICT', `${ room }聊天室已存在`)
+    user.chatRooms.push(room)
+    await user.save()
+  }
   export namespace Friends {
     export interface Opts {
       tags?: string[]

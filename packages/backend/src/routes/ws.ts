@@ -1,6 +1,8 @@
 import Websocket from 'ws'
 import { Middleware } from 'koa-websocket'
-import { Messages } from '@boiling/core'
+import { Messages, Users } from '@boiling/core'
+import { UsersService } from '../services/users'
+import Utils from '../utils'
 
 class Sender {
   constructor(public ws: Websocket) {
@@ -85,7 +87,22 @@ export const router: Middleware = async (context, next) => {
       switch (type) {
         case 'Basic':
           const [uid, pwd] = Buffer.from(content, 'base64').toString().split(':')
-          // TODO 鉴权 返回 ready 包
+            const user = await UsersService.get(uid)
+            if (!user) {
+              throw new HttpError('UNAUTHORIZED', '用户不存在')
+            }
+            if (!Utils.Security.match(pwd, user!.passwordHash)) {
+              throw new HttpError('UNAUTHORIZED', '密码错误')
+            }
+          sender.do({
+            op: Messages.Opcodes.DISPATCH,
+            // @ts-ignore
+            t: 'READY',
+            d: {
+              sessionId: '1551321315',
+              user: user
+            }
+          })
           break
         default:
           throw new HttpError('UNAUTHORIZED', '不支持的协议')
