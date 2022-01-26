@@ -36,8 +36,9 @@
 <script lang="ts" setup>
 import { ElPageHeader, ElForm,ElFormItem, ElSelect, ElOption, ElDatePicker, ElInput, ElButton } from 'element-plus'
 import { ArrowLeft } from '@element-plus/icons-vue'
-import { reactive } from 'vue'
+import { onMounted, onUnmounted, reactive } from 'vue'
 import User from './User.vue'
+import store from '../store'
 
 // do not use same name with ref
 const form = reactive({
@@ -53,6 +54,13 @@ const form = reactive({
 const onSubmit = () => {
   console.log('submit!')
 }
+
+onMounted(() => {
+  store.commit('setLeftSelectorHidden', true)
+})
+onUnmounted(() => {
+  store.commit('toggleLeftSelector')
+})
 
 </script>
 
