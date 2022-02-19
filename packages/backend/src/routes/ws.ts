@@ -54,22 +54,6 @@ const waitIdentify = <T extends Messages.PickTarget<Messages.Opcodes.IDENTIFY, M
   })
 })
 
-const waitHeartBeat = <T extends Messages.PickTarget<Messages.Opcodes.HEARTBEAT, Messages.Client>>(
-  ws: Websocket
-) => new Promise<T['op']>((resolve, reject) => {
-  ws.on('message', data => {
-    try {
-      const m = resolveData<T>(data)
-      if (m.op !== Messages.Opcodes.HEARTBEAT) {
-        reject(new HttpError('BAD_REQUEST', '长时间未收到 HEARTBEAT 消息'))
-      }
-      resolve(m.op)
-    } catch (e) {
-      reject(e)
-    }
-  })
-})
-
 /**
  * 基础流程：
  * 服务端发送 hello 数据包给客户端，其中包含了心跳包的间隔时间
@@ -130,12 +114,12 @@ export const router: Middleware = async (context, next) => {
 
     // 要求客户端按照 hello 包中的心跳包间隔时间，发送心跳包给服务端，服务端收到心跳包后，发送心跳包响应给客户端
     // 如果多次未发送心跳包，服务端会主动断开连接
-    let ispinged = false
+    let isPinged = false
     setInterval(() => {
-      if (!ispinged) {
+      if (!isPinged) {
         reject(new HttpError('REQUEST_TIMEOUT', '超时未发送心跳包'))
       } else {
-        ispinged = false
+        isPinged = false
       }
     }, Number(process.env.HEARTBEAT_INTERVAL || 600000) + 1000)
 
@@ -144,7 +128,7 @@ export const router: Middleware = async (context, next) => {
         const m = resolveData<Messages.Client>(data)
         switch (m.op) {
           case Messages.Opcodes.HEARTBEAT:
-            ispinged = true
+            isPinged = true
             sender.ping()
             break
           default:
@@ -152,8 +136,6 @@ export const router: Middleware = async (context, next) => {
         }
       } catch (e) { }
     })
-    await waitHeartBeat(ws)
-    sender.ping()
   }).catch(e => {
     if (e instanceof HttpError)
       ws.close(e.code + 4000, e.msg)
