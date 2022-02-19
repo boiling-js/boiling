@@ -103,13 +103,13 @@ export const router: Middleware = async (context, next) => {
       switch (type) {
         case 'Basic':
           const [uid, pwd] = Buffer.from(content, 'base64').toString().split(':')
-            const user = await UsersService.get(uid)
-            if (!user) {
-              throw new HttpError('UNAUTHORIZED', '用户不存在')
-            }
-            if (!Utils.Security.match(pwd, user!.passwordHash)) {
-              throw new HttpError('UNAUTHORIZED', '密码错误')
-            }
+          const user = await UsersService.get(uid)
+          if (!user) {
+            throw new HttpError('UNAUTHORIZED', '用户不存在')
+          }
+          if (!Utils.Security.match(pwd, user!.passwordHash)) {
+            throw new HttpError('UNAUTHORIZED', '密码错误')
+          }
           sender.do({
             op: Messages.Opcodes.DISPATCH,
             // @ts-ignore
