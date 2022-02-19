@@ -131,7 +131,7 @@ describe('WS', function () {
       ws.on('open', () => {
         ws.send(JSON.stringify({
           op: Messages.Opcodes.IDENTIFY,
-          d: { token: 'Basic hhhhhhh' }
+          d: { token: users.default[1] }
         }))
       })
       ws.on('close', (code, msg) => {
