@@ -103,7 +103,7 @@ export const router: Middleware = async (context, next) => {
       switch (type) {
         case 'Basic':
           const [uid, pwd] = Buffer.from(content, 'base64').toString().split(':')
-          const user = await UsersService.get(uid)
+          const user = await UsersService.get(+uid)
           if (!user) {
             throw new HttpError('UNAUTHORIZED', '用户不存在')
           }
@@ -126,11 +126,32 @@ export const router: Middleware = async (context, next) => {
     } catch (e) {
       reject(e)
     }
-
     isIdentified = true
 
     // 要求客户端按照 hello 包中的心跳包间隔时间，发送心跳包给服务端，服务端收到心跳包后，发送心跳包响应给客户端
     // 如果多次未发送心跳包，服务端会主动断开连接
+    let ispinged = false
+    setInterval(() => {
+      if (!ispinged) {
+        reject(new HttpError('REQUEST_TIMEOUT', '超时未发送心跳包'))
+      } else {
+        ispinged = false
+      }
+    }, Number(process.env.HEARTBEAT_INTERVAL || 600000) + 1000)
+
+    ws.once('message', data => {
+      try {
+        const m = resolveData<Messages.Client>(data)
+        switch (m.op) {
+          case Messages.Opcodes.HEARTBEAT:
+            ispinged = true
+            sender.ping()
+            break
+          default:
+            throw new HttpError('UNPROCESSABLE_ENTITY', '不支持的op类型')
+        }
+      } catch (e) { }
+    })
     await waitHeartBeat(ws)
     sender.ping()
   }).catch(e => {
