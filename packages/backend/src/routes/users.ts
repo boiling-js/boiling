@@ -45,7 +45,7 @@ export const router = new Router({
   .get('/:id(number)', async ctx => {
     return UsersService.get(ctx.params.id)
   })
-  .post(Users.Status, Users.Out.or(Schema.any()), '/:id(number)/status', async ctx => {
+  .post(Users.Login, Users.Out.or(Schema.any()), '/:id(number)/status', async ctx => {
     const { status, password } = ctx.request.body
     switch (status) {
       case 'online':

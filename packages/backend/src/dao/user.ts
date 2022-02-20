@@ -23,6 +23,10 @@ const userSchema = new Schema<Users.Model>({
     type: [String],
     default: []
   },
+  status: {
+    type: String,
+    default: 'offline'
+  },
   chatRooms: {
     type: [String],
     default: []
