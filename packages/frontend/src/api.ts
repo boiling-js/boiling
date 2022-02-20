@@ -13,7 +13,7 @@ interface OfficialApi {
   user(id: number | '@me'): {
     status: {
       /** 登录用户并设置用户状态 */
-      add(d: Users.Status): Promise<Users.Out>
+      add(d: Users.Login): Promise<Users.Out>
     }
     /** 获取好友列表 */
     friends: Promise<Users.FriendOut[]> & {

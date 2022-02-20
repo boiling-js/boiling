@@ -5,12 +5,13 @@
         <div class="avatar">
           <el-dropdown trigger="click">
             <img width="48" :src="`/api/${ user.avatar }`" alt="">
+            <div :class="`dot ${status}`"/>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item><div class="circle green"/>在线</el-dropdown-item>
-                <el-dropdown-item><div class="circle red"/>勿扰</el-dropdown-item>
-                <el-dropdown-item><div class="circle yellow"/>隐身</el-dropdown-item>
-                <el-dropdown-item><div class="circle gray"/>退出</el-dropdown-item>
+                <el-dropdown-item><div class="circle online"/>在线</el-dropdown-item>
+                <el-dropdown-item><div class="circle noDisturb"/>勿扰</el-dropdown-item>
+                <el-dropdown-item><div class="circle leave"/>隐身</el-dropdown-item>
+                <el-dropdown-item><div class="circle offline"/>退出</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -48,13 +49,15 @@ import { useStore } from 'vuex'
 import { ElTooltip, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
 import SearchUser from '../../components/SearchUser.vue'
+import { Users } from '@boiling/core'
 
 type ChatType = 'friend' | 'channel' | 'group'
 
 const
   store = useStore(),
   user = computed(() => store.state.user),
-  chatType = ref<ChatType>('friend')
+  chatType = ref<ChatType>('friend'),
+  status = ref<Users.Login['status']>('online')
 </script>
 
 <style lang="scss" scoped>
@@ -109,8 +112,29 @@ div.contain {
           > div {
             > img {
               background-color: #fff;
-              border-radius: 100%;
               cursor: pointer;
+              border-radius: 100%;
+            }
+            > .dot {
+              position: absolute;
+              right: 5px;
+              bottom: 3px;
+              width: 10px;
+              height: 10px;
+              border: 3px solid var(--color-auxi-regular);
+              border-radius: 100%;
+              &.noDisturb {
+                background-color: #ed4245;
+              }
+              &.online {
+                background-color: #3ba55d;
+              }
+              &.leave {
+                background-color: #faa81a;
+              }
+              &.offline {
+                background-color: #747f8d;
+              }
             }
           }
         }
@@ -147,16 +171,16 @@ div.contain {
     width: 10px;
     height: 10px;
     border-radius: 100%;
-    &.red {
+    &.noDisturb {
       background-color: #ed4245;
     }
-    &.green {
+    &.online {
       background-color: #3ba55d;
     }
-    &.yellow {
+    &.leave {
       background-color: #faa81a;
     }
-    &.gray {
+    &.offline {
       background-color: #747f8d;
     }
   }
