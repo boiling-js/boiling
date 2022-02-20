@@ -41,6 +41,8 @@ describe('WS', function () {
   }))
 
   it('should connect ws server.', function () {
+    this.timeout((process.env?.HEARTBEAT_INTERVAL ?? '20000') + 500)
+    let heartbeatInterval: number
     const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
     return new Promise<void>((resolve, reject) => {
       ws.once('message', d => {
@@ -49,6 +51,7 @@ describe('WS', function () {
             Messages.Opcodes.HELLO
           >>JSON.parse(d.toString())
           expect(m.op).to.equal(Messages.Opcodes.HELLO)
+          heartbeatInterval = m.d.heartbeatInterval
           resolve()
         } catch (e) {
           reject(e)
@@ -74,9 +77,31 @@ describe('WS', function () {
           expect(m.d).property('user').to.deep.equal({
             id: 1001,
             username: 'default',
-            avatar: 'default'
+            avatar: 'default',
+            status: 'offline'
           })
           resolve()
+        } catch (e) {
+          reject(e)
+        }
+      })
+    })).then(() => new Promise<void>((resolve, reject) => {
+      let c = 0
+      setInterval(() => {
+        ws.send(JSON.stringify({
+          op: Messages.Opcodes.HEARTBEAT
+        }))
+      }, heartbeatInterval)
+      ws.on('message', d => {
+        try {
+          const m = <Messages.PickTarget<
+            Messages.Opcodes.HEARTBEAT_ACK
+            >>JSON.parse(d.toString())
+          expect(m.op).to.equal(Messages.Opcodes.HEARTBEAT_ACK)
+          c++
+          if (c === 2) {
+            resolve()
+          }
         } catch (e) {
           reject(e)
         }
@@ -145,5 +170,83 @@ describe('WS', function () {
         }
       })
     })
+  })
+  it('should connect ws server and throw `REQUEST_TIMEOUT` error when break off.', function () {
+    this.timeout((process.env?.HEARTBEAT_INTERVAL ?? '20000') + 500)
+    const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
+    let heartbeatInterval: number
+    return new Promise<void>((resolve, reject) => {
+      ws.once('message', d => {
+      try {
+        const m = <Messages.PickTarget<
+          Messages.Opcodes.HELLO
+          >>JSON.parse(d.toString())
+        expect(m.op).to.equal(Messages.Opcodes.HELLO)
+        heartbeatInterval = m.d.heartbeatInterval
+        resolve()
+      } catch (e) {
+        reject(e)
+      }
+    })
+      ws.on('close', code => {
+        reject(new Error(`ws close: ${ code }`))
+      })
+    }).then(() => new Promise<void>((resolve, reject) => {
+      ws.send(JSON.stringify({
+        op: Messages.Opcodes.IDENTIFY,
+        d: {
+          token: users.default[1]
+        }
+      }))
+      ws.once('message', d => {
+        try {
+          const m = <Messages.PickTarget<
+            Messages.Opcodes.DISPATCH
+            >>JSON.parse(d.toString())
+          expect(m.op).to.equal(Messages.Opcodes.DISPATCH)
+          expect(m.t).to.equal('READY')
+          expect(m.d).property('user').to.deep.equal({
+            id: 1001,
+            username: 'default',
+            avatar: 'default',
+            status: 'offline'
+          })
+          resolve()
+        } catch (e) {
+          reject(e)
+        }
+      })
+    })).then(() => new Promise<void>((resolve, reject) => {
+      let c = 0
+      setTimeout(() => {
+        ws.send(JSON.stringify({
+          op: Messages.Opcodes.HEARTBEAT
+        }))
+      }, heartbeatInterval)
+      ws.on('message', d => {
+        try {
+          const m = <Messages.PickTarget<
+            Messages.Opcodes.HEARTBEAT_ACK
+            >>JSON.parse(d.toString())
+          expect(m.op).to.equal(Messages.Opcodes.HEARTBEAT_ACK)
+          c++
+          if (c === 2) {
+            resolve()
+          }
+        } catch (e) {
+          reject(e)
+        }
+      })
+      ws.on('close', (code, msg) => {
+        try {
+          expect(code).to.be.eq(4408)
+          expect(msg.toString())
+            .to.be.eq('超时未发送心跳包')
+          resolve()
+        } catch (e) {
+          reject(e)
+        }
+      })
+    }))
   })
 })

@@ -1,6 +1,6 @@
 import Websocket from 'ws'
 import { Middleware } from 'koa-websocket'
-import { Messages } from '@boiling/core'
+import { Messages, Users } from '@boiling/core'
 import { UsersService } from '../services/users'
 import Utils from '../utils'
 
@@ -100,7 +100,7 @@ export const router: Middleware = async (context, next) => {
             t: 'READY',
             d: {
               sessionId: '1551321315',
-              user: user
+              user: Users.BaseOut(user)
             }
           })
           break
@@ -123,7 +123,7 @@ export const router: Middleware = async (context, next) => {
       }
     }, Number(process.env.HEARTBEAT_INTERVAL || 600000) + 1000)
 
-    ws.once('message', data => {
+    ws.on('message', data => {
       try {
         const m = resolveData<Messages.Client>(data)
         switch (m.op) {
