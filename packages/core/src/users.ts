@@ -4,6 +4,7 @@ export namespace Users {
   export const Status = Schema.union<'online' | 'leave' | 'offline'>([
     'online', 'leave', 'offline'
   ])
+  export type Status = Schema.InferS<typeof Status>
   /** 基础数据 */
   export const Base = Schema.interface({
     /** 用户唯一 id */
