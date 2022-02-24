@@ -1,8 +1,8 @@
 import Schema from 'schemastery'
 
 export namespace Users {
-  export const Status = Schema.union<'online' | 'leave' | 'offline'>([
-    'online', 'leave', 'offline'
+  export const Status = Schema.union<'online' | 'leave' | 'offline' | 'noDisturb'>([
+    'online', 'leave', 'offline', 'noDisturb'
   ])
   export type Status = Schema.InferS<typeof Status>
   /** 基础数据 */
