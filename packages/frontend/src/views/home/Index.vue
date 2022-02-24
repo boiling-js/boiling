@@ -9,7 +9,7 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item @click="updateStatus('online')"><div class="circle online"/>在线</el-dropdown-item>
-                <el-dropdown-item @click="updateStatus('leave')"><div class="circle noDisturb"/>勿扰</el-dropdown-item>
+                <el-dropdown-item @click="updateStatus('noDisturb')"><div class="circle noDisturb"/>勿扰</el-dropdown-item>
                 <el-dropdown-item @click="updateStatus('leave')"><div class="circle leave"/>隐身</el-dropdown-item>
                 <el-dropdown-item @click="updateStatus('offline')"><div class="circle offline"/>退出</el-dropdown-item>
               </el-dropdown-menu>
