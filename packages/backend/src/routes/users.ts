@@ -67,7 +67,6 @@ export const router = new Router({
     status: Users.Status
   }), Schema.any(), '/:id(uid)/status', async ctx => {
     const { status } = ctx.request.body
-    console.log('patch', status)
     await UsersService.update(useCurUser(ctx.session).id, { status })
     switch (status) {
       case 'offline':
