@@ -14,6 +14,8 @@ interface OfficialApi {
     status: {
       /** 登录用户并设置用户状态 */
       add(d: Users.Login): Promise<Users.Out>
+      /** 更改用户状态 */
+      upd(d: { status: Users.Status }): Promise<void>
     }
     /** 获取好友列表 */
     friends: Promise<Users.FriendOut[]> & {

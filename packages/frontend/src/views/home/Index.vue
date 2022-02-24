@@ -8,10 +8,10 @@
             <div :class="`dot ${status}`"/>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item><div class="circle online"/>在线</el-dropdown-item>
-                <el-dropdown-item><div class="circle noDisturb"/>勿扰</el-dropdown-item>
-                <el-dropdown-item><div class="circle leave"/>隐身</el-dropdown-item>
-                <el-dropdown-item><div class="circle offline"/>退出</el-dropdown-item>
+                <el-dropdown-item @click="updateStatus('online')"><div class="circle online"/>在线</el-dropdown-item>
+                <el-dropdown-item @click="updateStatus('leave')"><div class="circle noDisturb"/>勿扰</el-dropdown-item>
+                <el-dropdown-item @click="updateStatus('leave')"><div class="circle leave"/>隐身</el-dropdown-item>
+                <el-dropdown-item @click="updateStatus('offline')"><div class="circle offline"/>退出</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -49,7 +49,6 @@ import { useStore } from 'vuex'
 import { ElTooltip, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
 import SearchUser from '../../components/SearchUser.vue'
-import { Users } from '@boiling/core'
 
 type ChatType = 'friend' | 'channel' | 'group'
 
@@ -57,7 +56,8 @@ const
   store = useStore(),
   user = computed(() => store.state.user),
   chatType = ref<ChatType>('friend'),
-  status = ref<Users.Login['status']>('online')
+  status = computed(() => store.state.user.status),
+  updateStatus = async (status: string) => await store.dispatch('updStatus', status)
 </script>
 
 <style lang="scss" scoped>
