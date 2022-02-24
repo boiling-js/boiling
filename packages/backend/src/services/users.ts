@@ -67,6 +67,11 @@ export namespace UsersService {
     user.avatar = avatar
     await user.save()
   }
+  export async function update(id: number, base: Partial<Users.Base>) {
+    const user = await UsersService.getOrThrow(id)
+    Object.assign(user, base)
+    await user.save()
+  }
   export async function addChatRoom(id: number, room: string) {
     const user = await UsersService.getOrThrow(id)
     if (user.chatRooms.includes(room))

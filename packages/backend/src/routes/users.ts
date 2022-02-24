@@ -59,7 +59,17 @@ export const router = new Router({
           ctx.session.curUser = <Users.Out><any>user
         else
           throw new HttpError('INTERNAL_SERVER_ERROR', '服务器内部错误')
+        await UsersService.update(u.id, { status: 'online' })
         return user
+    }
+  })
+  .patch(Schema.interface({
+    status: Users.Status
+  }), Schema.any(), '/:id(uid)/status', async ctx => {
+    const { status } = ctx.request.body
+    console.log('patch', status)
+    await UsersService.update(useCurUser(ctx.session).id, { status })
+    switch (status) {
       case 'offline':
         ctx.session && delete ctx.session.curUser
         return
