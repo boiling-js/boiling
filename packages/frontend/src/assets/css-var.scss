@@ -11,10 +11,22 @@
   --color-text-placeholder: var(--el-text-color-placeholder);
   // 主题色
   --color-primary: var(--el-color-primary);
-
   // 圆角
   --border-radius: 5px;
   // 阴影
   --box-shadow: 0 0 16px #959598;
 }
 .material-icons.md-light { color: rgb(255 255 255 / 100%); }
+// 用户状态色
+.noDisturb {
+  background-color: #ed4245;
+}
+.online {
+  background-color: #3ba55d;
+}
+.leave {
+  background-color: #faa81a;
+}
+.offline {
+  background-color: #747f8d;
+}

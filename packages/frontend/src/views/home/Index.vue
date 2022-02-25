@@ -111,8 +111,8 @@ div.contain {
         .el-dropdown {
           > div {
             > img {
-              background-color: #fff;
               cursor: pointer;
+              background-color: #fff;
               border-radius: 100%;
             }
             > .dot {
@@ -122,19 +122,7 @@ div.contain {
               width: 10px;
               height: 10px;
               border: 3px solid var(--color-auxi-regular);
-              border-radius: 100%;
-              &.noDisturb {
-                background-color: #ed4245;
-              }
-              &.online {
-                background-color: #3ba55d;
-              }
-              &.leave {
-                background-color: #faa81a;
-              }
-              &.offline {
-                background-color: #747f8d;
-              }
+              border-radius: 50%;
             }
           }
         }
@@ -171,18 +159,6 @@ div.contain {
     width: 10px;
     height: 10px;
     border-radius: 100%;
-    &.noDisturb {
-      background-color: #ed4245;
-    }
-    &.online {
-      background-color: #3ba55d;
-    }
-    &.leave {
-      background-color: #faa81a;
-    }
-    &.offline {
-      background-color: #747f8d;
-    }
   }
 }
 </style>
