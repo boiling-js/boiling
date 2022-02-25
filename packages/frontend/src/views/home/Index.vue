@@ -46,9 +46,10 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
-import { ElTooltip, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
+import { ElTooltip, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem, ElMessageBox, ElMessage } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
 import SearchUser from '../../components/SearchUser.vue'
+import { useRouter } from 'vue-router'
 
 type ChatType = 'friend' | 'channel' | 'group'
 
@@ -57,7 +58,23 @@ const
   user = computed(() => store.state.user),
   chatType = ref<ChatType>('friend'),
   status = computed(() => store.state.user.status),
-  updateStatus = async (status: string) => await store.dispatch('updStatus', status)
+  router = useRouter(),
+  updateStatus = async (status: string) => {
+    if (status === 'offline') {
+      await ElMessageBox.confirm(
+        '是否确认退出登录?',
+        '退出登录',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
+        router.push('/login')
+      }).catch()
+    }
+    await store.dispatch('updStatus', status)
+  }
 </script>
 
 <style lang="scss" scoped>

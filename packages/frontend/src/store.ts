@@ -15,7 +15,7 @@ export default createStore({
       tags: [],
       friends: [],
       chatRooms: [],
-      status: 'offline'
+      status: 'online'
     }
   },
   mutations: {
