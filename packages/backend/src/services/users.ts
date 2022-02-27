@@ -31,9 +31,10 @@ export namespace UsersService {
     user.tags.splice(index, 1)
     await user.save()
   }
-  export function get(id: number): ReturnType<typeof Model.findOne>
-  export function get(username: string): ReturnType<typeof Model.findOne>
-  export function get(val: number | string): ReturnType<typeof Model.findOne>
+  type GetReturnType = ReturnType<typeof Model.findOne>
+  export function get(id: number): GetReturnType
+  export function get(username: string): GetReturnType
+  export function get(val: number | string): GetReturnType
   export function get(val: number | string) {
     switch (typeof val) {
       case 'number':
@@ -44,7 +45,6 @@ export namespace UsersService {
         throw new Error('Not support type.')
     }
   }
-  type GetReturnType = ReturnType<typeof get>
   export async function getOrThrow(val: number | string, callback?: (user: GetReturnType) => void) {
     const t = get(val)
     const m = await (callback ? callback(t) : t)
@@ -65,6 +65,18 @@ export namespace UsersService {
   export async function updateAvatar(id: number, avatar: string) {
     const user = await UsersService.getOrThrow(id)
     user.avatar = avatar
+    await user.save()
+  }
+  export async function update(id: number, base: Partial<Users.Base>) {
+    const user = await UsersService.getOrThrow(id)
+    Object.assign(user, base)
+    await user.save()
+  }
+  export async function addChatRoom(id: number, room: string) {
+    const user = await UsersService.getOrThrow(id)
+    if (user.chatRooms.includes(room))
+      throw new HttpError('CONFLICT', `${ room }聊天室已存在`)
+    user.chatRooms.push(room)
     await user.save()
   }
   export namespace Friends {

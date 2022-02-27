@@ -14,7 +14,8 @@ export default createStore({
       avatar: '',
       tags: [],
       friends: [],
-      chatRooms: []
+      chatRooms: [],
+      status: 'online'
     }
   },
   mutations: {
@@ -40,6 +41,9 @@ export default createStore({
     },
     updAvatar(state, avatar: string) {
       state.user.avatar = avatar
+    },
+    updStatus(state, status: Users.Status) {
+      state.user.status = status
     }
   },
   actions: {
@@ -63,6 +67,10 @@ export default createStore({
         avatar
       })
       context.commit('updAvatar', avatar)
+    },
+    async updStatus(context, status: Users.Status) {
+      await api.user('@me').status.upd({ status })
+      context.commit('updStatus', status)
     }
   },
   plugins: [CreatePersistedState()]

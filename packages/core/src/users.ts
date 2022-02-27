@@ -1,6 +1,10 @@
 import Schema from 'schemastery'
 
 export namespace Users {
+  export const Status = Schema.union<'online' | 'leave' | 'offline' | 'noDisturb'>([
+    'online', 'leave', 'offline', 'noDisturb'
+  ])
+  export type Status = Schema.InferS<typeof Status>
   /** 基础数据 */
   export const Base = Schema.interface({
     /** 用户唯一 id */
@@ -10,7 +14,9 @@ export namespace Users {
     /** 加密的用户密码 */
     avatar: Schema.string(),
     /** 用户头像 */
-    passwordHash: Schema.string()
+    passwordHash: Schema.string(),
+    /** 用户状态 */
+    status: Status.optional()
   })
   export type Base = Schema.InferS<typeof Base>
   /** 基础数据出口 */
@@ -48,13 +54,12 @@ export namespace Users {
     password: Schema.string()
   }))
   export type Register = Schema.InferS<typeof Register>
-  export const Status = Schema.interface({
+  /** 登录 */
+  export const Login = Schema.interface({
     /** 用户状态 */
-    status: Schema.union<'online' | 'leave' | 'offline'>([
-      'online', 'leave', 'offline'
-    ]),
+    status: Status,
     /** 用户密码 */
     password: Schema.string()
   })
-  export type Status = Schema.InferS<typeof Status>
+  export type Login = Schema.InferS<typeof Login>
 }

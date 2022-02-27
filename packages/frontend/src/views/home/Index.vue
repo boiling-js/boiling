@@ -5,12 +5,13 @@
         <div class="avatar">
           <el-dropdown trigger="click">
             <img width="48" :src="`/api/${ user.avatar }`" alt="">
+            <div :class="`dot ${status}`"/>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item><div class="circle green"/>在线</el-dropdown-item>
-                <el-dropdown-item><div class="circle red"/>勿扰</el-dropdown-item>
-                <el-dropdown-item><div class="circle yellow"/>隐身</el-dropdown-item>
-                <el-dropdown-item><div class="circle gray"/>退出</el-dropdown-item>
+                <el-dropdown-item @click="updateStatus('online')"><div class="circle online"/>在线</el-dropdown-item>
+                <el-dropdown-item @click="updateStatus('noDisturb')"><div class="circle noDisturb"/>勿扰</el-dropdown-item>
+                <el-dropdown-item @click="updateStatus('leave')"><div class="circle leave"/>隐身</el-dropdown-item>
+                <el-dropdown-item @click="updateStatus('offline')"><div class="circle offline"/>退出</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -45,16 +46,35 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
-import { ElTooltip, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
+import { ElTooltip, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem, ElMessageBox, ElMessage } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
 import SearchUser from '../../components/SearchUser.vue'
+import { useRouter } from 'vue-router'
 
 type ChatType = 'friend' | 'channel' | 'group'
 
 const
   store = useStore(),
   user = computed(() => store.state.user),
-  chatType = ref<ChatType>('friend')
+  chatType = ref<ChatType>('friend'),
+  status = computed(() => store.state.user.status),
+  router = useRouter(),
+  updateStatus = async (status: string) => {
+    if (status === 'offline') {
+      await ElMessageBox.confirm(
+        '是否确认退出登录?',
+        '退出登录',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
+        router.push('/login')
+      }).catch()
+    }
+    await store.dispatch('updStatus', status)
+  }
 </script>
 
 <style lang="scss" scoped>
@@ -108,9 +128,18 @@ div.contain {
         .el-dropdown {
           > div {
             > img {
+              cursor: pointer;
               background-color: #fff;
               border-radius: 100%;
-              cursor: pointer;
+            }
+            > .dot {
+              position: absolute;
+              right: 5px;
+              bottom: 3px;
+              width: 10px;
+              height: 10px;
+              border: 3px solid var(--color-auxi-regular);
+              border-radius: 50%;
             }
           }
         }
@@ -147,18 +176,6 @@ div.contain {
     width: 10px;
     height: 10px;
     border-radius: 100%;
-    &.red {
-      background-color: #ed4245;
-    }
-    &.green {
-      background-color: #3ba55d;
-    }
-    &.yellow {
-      background-color: #faa81a;
-    }
-    &.gray {
-      background-color: #747f8d;
-    }
   }
 }
 </style>

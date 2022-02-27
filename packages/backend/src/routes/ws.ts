@@ -1,6 +1,8 @@
 import Websocket from 'ws'
 import { Middleware } from 'koa-websocket'
-import { Messages } from '@boiling/core'
+import { Messages, Users } from '@boiling/core'
+import { UsersService } from '../services/users'
+import Utils from '../utils'
 
 class Sender {
   constructor(public ws: Websocket) {
@@ -52,6 +54,8 @@ const waitIdentify = <T extends Messages.PickTarget<Messages.Opcodes.IDENTIFY, M
   })
 })
 
+export const senders = new Map<string, Sender>()
+
 /**
  * 基础流程：
  * 服务端发送 hello 数据包给客户端，其中包含了心跳包的间隔时间
@@ -73,6 +77,7 @@ export const router: Middleware = async (context, next) => {
   const sender = new Sender(ws)
   sender.hello()
   new Promise(async (resolve, reject) => {
+    let uid: string | undefined
     let isIdentified = false
     // 五秒内发送鉴权
     setTimeout(() => {
@@ -84,8 +89,21 @@ export const router: Middleware = async (context, next) => {
       const [ type, content ] = token?.split(' ') ?? []
       switch (type) {
         case 'Basic':
-          const [uid, pwd] = Buffer.from(content, 'base64').toString().split(':')
-          // TODO 鉴权 返回 ready 包
+          const [id, pwd] = Buffer.from(content, 'base64').toString().split(':')
+          const user = await UsersService.getOrThrow(+id)
+          uid = user.id
+          if (!Utils.Security.match(pwd, user!.passwordHash)) {
+            throw new HttpError('UNAUTHORIZED', '密码错误')
+          }
+          sender.do({
+            op: Messages.Opcodes.DISPATCH,
+            // @ts-ignore
+            t: 'READY',
+            d: {
+              sessionId: '1551321315',
+              user: Users.BaseOut(user)
+            }
+          })
           break
         default:
           throw new HttpError('UNAUTHORIZED', '不支持的协议')
@@ -93,10 +111,35 @@ export const router: Middleware = async (context, next) => {
     } catch (e) {
       reject(e)
     }
-
     isIdentified = true
-    // TODO 要求客户端按照 hello 包中的心跳包间隔时间，发送心跳包给服务端，服务端收到心跳包后，发送心跳包响应给客户端
-    //      如果多次未发送心跳包，服务端会主动断开连接
+
+    // 要求客户端按照 hello 包中的心跳包间隔时间，发送心跳包给服务端，服务端收到心跳包后，发送心跳包响应给客户端
+    // 如果多次未发送心跳包，服务端会主动断开连接
+    let isPinged = false
+    setInterval(() => {
+      if (!isPinged) {
+        reject(new HttpError('REQUEST_TIMEOUT', '超时未发送心跳包'))
+      } else {
+        isPinged = false
+      }
+    }, Number(process.env.HEARTBEAT_INTERVAL || 600000) + 1000)
+
+    ws.on('message', data => {
+      try {
+        const m = resolveData<Messages.Client>(data)
+        switch (m.op) {
+          case Messages.Opcodes.HEARTBEAT:
+            isPinged = true
+            sender.ping()
+            break
+          default:
+            throw new HttpError('UNPROCESSABLE_ENTITY', '不支持的op类型')
+        }
+      } catch (e) {
+        reject(e)
+      }
+    })
+    uid && senders.set(uid, sender)
   }).catch(e => {
     if (e instanceof HttpError)
       ws.close(e.code + 4000, e.msg)

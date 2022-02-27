@@ -33,7 +33,7 @@ import { ElInput, ElButton } from 'element-plus'
 import { Users } from '@boiling/core'
 import { api } from '../api'
 
-type Account = Users.Status & {
+type Account = Users.Login & {
   id: string
 }
 

@@ -14,6 +14,7 @@
       class="avatar" :style="{
         backgroundImage: `url(/api${info.avatar})`
       }"/>
+    <div :class="`dot ${info.status}`"></div>
     <div class="info">
       {{ info.remark || info.username }}<span class="id">#{{ info.id }}</span>
     </div>
@@ -66,6 +67,16 @@ div.user {
   overflow: hidden;
   color: var(--color-text-regular);
   background-color: var(--bg-color);
+  > div.dot {
+    z-index: 100;
+    position: absolute;
+    bottom: 8px;
+    left: 39px;
+    width: 10px;
+    height: 10px;
+    border: 3px solid var(--color-auxi-placeholder);
+    border-radius: 50%;
+  }
   > div.bg {
     position: absolute;
     top: 0;

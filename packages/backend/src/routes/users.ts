@@ -45,7 +45,7 @@ export const router = new Router({
   .get('/:id(number)', async ctx => {
     return UsersService.get(ctx.params.id)
   })
-  .post(Users.Status, Users.Out.or(Schema.any()), '/:id(number)/status', async ctx => {
+  .post(Users.Login, Users.Out.or(Schema.any()), '/:id(number)/status', async ctx => {
     const { status, password } = ctx.request.body
     switch (status) {
       case 'online':
@@ -59,7 +59,16 @@ export const router = new Router({
           ctx.session.curUser = <Users.Out><any>user
         else
           throw new HttpError('INTERNAL_SERVER_ERROR', '服务器内部错误')
+        await UsersService.update(u.id, { status: 'online' })
         return user
+    }
+  })
+  .patch(Schema.interface({
+    status: Users.Status
+  }), Schema.any(), '/:id(uid)/status', async ctx => {
+    const { status } = ctx.request.body
+    await UsersService.update(useCurUser(ctx.session).id, { status })
+    switch (status) {
       case 'offline':
         ctx.session && delete ctx.session.curUser
         return

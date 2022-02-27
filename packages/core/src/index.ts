@@ -16,8 +16,9 @@ export interface SearchQuery {
 }
 
 export * from './users'
-export * from './chat-rooms'
 export * from './messages'
+export * from './chat-rooms'
 export * from './api'
 export * from './router'
 export { Utils } from './utils'
+export { WsClient } from './ws-client'
