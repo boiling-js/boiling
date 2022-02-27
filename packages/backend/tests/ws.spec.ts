@@ -87,6 +87,9 @@ describe('WS', function () {
     const wsClient = new WsClient(new Websocket(`ws://${ HOST }:${ PORT }/ws`))
     await identifyAndHeartbeat(wsClient)
 
+    // 模拟前端请求了发消息接口后，后端找到对应用户并将消息推送给这个连接上的用户
+    // post http://server:port/chat-rooms/[时间戳]:1001:1002/messages { content: 'hello', ... }
+    // 后端把这个消息储存到数据库中，再在在线用户列表中找到这个用户把消息发送给他
     senders.get(1001)?.dispatch('MESSAGE', {
       content: 'hello'
     })
