@@ -124,7 +124,7 @@ describe('WS', function () {
       ws.send(JSON.stringify({
         op: Messages.Opcodes.IDENTIFY,
         d: {
-          token: 'Basic none'
+          token: `Basic ${ Buffer.from('1000:default').toString('base64')}`
         }
       }))
       ws.on('close', code => {
