@@ -42,18 +42,17 @@ describe('WS', function () {
 
   it('should connect ws server.', async function () {
     this.timeout((process.env?.HEARTBEAT_INTERVAL ?? '20000') + 500)
-    const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
-    const wsClient = new WsClient(ws)
+    const wsClient = new WsClient(new Websocket(`ws://${ HOST }:${ PORT }/ws`))
     const m1 = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.HELLO])
     expect(m1.op).to.equal(Messages.Opcodes.HELLO)
     const heartbeatInterval = m1.d.heartbeatInterval
 
-    ws.send(JSON.stringify({
+    wsClient.send({
       op: Messages.Opcodes.IDENTIFY,
       d: {
         token: users.default[1]
       }
-    }))
+    })
     const m2 = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.DISPATCH])
     expect(m2.op).to.equal(Messages.Opcodes.DISPATCH)
     expect(m2.t).to.equal('READY')
@@ -66,9 +65,9 @@ describe('WS', function () {
 
     let c = 0
     setInterval(() => {
-      ws.send(JSON.stringify({
+      wsClient.send({
         op: Messages.Opcodes.HEARTBEAT
-      }))
+      })
     }, heartbeatInterval)
     for await (const _ of wsClient.waitMessage()) {
       const m = resolveMessage(_, [Messages.Opcodes.HEARTBEAT_ACK])
@@ -77,6 +76,9 @@ describe('WS', function () {
       if (c === 2)
         break
     }
+  })
+  it('should connect ws server and receive messages.', async function () {
+
   })
   it('should connect ws server and throw `BAD_REQUEST` error.', function (done) {
     const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
