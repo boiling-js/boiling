@@ -2,8 +2,8 @@ import Websocket from 'ws'
 import Koa from 'koa'
 import websockify from 'koa-websocket'
 import { expect } from 'chai'
-import { Messages } from '@boiling/core'
-import { router as WSRouter } from '../src/routes/ws'
+import { Messages, WsClient, resolveMessage } from '@boiling/core'
+import { router as WSRouter, senders } from '../src/routes/ws'
 import DAOMain from '../src/dao'
 import { UserModel } from '../src/dao/user'
 import { Security } from '../src/utils'
@@ -40,73 +40,43 @@ describe('WS', function () {
     await users.default[0].save()
   }))
 
-  it('should connect ws server.', function () {
+  it('should connect ws server.', async function () {
     this.timeout((process.env?.HEARTBEAT_INTERVAL ?? '20000') + 500)
-    let heartbeatInterval: number
     const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
-    return new Promise<void>((resolve, reject) => {
-      ws.once('message', d => {
-        try {
-          const m = <Messages.PickTarget<
-            Messages.Opcodes.HELLO
-          >>JSON.parse(d.toString())
-          expect(m.op).to.equal(Messages.Opcodes.HELLO)
-          heartbeatInterval = m.d.heartbeatInterval
-          resolve()
-        } catch (e) {
-          reject(e)
-        }
-      })
-      ws.on('close', code => {
-        reject(new Error(`ws close: ${ code }`))
-      })
-    }).then(() => new Promise<void>((resolve, reject) => {
-      ws.send(JSON.stringify({
-        op: Messages.Opcodes.IDENTIFY,
-        d: {
-          token: users.default[1]
-        }
-      }))
-      ws.once('message', d => {
-        try {
-          const m = <Messages.PickTarget<
-            Messages.Opcodes.DISPATCH
-            >>JSON.parse(d.toString())
-          expect(m.op).to.equal(Messages.Opcodes.DISPATCH)
-          expect(m.t).to.equal('READY')
-          expect(m.d).property('user').to.deep.equal({
-            id: 1001,
-            username: 'default',
-            avatar: 'default',
-            status: 'offline'
-          })
-          resolve()
-        } catch (e) {
-          reject(e)
-        }
-      })
-    })).then(() => new Promise<void>((resolve, reject) => {
-      let c = 0
-      setInterval(() => {
-        ws.send(JSON.stringify({
-          op: Messages.Opcodes.HEARTBEAT
-        }))
-      }, heartbeatInterval)
-      ws.on('message', d => {
-        try {
-          const m = <Messages.PickTarget<
-            Messages.Opcodes.HEARTBEAT_ACK
-            >>JSON.parse(d.toString())
-          expect(m.op).to.equal(Messages.Opcodes.HEARTBEAT_ACK)
-          c++
-          if (c === 2) {
-            resolve()
-          }
-        } catch (e) {
-          reject(e)
-        }
-      })
+    const wsClient = new WsClient(ws)
+    const m1 = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.HELLO])
+    expect(m1.op).to.equal(Messages.Opcodes.HELLO)
+    const heartbeatInterval = m1.d.heartbeatInterval
+
+    ws.send(JSON.stringify({
+      op: Messages.Opcodes.IDENTIFY,
+      d: {
+        token: users.default[1]
+      }
     }))
+    const m2 = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.DISPATCH])
+    expect(m2.op).to.equal(Messages.Opcodes.DISPATCH)
+    expect(m2.t).to.equal('READY')
+    expect(m2.d).property('user').to.deep.equal({
+      id: 1001,
+      username: 'default',
+      avatar: 'default',
+      status: 'offline'
+    })
+
+    let c = 0
+    setInterval(() => {
+      ws.send(JSON.stringify({
+        op: Messages.Opcodes.HEARTBEAT
+      }))
+    }, heartbeatInterval)
+    for await (const _ of wsClient.waitMessage()) {
+      const m = resolveMessage(_, [Messages.Opcodes.HEARTBEAT_ACK])
+      if (m.op === Messages.Opcodes.HEARTBEAT_ACK)
+        c++
+      if (c === 2)
+        break
+    }
   })
   it('should connect ws server and throw `BAD_REQUEST` error.', function (done) {
     const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
