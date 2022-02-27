@@ -134,7 +134,9 @@ export const router: Middleware = async (context, next) => {
           default:
             throw new HttpError('UNPROCESSABLE_ENTITY', '不支持的op类型')
         }
-      } catch (e) { }
+      } catch (e) {
+        reject(e)
+      }
     })
   }).catch(e => {
     if (e instanceof HttpError)
