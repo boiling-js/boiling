@@ -31,9 +31,10 @@ export namespace UsersService {
     user.tags.splice(index, 1)
     await user.save()
   }
-  export function get(id: number): ReturnType<typeof Model.findOne>
-  export function get(username: string): ReturnType<typeof Model.findOne>
-  export function get(val: number | string): ReturnType<typeof Model.findOne>
+  type GetReturnType = ReturnType<typeof Model.findOne>
+  export function get(id: number): GetReturnType
+  export function get(username: string): GetReturnType
+  export function get(val: number | string): GetReturnType
   export function get(val: number | string) {
     switch (typeof val) {
       case 'number':
@@ -44,7 +45,6 @@ export namespace UsersService {
         throw new Error('Not support type.')
     }
   }
-  type GetReturnType = ReturnType<typeof get>
   export async function getOrThrow(val: number | string, callback?: (user: GetReturnType) => void) {
     const t = get(val)
     const m = await (callback ? callback(t) : t)
