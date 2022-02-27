@@ -4,7 +4,7 @@ import { Messages } from './messages'
 const genOnClose = (reject: (reason?: any) => void) =>
   (code: number) => reject(new Error(`ws close: ${ code }`))
 
-const resolveMessage = async <T extends Messages.Opcodes, E = Messages.Server>(
+export const resolveMessage = <T extends Messages.Opcodes, E = Messages.Server>(
   message: string, opcodes: T[] | undefined = undefined
 ) => {
   const msg = JSON.parse(message) as Messages.PickTarget<T, E>
@@ -50,6 +50,7 @@ export class WsClient {
     this.ws.on('message', function onMessage(d) {
       if (resolve) {
         resolve({ value: d.toString() })
+        resolve = undefined
       } else {
         setTimeout(onMessage.bind(this, d), 10)
       }
