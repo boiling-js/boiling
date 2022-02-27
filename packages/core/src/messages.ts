@@ -1,5 +1,5 @@
 import Schema from 'schemastery'
-import { Users } from './index'
+import { Users } from './users'
 
 export namespace Messages {
   /** 储存在数据库的消息 */
