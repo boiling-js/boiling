@@ -32,6 +32,9 @@ export class WsClient {
   constructor(private ws: Websocket) {
     this.ws = ws
   }
+  send(message: Messages.Client) {
+    this.ws.send(JSON.stringify(message))
+  }
   waitOnceMessage() {
     return createMessageResolver(new Promise<string>((resolve, reject) => {
       const onClose = genOnClose(reject)
