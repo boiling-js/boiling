@@ -40,9 +40,7 @@ describe('WS', function () {
     await users.default[0].save()
   }))
 
-  it('should connect ws server.', async function () {
-    this.timeout((process.env?.HEARTBEAT_INTERVAL ?? '20000') + 500)
-    const wsClient = new WsClient(new Websocket(`ws://${ HOST }:${ PORT }/ws`))
+  const identifyAndHeartbeat = async (wsClient: WsClient) => {
     const m1 = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.HELLO])
     expect(m1.op).to.equal(Messages.Opcodes.HELLO)
     const heartbeatInterval = m1.d.heartbeatInterval
@@ -63,12 +61,19 @@ describe('WS', function () {
       status: 'offline'
     })
 
-    let c = 0
     setInterval(() => {
       wsClient.send({
         op: Messages.Opcodes.HEARTBEAT
       })
     }, heartbeatInterval)
+  }
+
+  it('should connect ws server.', async function () {
+    this.timeout((process.env?.HEARTBEAT_INTERVAL ?? '20000') + 500)
+    const wsClient = new WsClient(new Websocket(`ws://${ HOST }:${ PORT }/ws`))
+    await identifyAndHeartbeat(wsClient)
+
+    let c = 0
     for await (const _ of wsClient.waitMessage()) {
       const m = resolveMessage(_, [Messages.Opcodes.HEARTBEAT_ACK])
       if (m.op === Messages.Opcodes.HEARTBEAT_ACK)
@@ -78,7 +83,32 @@ describe('WS', function () {
     }
   })
   it('should connect ws server and receive messages.', async function () {
+    this.timeout((process.env?.HEARTBEAT_INTERVAL ?? '20000') + 500)
+    const wsClient = new WsClient(new Websocket(`ws://${ HOST }:${ PORT }/ws`))
+    await identifyAndHeartbeat(wsClient)
 
+    senders.get(1001)?.dispatch('MESSAGE', {
+      content: 'hello'
+    })
+    for await (const _ of wsClient.waitMessage()) {
+      const m = resolveMessage(_, [
+        Messages.Opcodes.HEARTBEAT_ACK,
+        Messages.Opcodes.DISPATCH
+      ])
+      switch (m.op) {
+        case Messages.Opcodes.HEARTBEAT_ACK:
+          continue
+        case Messages.Opcodes.DISPATCH:
+          switch (m.t) {
+            case 'MESSAGE':
+              expect(m.d).to.deep.equal({
+                content: 'hello'
+              })
+              return
+          }
+          break
+      }
+    }
   })
   it('should connect ws server and throw `BAD_REQUEST` error.', function (done) {
     const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
