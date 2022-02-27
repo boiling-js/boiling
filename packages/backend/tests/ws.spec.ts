@@ -118,7 +118,7 @@ describe('WS', function () {
       })
     })
   })
-  it('should connect ws server and throw `UNAUTHORIZED` error.', function (done) {
+  it('should connect ws server and throw `NOT_FOUND` error.', function (done) {
     const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
     ws.on('open', () => {
       ws.send(JSON.stringify({
@@ -128,7 +128,7 @@ describe('WS', function () {
         }
       }))
       ws.on('close', code => {
-        expect(code).to.be.eq(4401)
+        expect(code).to.be.eq(4404)
         done()
       })
     })

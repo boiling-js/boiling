@@ -54,6 +54,8 @@ const waitIdentify = <T extends Messages.PickTarget<Messages.Opcodes.IDENTIFY, M
   })
 })
 
+export const senders = new Map<string, Sender>()
+
 /**
  * 基础流程：
  * 服务端发送 hello 数据包给客户端，其中包含了心跳包的间隔时间
@@ -75,6 +77,7 @@ export const router: Middleware = async (context, next) => {
   const sender = new Sender(ws)
   sender.hello()
   new Promise(async (resolve, reject) => {
+    let uid: string | undefined
     let isIdentified = false
     // 五秒内发送鉴权
     setTimeout(() => {
@@ -86,11 +89,9 @@ export const router: Middleware = async (context, next) => {
       const [ type, content ] = token?.split(' ') ?? []
       switch (type) {
         case 'Basic':
-          const [uid, pwd] = Buffer.from(content, 'base64').toString().split(':')
-          const user = await UsersService.get(+uid)
-          if (!user) {
-            throw new HttpError('UNAUTHORIZED', '用户不存在')
-          }
+          const [id, pwd] = Buffer.from(content, 'base64').toString().split(':')
+          const user = await UsersService.getOrThrow(+id)
+          uid = user.id
           if (!Utils.Security.match(pwd, user!.passwordHash)) {
             throw new HttpError('UNAUTHORIZED', '密码错误')
           }
@@ -138,6 +139,7 @@ export const router: Middleware = async (context, next) => {
         reject(e)
       }
     })
+    uid && senders.set(uid, sender)
   }).catch(e => {
     if (e instanceof HttpError)
       ws.close(e.code + 4000, e.msg)
