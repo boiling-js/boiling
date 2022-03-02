@@ -1,19 +1,19 @@
-import Websocket from 'ws'
+import WS from 'ws'
 import { Messages, WsClient } from '@boiling/core'
 import { expect } from 'chai'
-import { resolveMessage } from '../src/ws-client'
+import { resolveMessage } from '@boiling/core'
 
 after(() => {
   process.exit(0)
 })
 
 describe('Ws Client', function () {
-  let ws: Websocket
-  const wss = new Websocket.Server({ port: 8080 })
+  let ws: WS
+  const wss = new WS.Server({ port: 8080 })
   wss.on('connection', _ => {
     ws = _
   })
-  const wsClient = new WsClient(new Websocket('ws://localhost:8080'))
+  const wsClient = new WsClient(new WebSocket('ws://localhost:8080'))
 
   it('should wait once message.', async function () {
     ws && ws.send('hi')

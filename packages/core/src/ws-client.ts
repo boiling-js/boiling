@@ -1,8 +1,7 @@
-import Websocket from 'ws'
 import { Messages } from './messages'
 
 const genOnClose = (reject: (reason?: any) => void) =>
-  (code: number) => reject(new Error(`ws close: ${ code }`))
+  (ev: WebSocketEventMap['close']) => reject(new Error(`ws close: ${ ev.code } ${ ev.reason }`))
 
 export const resolveMessage = <T extends Messages.Opcodes, E = Messages.Server>(
   message: string, opcodes: T[] | undefined = undefined
@@ -29,8 +28,14 @@ const createMessageResolver = (p: Promise<string>) => new Proxy(p as Promise<str
 })
 
 export class WsClient {
-  constructor(private ws: Websocket) {
+  constructor(private ws: WebSocket) {
     this.ws = ws
+  }
+  once<K extends keyof WebSocketEventMap>(type: K, listener: (this: WebSocket, ev: WebSocketEventMap[K]) => any, options?: boolean | AddEventListenerOptions) {
+    this.ws.addEventListener(type, function _(...args) {
+      listener.call(this, ...args)
+      this.removeEventListener(type, _)
+    }, options)
   }
   send(message: Messages.Client) {
     this.ws.send(JSON.stringify(message))
@@ -39,28 +44,28 @@ export class WsClient {
     return createMessageResolver(new Promise<string>((resolve, reject) => {
       const onClose = genOnClose(reject)
 
-      this.ws.once('message', d => {
+      this.once('message', d => {
         resolve(d.toString())
-        this.ws.removeListener('close', onClose)
+        this.ws.removeEventListener('close', onClose)
       })
-      this.ws.once('close', onClose)
+      this.once('close', onClose)
     }))
   }
   waitMessage() {
     let reject: undefined | ((reason?: any) => void)
     let resolve: undefined | ((r: { value: string }) => void)
 
-    this.ws.on('message', function onMessage(d) {
+    this.ws.onmessage = function onMessage(d) {
       if (resolve) {
         resolve({ value: d.toString() })
         resolve = undefined
       } else {
         setTimeout(onMessage.bind(this, d), 10)
       }
-    })
-    this.ws.on('close', (code) => {
+    }
+    this.ws.onclose = (code) => {
       reject && reject(new Error(`ws close: ${ code }`))
-    })
+    }
     return {
       [Symbol.asyncIterator]: () => ({
         next: () => new Promise<{ value: string }>((_, __) => {
