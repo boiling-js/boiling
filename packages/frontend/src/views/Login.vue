@@ -32,12 +32,14 @@ import { onMounted, onUnmounted, reactive } from 'vue'
 import { ElInput, ElButton } from 'element-plus'
 import { Users } from '@boiling/core'
 import { api } from '../api'
+import { identifyWS, useWsClient } from '../hooks/useWsClient'
 
 type Account = Users.Login & {
   id: string
 }
 
 const
+  [wsClient] = useWsClient(),
   store = useStore(),
   account = reactive<Account>({
     id: '',
@@ -46,6 +48,7 @@ const
   }),
   login = async () => {
     const { id, ...status } = account
+    identifyWS(wsClient, id, account.password)
     store.commit('setUser', await api.user(+id).status.add(status))
   }
 
