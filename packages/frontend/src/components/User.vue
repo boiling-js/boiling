@@ -14,7 +14,9 @@
       class="avatar" :style="{
         backgroundImage: `url(/api${info.avatar})`
       }"/>
-    <div :class="`dot ${info.status}`"></div>
+    <div
+      v-if="type === 'inline'"
+      :class="`dot ${info.status}`"></div>
     <div class="info">
       {{ info.remark || info.username }}<span class="id">#{{ info.id }}</span>
     </div>
