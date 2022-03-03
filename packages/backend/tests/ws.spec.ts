@@ -70,7 +70,7 @@ describe('WS', function () {
 
   it('should connect ws server.', async function () {
     this.timeout((process.env?.HEARTBEAT_INTERVAL ?? '20000') + 500)
-    const wsClient = new WsClient(new Websocket(`ws://${ HOST }:${ PORT }/ws`))
+    const wsClient = new WsClient(new WebSocket(`ws://${ HOST }:${ PORT }/ws`))
     await identifyAndHeartbeat(wsClient)
 
     let c = 0
@@ -84,7 +84,7 @@ describe('WS', function () {
   })
   it('should connect ws server and receive messages.', async function () {
     this.timeout((process.env?.HEARTBEAT_INTERVAL ?? '20000') + 500)
-    const wsClient = new WsClient(new Websocket(`ws://${ HOST }:${ PORT }/ws`))
+    const wsClient = new WsClient(new WebSocket(`ws://${ HOST }:${ PORT }/ws`))
     await identifyAndHeartbeat(wsClient)
 
     // 模拟前端请求了发消息接口后，后端找到对应用户并将消息推送给这个连接上的用户

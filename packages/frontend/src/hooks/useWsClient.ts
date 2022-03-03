@@ -1,5 +1,4 @@
 import { Messages, resolveMessage, Users, WsClient } from '@boiling/core'
-import Websocket from 'ws'
 
 let wsClient: WsClient | null = null
 
@@ -31,7 +30,7 @@ export const identifyWS = async (wsClient: WsClient, id: string, pwd: Users.Logi
 
 export const useWsClient = (): [WsClient, (v: typeof wsClient) => void] => {
   if (wsClient === null) {
-    wsClient = new WsClient(new Websocket('/api/ws'))
+    wsClient = new WsClient(new WebSocket(`ws://${location.host}/api/ws`))
   }
   return [wsClient, v => wsClient = v]
 }
