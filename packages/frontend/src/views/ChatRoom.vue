@@ -17,12 +17,20 @@
 <script setup lang="ts">
 import { ElInput } from 'element-plus'
 import { ref } from 'vue'
+import { onDispatch } from '../hooks/useWsClient'
 
 const
   props = defineProps<{
     id: number
   }>(),
   editingMessage = ref('')
+
+onDispatch(m => {
+  switch (m.t) {
+    case 'MESSAGE':
+      break
+  }
+})
 </script>
 
 <style scoped lang="scss">

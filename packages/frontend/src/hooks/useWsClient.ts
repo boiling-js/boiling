@@ -2,12 +2,21 @@ import { Messages, resolveMessage, Users, WsClient } from '@boiling/core'
 
 let wsClient: WsClient | null = null
 
+type DispatchListener =
+  (message: Messages.PickTarget<Messages.Opcodes.DISPATCH>) => void
+
+const dispatchListeners = new Set<DispatchListener>()
+
+export const onDispatch = (listener: DispatchListener) => {
+  dispatchListeners.add(listener)
+}
+
 export const identifyWS = async (wsClient: WsClient, id: string, pwd: Users.Login['password']) => {
-  const m1 = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.HELLO])
-  if (m1.op !== Messages.Opcodes.HELLO) {
+  const helloPkg = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.HELLO])
+  if (helloPkg.op !== Messages.Opcodes.HELLO) {
     throw new Error('未成功连接服务器')
   }
-  const heartbeatInterval = m1.d.heartbeatInterval
+  const heartbeatInterval = helloPkg.d.heartbeatInterval
 
   wsClient.send({
     op: Messages.Opcodes.IDENTIFY,
@@ -15,7 +24,7 @@ export const identifyWS = async (wsClient: WsClient, id: string, pwd: Users.Logi
       token: `Basic ${ Buffer.from(id + ':' + pwd).toString('base64') }`
     }
   })
-  const m2 = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.DISPATCH])
+  const identifyPkg = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.DISPATCH])
 
   setInterval(() => {
     wsClient.send({
@@ -24,7 +33,17 @@ export const identifyWS = async (wsClient: WsClient, id: string, pwd: Users.Logi
   }, heartbeatInterval)
 
   for await (const _ of wsClient.waitMessage()) {
-    const m = resolveMessage(_, [Messages.Opcodes.HEARTBEAT_ACK])
+    const m = resolveMessage(_, [
+      Messages.Opcodes.HEARTBEAT_ACK,
+      Messages.Opcodes.DISPATCH
+    ])
+    switch (m.op) {
+      case Messages.Opcodes.DISPATCH:
+        dispatchListeners.forEach(listener => listener(m))
+        break
+      case Messages.Opcodes.HEARTBEAT_ACK:
+        break
+    }
   }
 }
 
