@@ -1,3 +1,4 @@
+import mockFs from 'mock-fs'
 import { expect, use } from 'chai'
 import cap from 'chai-as-promised'
 
@@ -157,15 +158,23 @@ describe('Users Service', function () {
     expect(addFriend[0].id).to.be.eq(friend1.id)
   })
   it('should get all avatar', async function () {
-    // TODO 使用 mock-fs 模拟文件系统进行测试
-    const files = await UsersService.getAvatar()
-    expect(files[0]).to.be.deep.eq('/img/avatar/0.jpg')
-  })
-  it('should update user\'s avatar', async function () {
-    const user = await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
-    await UsersService.updateAvatar(user.id, '/img/avatar/3.jpg')
-    const newUser = await UsersService.get(user.id)
-    expect(newUser?.avatar).to.be.eq('/img/avatar/3.jpg')
+    mockFs({
+      './static/img/avatar': {}
+    })
+    await expect(UsersService.getAvatars())
+      .to.be.eventually.deep.eq([])
+    const files = {
+      '0.jpg': '',
+      '1.jpg': ''
+    }
+    mockFs({
+      './static/img/avatar': files
+    })
+    const avatars = await UsersService.getAvatars()
+    expect(avatars.length).to.be.eq(2)
+    Object.entries(files).forEach(([ file, _ ]) => {
+      expect(avatars).to.be.include(`/img/avatar/${ file }`)
+    })
   })
   it('should update user.', async function () {
     const user = await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })

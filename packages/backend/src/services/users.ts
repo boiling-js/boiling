@@ -58,9 +58,9 @@ export namespace UsersService {
   export async function exist(uname: string) {
     return await UserModel.findOne({ username: uname }) !== null
   }
-  export async function getAvatar() {
-    const files = (await fs.readdir('./static/img/avatar')).map(f => `/img/avatar/${ f }`)
-    return files
+  export async function getAvatars() {
+    return (await fs.readdir('./static/img/avatar'))
+      .map(f => `/img/avatar/${f}`)
   }
   export async function updateAvatar(id: number, avatar: string) {
     const user = await UsersService.getOrThrow(id)
@@ -72,11 +72,11 @@ export namespace UsersService {
     Object.assign(user, base)
     await user.save()
   }
-  export async function addChatRoom(id: number, room: string) {
+  export async function addChatRoom(id: number, roomId: string) {
     const user = await UsersService.getOrThrow(id)
-    if (user.chatRooms.includes(room))
-      throw new HttpError('CONFLICT', `${ room }聊天室已存在`)
-    user.chatRooms.push(room)
+    if (user.chatRooms.includes(roomId))
+      throw new HttpError('CONFLICT', `${ roomId }聊天室已存在`)
+    user.chatRooms.push(roomId)
     await user.save()
   }
   export namespace Friends {
