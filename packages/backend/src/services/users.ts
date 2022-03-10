@@ -67,9 +67,13 @@ export namespace UsersService {
     Object.assign(user, base)
     await user.save()
   }
+  export async function hasChatRoom(id: number, roomId: string) {
+    const user = await UsersService.getOrThrow(id)
+    return user.chatRooms.includes(roomId)
+  }
   export async function addChatRoom(id: number, roomId: string) {
     const user = await UsersService.getOrThrow(id)
-    if (user.chatRooms.includes(roomId))
+    if (await hasChatRoom(id, roomId))
       throw new HttpError('CONFLICT', `${ roomId }聊天室已存在`)
     user.chatRooms.push(roomId)
     await user.save()

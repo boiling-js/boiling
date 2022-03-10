@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose'
 import { Users } from '@boiling/core'
 
-const userSchema = new Schema<Users.Model>({
+export const userSchema = new Schema<Users.Model>({
   id: {
     type: Number,
     unique: true,

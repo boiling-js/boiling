@@ -1,4 +1,6 @@
 import { Messages } from '@boiling/core'
+import { StatusCodes } from 'http-status-codes'
+import { v4 as uuid } from 'uuid'
 import { MessageModel } from '../dao/message'
 import { UsersService } from './users'
 
@@ -17,16 +19,30 @@ export namespace ChatRoomsService {
    * 如果为聊天室的第一条消息，则在用户的聊天室列表中添加该聊天室
    */
   export async function pushMessage(
-    senderId: number, msg: M, isFirst = false
+    senderId: number, msg: M, receiverIds: number[]
   ) {
-    const message = await MessageModel.create({
-      ...msg,
-      sender: { id: senderId }
-    })
-    if (isFirst) {
-      await UsersService.addChatRoom(senderId, message.id)
+    const user = await UsersService.getOrThrow(senderId)
+    try {
+      await UsersService.addChatRoom(senderId, msg.chatRoomId)
+    } catch (e) {
+      if (!(e instanceof HttpError && e.code === StatusCodes.CONFLICT)) {
+        throw e
+      }
     }
-    return message
+    for (let i = 0; i < receiverIds.length; i++) {
+      try {
+        await UsersService.addChatRoom(receiverIds[i], msg.chatRoomId)
+      } catch (e) {
+        if (!(e instanceof HttpError && e.code === StatusCodes.CONFLICT)) {
+          throw e
+        }
+      }
+    }
+    return new MessageModel({
+      ...msg,
+      id: uuid(),
+      sender: user
+    }).save()
   }
   /**
    * 获取聊天室的消息列表
