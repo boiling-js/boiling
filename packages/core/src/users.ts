@@ -11,9 +11,9 @@ export namespace Users {
     id: Schema.number(),
     /** 用户名 */
     username: Schema.string(),
-    /** 加密的用户密码 */
-    avatar: Schema.string(),
     /** 用户头像 */
+    avatar: Schema.string(),
+    /** 加密的用户密码 */
     passwordHash: Schema.string(),
     /** 用户状态 */
     status: Status.optional()
