@@ -96,7 +96,7 @@ export class Router<O extends Router.Options, Docs> {
         if (item.pathRegexp.test(ctx.path)) {
           // @ts-ignore
           item.inn(ctx.request.body)
-          const { param, query } = Router.resolveSource(ctx.url, {
+          const { param, query } = Router.resolveSource(ctx.url.replace(new RegExp(`^${this.opts.prefix}`), ''), {
             query: item.queryTypes,
             param: item.paramTypes
           })
