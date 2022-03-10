@@ -211,7 +211,7 @@ export namespace Router {
     })
   }
   const paramTypesRegex = <Record<keyof PathParams, RegExp | undefined>>{
-    string: /\w+/,
+    string: /[^/?#]+/,
     number: /([-+])?\d+(\.\d+)?/,
     boolean: /0|1|(F|false)|(T|true)/
   }

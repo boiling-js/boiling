@@ -130,11 +130,14 @@ describe('Router', () => {
       url.param.fuu.schema('2')
     })
     describe('Type', () => {
-      it('should resolve no type.', function () {
+      it('should resolve no type.', () => {
         const t0 = resolveType('')
-        t0.schema('1')
-        expect(t0.regex.test('ahhh'))
-          .to.be.eq(true)
+        const strArr = ['1', 'hi:12:12', 'sad.,i7']
+        strArr.forEach(str => {
+          t0.schema(str)
+          expect(t0.regex.test(str))
+            .to.be.eq(true)
+        })
         // @ts-ignore
         expect(t0.schema.bind(null, 1))
           .to.throw('expected string but got 1')
