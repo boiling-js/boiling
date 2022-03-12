@@ -54,7 +54,7 @@ const waitIdentify = <T extends Messages.PickTarget<Messages.Opcodes.IDENTIFY, M
   })
 })
 
-export const senders = new Map<number, Sender>()
+export const clients = new Map<number, Sender>()
 
 /**
  * 基础流程：
@@ -139,7 +139,7 @@ export const router: Middleware = async (context, next) => {
         reject(e)
       }
     })
-    uid && senders.set(uid, sender)
+    uid && clients.set(uid, sender)
   }).catch(e => {
     if (e instanceof HttpError)
       ws.close(e.code + 4000, e.msg)

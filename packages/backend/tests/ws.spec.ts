@@ -3,7 +3,7 @@ import Koa from 'koa'
 import websockify from 'koa-websocket'
 import { expect } from 'chai'
 import { Messages, WsClient, resolveMessage } from '@boiling/core'
-import { router as WSRouter, senders } from '../src/routes/ws'
+import { router as WSRouter, clients } from '../src/routes/ws'
 import DAOMain from '../src/dao'
 import { UserModel } from '../src/dao/user'
 import { Security } from '../src/utils'
@@ -90,7 +90,7 @@ describe('WS', function () {
     // 模拟前端请求了发消息接口后，后端找到对应用户并将消息推送给这个连接上的用户
     // post http://server:port/chat-rooms/[时间戳]:1001:1002/messages { content: 'hello', ... }
     // 后端把这个消息储存到数据库中，再在在线用户列表中找到这个用户把消息发送给他
-    senders.get(1001)?.dispatch('MESSAGE', {
+    clients.get(1001)?.dispatch('MESSAGE', {
       content: 'hello'
     })
     for await (const _ of wsClient.waitMessage()) {
