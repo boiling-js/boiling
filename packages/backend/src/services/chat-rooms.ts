@@ -22,16 +22,10 @@ export namespace ChatRoomsService {
     senderId: number, msg: M, receiverIds: number[]
   ) {
     const user = await UsersService.getOrThrow(senderId)
-    try {
-      await UsersService.addChatRoom(senderId, msg.chatRoomId)
-    } catch (e) {
-      if (!(e instanceof HttpError && e.code === StatusCodes.CONFLICT)) {
-        throw e
-      }
-    }
-    for (let i = 0; i < receiverIds.length; i++) {
+    const dealIds = receiverIds.concat(senderId)
+    for (let i = 0; i < dealIds.length; i++) {
       try {
-        await UsersService.addChatRoom(receiverIds[i], msg.chatRoomId)
+        await UsersService.addChatRoom(dealIds[i], msg.chatRoomId)
       } catch (e) {
         if (!(e instanceof HttpError && e.code === StatusCodes.CONFLICT)) {
           throw e
