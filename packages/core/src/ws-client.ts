@@ -45,7 +45,7 @@ export class WsClient {
       const onClose = genOnClose(reject)
 
       this.once('message', d => {
-        resolve(d.toString())
+        resolve(d.data.toString())
         this.ws.removeEventListener('close', onClose)
       })
       this.once('close', onClose)
@@ -57,7 +57,7 @@ export class WsClient {
 
     this.ws.onmessage = function onMessage(d) {
       if (resolve) {
-        resolve({ value: d.toString() })
+        resolve({ value: d.data.toString() })
         resolve = undefined
       } else {
         setTimeout(onMessage.bind(this, d), 10)
