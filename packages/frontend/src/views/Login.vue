@@ -42,9 +42,9 @@ const
   [wsClient] = useWsClient(),
   store = useStore(),
   account = reactive<Account>({
-    id: '',
+    id: import.meta.env.VITE_LOGIN_UID || '',
     status: 'online',
-    password: ''
+    password: import.meta.env.VITE_LOGIN_PWD || ''
   }),
   login = async () => {
     const { id, ...status } = account
