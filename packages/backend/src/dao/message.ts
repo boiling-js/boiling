@@ -11,7 +11,6 @@ const messageSchema = new Schema<Messages.Model>({
     type: new Schema<Users.BaseOut>({
       id: {
         type: Number,
-        unique: true,
         required: true
       },
       username: {

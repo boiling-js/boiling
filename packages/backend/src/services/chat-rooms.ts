@@ -23,13 +23,13 @@ export namespace ChatRoomsService {
   ) {
     const user = await UsersService.getOrThrow(senderId)
     const dealIds = receiverIds.concat(senderId)
-    for (let i = 0; i < dealIds.length; i++) {
-      try {
+    try {
+      for (let i = 0; i < dealIds.length; i++) {
         await UsersService.addChatRoom(dealIds[i], msg.chatRoomId)
-      } catch (e) {
-        if (!(e instanceof HttpError && e.code === StatusCodes.CONFLICT)) {
-          throw e
-        }
+      }
+    } catch (e) {
+      if (!(e instanceof HttpError && e.code === StatusCodes.CONFLICT)) {
+        throw e
       }
     }
     return new MessageModel({
