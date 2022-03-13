@@ -21,7 +21,7 @@ export const identifyWS = async (wsClient: WsClient, id: string, pwd: Users.Logi
   wsClient.send({
     op: Messages.Opcodes.IDENTIFY,
     d: {
-      token: `Basic ${ Buffer.from(id + ':' + pwd).toString('base64') }`
+      token: `Basic ${ btoa(id + ':' + pwd) }`
     }
   })
   const identifyPkg = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.DISPATCH])
