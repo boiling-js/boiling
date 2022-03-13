@@ -7,7 +7,18 @@
     </div>
     <div class="room">
       <div class="content">
-        {{ historyMessages.join('\n') }}
+        <div
+          v-for="historyMessage in historyMessages"
+          :key="historyMessage.chatRoomId"
+          class="item">
+          <img
+            class="avatar"
+            :src="`/api/${historyMessage.sender.avatar}`">
+          <div class="message">
+            <div class="time">{{ getLocalTime(historyMessage.createdAt) }}</div>
+            <div class="text">{{ historyMessage.content }}</div>
+          </div>
+        </div>
       </div>
       <div class="message-input">
         <el-input
@@ -38,6 +49,9 @@ const
       content: editingMessage.value
     })
     editingMessage.value = ''
+  },
+  getLocalTime = (nS: string) => {
+    return new Date(parseInt(nS)).toLocaleString().replace(/:\d{1,2}$/, ' ')
   }
 
 onDispatch(async m => {
@@ -75,6 +89,31 @@ onDispatch(async m => {
     width: calc(100% - 40px);
     > div.content {
       flex-grow: 1;
+      > .item {
+        display: flex;
+        margin-bottom: 10px;
+        > .avatar {
+          margin-right: 15px;
+          width: 45px;
+          height: 45px;
+          border-radius: 50%;
+        }
+        > .message {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          > .time {
+            color: #ccc;
+            font-size: 12px;
+          }
+          > .text {
+            margin-top: 5px;
+            color: #fff;
+            font-size: 14px;
+            word-break: break-all;
+          }
+        }
+      }
     }
     > div.message-input {
       height: 60px;
