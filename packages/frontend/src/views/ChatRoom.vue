@@ -6,9 +6,14 @@
       <span>{{ props.id }}</span>
     </div>
     <div class="room">
-      <div class="content"/>
+      <div class="content">
+        {{ historyMessages.join('\n') }}
+      </div>
       <div class="message-input">
-        <el-input v-model="editingMessage" type="textarea"/>
+        <el-input
+          v-model="editingMessage"
+          type="textarea"
+          @keydown.enter="sendMessage"/>
       </div>
     </div>
   </div>
@@ -16,18 +21,29 @@
 
 <script setup lang="ts">
 import { ElInput } from 'element-plus'
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
+import { Messages } from '@boiling/core'
 import { onDispatch } from '../hooks/useWsClient'
+import { api } from '../api'
+import store from '../store'
 
 const
   props = defineProps<{
     id: number
   }>(),
-  editingMessage = ref('')
+  editingMessage = ref(''),
+  historyMessages = reactive<Messages.Model[]>([]),
+  sendMessage = async () => {
+    await api['chat-room'](`[${new Date().getTime()}]:${store.state.user.id}:${props.id}:`).messages.add({
+      content: editingMessage.value
+    })
+    editingMessage.value = ''
+  }
 
-onDispatch(m => {
+onDispatch(async m => {
   switch (m.t) {
     case 'MESSAGE':
+      historyMessages.push(m.d)
       break
   }
 })
