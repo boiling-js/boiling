@@ -36,7 +36,7 @@ interface OfficialApi {
   }
   /** 聊天室 */
   'chat-room'(chatRoomId: string): {
-    messages: {
+    messages: Promise<Messages.Model> & {
       /** 发送消息 */
       add(d: { content: string }): Promise<Messages.Model>
     }

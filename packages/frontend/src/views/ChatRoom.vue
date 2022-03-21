@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { ElInput } from 'element-plus'
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { Messages } from '@boiling/core'
 import { onDispatch } from '../hooks/useWsClient'
 import { api } from '../api'
@@ -52,8 +52,14 @@ const
   },
   getLocalTime = (nS: string) => {
     return new Date(parseInt(nS)).toLocaleString().replace(/:\d{1,2}$/, ' ')
+  },
+  getHistoryMessages = async () => {
+    // const
+    //   messages = await api['chat-room'](`[${new Date().getTime()}]:${store.state.user.id}:${props.id}:`).messages.get()
+    // historyMessages = messages
   }
 
+onMounted(() => getHistoryMessages())
 onDispatch(async m => {
   switch (m.t) {
     case 'MESSAGE':
