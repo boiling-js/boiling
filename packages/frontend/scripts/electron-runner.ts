@@ -19,7 +19,7 @@ async function createWindow() {
     }
   })
   await viteServer.listen()
-  await mainWindow.loadURL(`http://localhost:${
+  await mainWindow.loadURL(`http://127.0.0.1:${
     viteServer.config.server.port
   }`)
   mainWindow.webContents.openDevTools({
