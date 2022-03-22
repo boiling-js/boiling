@@ -1,4 +1,4 @@
-import { Api, attachApi, Messages, Pagination, QueryPromise, SearchQuery, Users } from '@boiling/core'
+import { Api, attachApi, ChatRooms, Messages, Pagination, QueryPromise, SearchQuery, Users } from '@boiling/core'
 import { ElMessage } from 'element-plus'
 
 interface OfficialApi {
@@ -36,6 +36,8 @@ interface OfficialApi {
   }
   /** 聊天室 */
   'chat-room'(chatRoomId: string): {
+    /** 创建聊天室 */
+    add(d: Omit<ChatRooms.Model, 'id'>): Promise<void>
     messages: Promise<Messages.Model> & {
       /** 发送消息 */
       add(d: { content: string }): Promise<Messages.Model>
