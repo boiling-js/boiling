@@ -28,9 +28,7 @@ export namespace Users {
     /** 用户好友 */
     friends: Schema.array(Users.Friend),
     /** 用户标签 */
-    tags: Schema.array(Schema.string()),
-    /** 聊天室 id 列表 */
-    chatRooms: Schema.array(Schema.string())
+    tags: Schema.array(Schema.string())
   }))
   export type Model = Schema.InferS<typeof Model>
   /** 用户数据出口 */
