@@ -27,10 +27,6 @@ export const userSchema = new Schema<Users.Model>({
     type: String,
     default: 'offline'
   },
-  chatRooms: {
-    type: [String],
-    default: []
-  },
   friends: {
     type: [{
       id: Number,

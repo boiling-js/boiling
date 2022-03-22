@@ -2,21 +2,15 @@ import { Schema, model } from 'mongoose'
 import { ChatRooms } from '@boiling/core'
 
 export const chatRoomSchema = new Schema<ChatRooms.Model>({
-  id: {
-    type: String,
-    required: true,
-    unique: true
-  },
   name: {
-    type: String,
-    required: true
+    type: String
   },
   avatar: {
     type: String
   },
   members: [{
-      type: [String],
-      required: true
+    type: [Number],
+    required: true
   }],
   createdAt: {
     type: String,

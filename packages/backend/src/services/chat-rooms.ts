@@ -1,24 +1,27 @@
 import { ChatRooms, Messages } from '@boiling/core'
-import { StatusCodes } from 'http-status-codes'
-import { v4 as uuid } from 'uuid'
 import { UsersService } from './users'
 import { MessageModel } from '../dao/message'
 import { ChatRoomModel } from '../dao/chatRoom'
 
 export namespace ChatRoomsService {
   export const Model = ChatRoomModel
-  type M = Omit<ChatRooms.Model, 'id'>
+  type M = ChatRooms.Model
 
   /**
    * 创建聊天室
    *
-   * @param chatRoom 聊天室基本信息
+   * @param members
+   * @param options
    */
-  export async function create(chatRoom: M) {
+  export async function create(members: M['members'], options?: Partial<Pick<M, 'name' | 'avatar'>>) {
+    members.forEach(id => UsersService.getOrThrow(id))
     return new ChatRoomModel({
-      id: uuid(),
-      ...chatRoom
+      members, ...options,
+      createdAt: `${new Date()}`
     }).save()
+  }
+  export function get(id: string) {
+    return ChatRoomModel.findById(id)
   }
   /**
    * 获取聊天室的消息列表
@@ -37,22 +40,6 @@ export namespace ChatRoomsService {
     export async function create(
       senderId: number, msg: M, receiverIds: number[]
     ) {
-      const user = await UsersService.getOrThrow(senderId)
-      const dealIds = receiverIds.concat(senderId)
-      try {
-        for (let i = 0; i < dealIds.length; i++) {
-          await UsersService.addChatRoom(dealIds[i], msg.chatRoomId)
-        }
-      } catch (e) {
-        if (!(e instanceof HttpError && e.code === StatusCodes.CONFLICT)) {
-          throw e
-        }
-      }
-      return new MessageModel({
-        ...msg,
-        id: uuid(),
-        sender: user
-      }).save()
     }
     /**
      * 获取聊天室数据
