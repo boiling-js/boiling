@@ -8,7 +8,7 @@ export const router = new Router({
   /**
    * 创建聊天室
    */
-  .post(Schema.Omit(ChatRooms.Model, ['id']), Schema.any(), '', async ctx => {
+  .post(Schema.Pick(ChatRooms.Model, ['members', 'name', 'avatar']), Schema.any(), '', async ctx => {
     const { members, ...opts } = ctx.request.body
     await ChatRoomsService.create(members, opts)
   })
