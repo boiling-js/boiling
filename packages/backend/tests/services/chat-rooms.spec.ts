@@ -23,7 +23,7 @@ describe('ChatRooms Service', () => {
     await ChatRoomsService.Model.deleteMany({})
     await ChatRoomsService.Message.Model.deleteMany({})
   })
-  it('should create a chatRoom.', async () => {
+  it('should create a chat room.', async () => {
     const { id } = await ChatRoomsService.create([sender.id, receiver.id])
     const charRoom = await ChatRoomsService.get(id)
     expect(charRoom?.name).to.equal(undefined)
@@ -38,7 +38,21 @@ describe('ChatRooms Service', () => {
       'throw `NOT_FOUND` error'
     ).to.be.eventually.rejectedWith('[404] members 中存在不存在的用户')
   })
-  it('should get chat room whether exist.', async () => {
+  it('should get chat room by members or id.', async () => {
+    const members = [sender.id, receiver.id]
+    const { id } = await ChatRoomsService.create(members)
+    await expect(ChatRoomsService.get(id))
+      .to.be.eventually.have.property('id', id)
+    await expect(ChatRoomsService.get(members))
+      .to.be.eventually.have.property('id', id)
+    await expect(ChatRoomsService.get(members.reverse()))
+      .to.be.eventually.have.property('id', id)
+    await expect(ChatRoomsService.getOrThrow(members.concat(123)))
+      .to.be.eventually.rejectedWith(`[404] members 为 [${ members.concat(123).join(', ') }] 的聊天室不存在`)
+    await expect(ChatRoomsService.getOrThrow('623f1b13e11111f3c2debd48'))
+      .to.be.eventually.rejectedWith('[404] id 为 \'623f1b13e11111f3c2debd48\' 的聊天室不存在')
+  })
+  it('should determine whether the chat room exists.', async () => {
     const members = [sender.id, receiver.id]
     const { id } = await ChatRoomsService.create(members)
     await expect(ChatRoomsService.exists(id))
