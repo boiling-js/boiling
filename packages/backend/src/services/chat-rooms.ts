@@ -17,10 +17,11 @@ export namespace ChatRoomsService {
   export async function create(members: M['members'], options?: Partial<Pick<M, 'name' | 'avatar'>>) {
     if (members.length === 2 && await exists(members))
       throw new HttpError('CONFLICT', `members 为 [${ members.join(', ') }] 的聊天室已存在`)
-    await Promise.all(members.map(id => UsersService.exists(id))).then(exists => {
-      if (!exists.every(Boolean))
-        throw new HttpError('NOT_FOUND', 'members 中存在不存在的用户')
-    })
+    if (
+      await Promise.all(members.map(id => UsersService.exists(id)))
+        .then(exists => !exists.every(Boolean))
+    ) throw new HttpError('NOT_FOUND', 'members 中存在不存在的用户')
+
     return new Model({
       members, ...options,
       createdAt: new Date()
