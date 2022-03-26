@@ -38,6 +38,15 @@ import { onDispatch } from '../hooks/useWsClient'
 import { api } from '../api'
 import store from '../store'
 
+/**
+ * 用户加好友的时候接口中默认创建一个聊天室
+ * 用户准备和好友聊天的时候
+ *   先检查聊天室是否存在
+ *     存在的时候，直接拿到聊天室 id
+ *     不存在则创建一个新的，同时获取到 id
+ *   然后通过聊天室 id 获取聊天室最近的聊天信息
+ *   同时也能通过聊天室 id 发送消息
+ */
 const
   props = defineProps<{
     id: number
@@ -53,13 +62,10 @@ const
   getLocalTime = (nS: string) => {
     return new Date(parseInt(nS)).toLocaleString().replace(/:\d{1,2}$/, ' ')
   },
-  getHistoryMessages = async () => {
-    // const
-    //   messages = await api['chat-room'](`[${new Date().getTime()}]:${store.state.user.id}:${props.id}:`).messages.get()
-    // historyMessages = messages
+  getMessages = async () => {
   }
 
-onMounted(() => getHistoryMessages())
+onMounted(() => getMessages())
 onDispatch(async m => {
   switch (m.t) {
     case 'MESSAGE':
