@@ -2,6 +2,7 @@ import { Users } from '@boiling/core'
 import { UserModel } from '../dao/user'
 import { Seq } from '../utils'
 import fs from 'fs-extra'
+import { ChatRoomsService } from './chat-rooms'
 
 export namespace UsersService {
   export const Model = UserModel
@@ -92,7 +93,7 @@ export namespace UsersService {
         tags: [],
         remark: ''
       }, opts) })
-      await user.save()
+      await Promise.all([user.save(), ChatRoomsService.create([user.id, fUid])])
     }
     export async function del(uid: number, fUid: number) {
       const [ user, friend ] = await Promise.all([UsersService.getOrThrow(uid), UsersService.getOrThrow(fUid)])
@@ -101,6 +102,7 @@ export namespace UsersService {
         throw new HttpError('NOT_FOUND', `${ friend.username }不是你的好友`)
       user.friends.splice(index, 1)
       await user.save()
+      // TODO: 删除聊天室 and 删除对应聊天室的消息
     }
     export async function get(uid: number) {
       const target = await UsersService.getOrThrow(uid)

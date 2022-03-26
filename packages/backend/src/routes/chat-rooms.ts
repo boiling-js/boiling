@@ -8,8 +8,20 @@ export const router = new Router({
   /**
    * 获取聊天室
    */
-  .get(Schema.Pick(ChatRooms.Model, ['members']), ChatRooms.Model, '', async ctx => {
-    const { members } = ctx.request.body
+  .get(ChatRooms.Model, '?key', async ctx => {
+    const { key } = ctx.query
+    const keywords = key.split(' ')
+    const names: string[] = []
+    const members: number[] = []
+    keywords.forEach(keyword => {
+      const [type, content] = keyword.split(':')
+      if (!!content && type === 'members') {
+        const ids = content.split(',').map(id => parseInt(id))
+        members.push(...ids)
+      } else {
+        names.push(keyword)
+      }
+    })
     return ChatRoomsService.get(members) as any as ChatRooms.Model
   })
   /**
