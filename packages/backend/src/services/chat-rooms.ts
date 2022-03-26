@@ -37,6 +37,16 @@ export namespace ChatRoomsService {
       return Model.exists({ _id: arg0 })
     }
   }
+  export function existsOrThrow(arg0: string | number[]) {
+    return exists(arg0).then(exists => {
+      if (!exists)
+        throw new HttpError(
+          'NOT_FOUND', Array.isArray(arg0)
+            ? `members 为 [${ arg0.join(', ') }] 的聊天室不存在`
+            : `id 为 '${ arg0 }' 的聊天室不存在`
+        )
+    })
+  }
   type GetReturnType = ReturnType<typeof Model.findOne>
   export function get(id: string): GetReturnType
   export function get(members: number[]): GetReturnType
@@ -49,14 +59,12 @@ export namespace ChatRoomsService {
     }
   }
   export async function getOrThrow(arg0: string | number[]) {
-    if (!await exists(arg0)) {
-      throw new HttpError(
-        'NOT_FOUND', Array.isArray(arg0)
-          ? `members 为 [${ arg0.join(', ') }] 的聊天室不存在`
-          : `id 为 '${ arg0 }' 的聊天室不存在`
-      )
-    }
+    await existsOrThrow(arg0)
     return get(arg0)
+  }
+  export async function del(id: string) {
+    await existsOrThrow(id)
+    return Model.deleteOne({ _id: id })
   }
   export namespace Message {
     import BaseOut = Users.BaseOut

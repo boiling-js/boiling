@@ -64,6 +64,15 @@ describe('ChatRooms Service', () => {
     await expect(ChatRoomsService.exists('623f1b13e11111f3c2debd48'))
       .to.eventually.equal(false)
   })
+  it('should delete chat room by id.', async () => {
+    const members = [sender.id, receiver.id]
+    const { id } = await ChatRoomsService.create(members)
+    await ChatRoomsService.del(id)
+    await expect(ChatRoomsService.get(id))
+      .to.eventually.equal(null)
+    await expect(ChatRoomsService.del('623f1b13e11111f3c2debd48'))
+      .to.eventually.be.rejectedWith('[404] id 为 \'623f1b13e11111f3c2debd48\' 的聊天室不存在')
+  })
   describe('Message', function () {
     it('should push message to target chat room.', async () => {
       const { id } = await ChatRoomsService.create([sender.id, receiver.id])
