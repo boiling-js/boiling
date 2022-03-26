@@ -34,10 +34,12 @@ interface OfficialApi {
       upd(d: { avatar: string }): Promise<void>
     }
   }
+  'chat-rooms': {
+    /** 创建聊天室 */
+    add(d: Pick<ChatRooms.Model, 'members' | 'name' |'avatar'>): Promise<ChatRooms.Model>
+  }
   /** 聊天室 */
   'chat-room'(chatRoomId: string): {
-    /** 创建聊天室 */
-    add(d: Omit<ChatRooms.Model, 'id'>): Promise<void>
     messages: Promise<Messages.Model> & {
       /** 发送消息 */
       add(d: { content: string }): Promise<Messages.Model>
