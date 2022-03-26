@@ -123,9 +123,6 @@ const
       })
       isShow.value = false
       ElMessage.success('请求发送成功！')
-      await api['chat-rooms'].add({
-        members: [store.state.user.id, props.info.id]
-      })
     } catch {}
   },
   settingFriend = async () => {
