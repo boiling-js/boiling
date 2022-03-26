@@ -5,6 +5,9 @@ import { ChatRoomsService } from '../services/chat-rooms'
 export const router = new Router({
   prefix: '/chat-rooms' as '/chat-rooms'
 })
+  /**
+   * 获取聊天室
+   */
   .get(Schema.Pick(ChatRooms.Model, ['members']), ChatRooms.Model, '', async ctx => {
     const { members } = ctx.request.body
     return ChatRoomsService.get(members) as any as ChatRooms.Model
@@ -19,10 +22,13 @@ export const router = new Router({
   /**
    * 添加消息
    */
-  .post(Schema.Pick(Messages.Model, ['content']), Schema.any(), '/:chatRoomId/messages/:senderId', async ctx => {
+  .post(Schema.Pick(Messages.Model, ['content']), Schema.any(), '/:chatRoomId/messages/:senderId(number)', async ctx => {
     const { content } = ctx.request.body
-    await ChatRoomsService.Message.create(ctx.params.chatRoomId, +ctx.params.senderId, content)
+    await ChatRoomsService.Message.create(ctx.params.chatRoomId, ctx.params.senderId, content)
   })
+  /**
+   * 获取聊天室消息列表
+   */
   .get('/:chatRoomId/messages', async ctx => {
     /**
      * 获取最近十条消息
@@ -39,5 +45,5 @@ export const router = new Router({
      *   发送者信息、消息内容
      */
     const { chatRoomId } = ctx.params
-    return ChatRoomsService.getMessages(chatRoomId)
+    return ChatRoomsService.Message.search(chatRoomId)
   })

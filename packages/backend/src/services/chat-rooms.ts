@@ -54,12 +54,6 @@ export namespace ChatRoomsService {
     }
     return get(arg0)
   }
-  /**
-   * 获取聊天室的消息列表
-   */
-  export function getMessages(id: string) {
-    return MessageModel.find({ chatRoomId: id })
-  }
   export namespace Message {
     import BaseOut = Users.BaseOut
     export const Model = MessageModel
