@@ -13,7 +13,7 @@ export const chatRoomSchema = new Schema<ChatRooms.Model>({
     required: true
   }],
   createdAt: {
-    type: String,
+    type: Date,
     required: true
   }
 })

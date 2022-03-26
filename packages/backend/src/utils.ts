@@ -28,6 +28,23 @@ namespace Utils {
         .then(m => m.initIndent + m.seq)
     }
   }
+  export type Period = [Date | undefined, Date | undefined]
+  export function periodQuery(key: string, period?: Period) {
+    if (!period) return {}
+
+    let query
+    const [start, end] = period
+    if (start && end) {
+      query = { $gte: start, $lte: end }
+    } else if (start) {
+      query = { $gte: start }
+    } else if (end) {
+      query = { $lte: end }
+    } else {
+      query = {}
+    }
+    return { [key]: query }
+  }
 }
 
 export = Utils

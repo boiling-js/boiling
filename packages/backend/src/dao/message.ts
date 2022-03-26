@@ -2,11 +2,6 @@ import { Schema, model } from 'mongoose'
 import { Messages, Users } from '@boiling/core'
 
 const messageSchema = new Schema<Messages.Model>({
-  id: {
-    type: String,
-    unique: true,
-    required: true
-  },
   sender: {
     type: new Schema<Users.BaseOut>({
       id: {
@@ -33,7 +28,7 @@ const messageSchema = new Schema<Messages.Model>({
     required: true
   },
   createdAt: {
-    type: String,
+    type: Date,
     required: true
   },
   chatRoomId: {
