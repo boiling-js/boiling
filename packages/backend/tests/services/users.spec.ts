@@ -15,12 +15,12 @@ describe('Users Service', function () {
     await UsersService.Model.deleteMany({})
   })
   it('should add user.', async function () {
-    expect(await UsersService.exist('test')).to.be.eq(false)
+    expect(await UsersService.exists('test')).to.be.eq(false)
     const nu = await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
     expect(nu).not.to.be.undefined
     expect(nu).property('passwordHash')
       .to.be.eq('test')
-    expect(await UsersService.exist('test')).to.be.eq(true)
+    expect(await UsersService.exists('test')).to.be.eq(true)
     await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
       .catch(e => {
         if (e instanceof HttpError) {

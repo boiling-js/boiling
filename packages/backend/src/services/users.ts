@@ -7,7 +7,7 @@ export namespace UsersService {
   export const Model = UserModel
   export type U = Omit<Users.Base, 'id'>
   export async function add(u: U) {
-    if (await exist(u.username))
+    if (await exists(u.username))
       throw new HttpError('CONFLICT', `User with the name "${ u.username }" already exists`)
     return new UserModel(Object.assign({
       id: await Seq.auto('users', 1000)
@@ -55,8 +55,13 @@ export namespace UsersService {
   export function search(key: string) {
     return Model.find({ username: new RegExp(`${key}.*`) })
   }
-  export async function exist(uname: string) {
-    return await UserModel.findOne({ username: uname }) !== null
+  export async function exists(id: number): Promise<boolean>
+  export async function exists(uname: string): Promise<boolean>
+  export async function exists(arg0: string | number) {
+    if (typeof arg0 === 'number')
+      return Model.exists({ id: arg0 })
+    else
+      return Model.exists({ username: arg0 })
   }
   export async function getAvatars() {
     return (await fs.readdir('./static/img/avatar'))
