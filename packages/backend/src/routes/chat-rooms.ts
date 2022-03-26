@@ -1,21 +1,27 @@
 import Schema from 'schemastery'
-import { ChatRooms, Router } from '@boiling/core'
+import { ChatRooms, Messages, Router } from '@boiling/core'
 import { ChatRoomsService } from '../services/chat-rooms'
 
 export const router = new Router({
   prefix: '/chat-rooms' as '/chat-rooms'
 })
+  .get(Schema.Pick(ChatRooms.Model, ['members']), ChatRooms.Model, '', async ctx => {
+    const { members } = ctx.request.body
+    return ChatRoomsService.get(members) as any as ChatRooms.Model
+  })
   /**
    * 创建聊天室
    */
   .post(Schema.Pick(ChatRooms.Model, ['members', 'name', 'avatar']), Schema.any(), '', async ctx => {
     const { members, ...opts } = ctx.request.body
-    await ChatRoomsService.create(members, opts)
+    return ChatRoomsService.create(members, opts)
   })
   /**
    * 添加消息
    */
-  .post('/:chatRoomId/messages', async ctx => {
+  .post(Schema.Pick(Messages.Model, ['content']), Schema.any(), '/:chatRoomId/messages/:senderId', async ctx => {
+    const { content } = ctx.request.body
+    await ChatRoomsService.Message.create(ctx.params.chatRoomId, +ctx.params.senderId, content)
   })
   .get('/:chatRoomId/messages', async ctx => {
     /**
