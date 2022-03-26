@@ -11,7 +11,7 @@ export namespace Messages {
     /** 内容 */
     content: Schema.string(),
     /** 发送时间 */
-    createdAt: Schema.string(),
+    createdAt: Schema.from(Date),
     /**
      * id
      *
