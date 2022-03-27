@@ -9,7 +9,7 @@ export const router = new Router({
   /**
    * 获取聊天室
    */
-  .get(ChatRooms.Model, '?key', async ctx => {
+  .get(ChatRooms.Model, '?key', ctx => {
     const { key } = ctx.query
     const keywords = decodeURI(key).split(' ')
     const names: string[] = []
@@ -23,7 +23,7 @@ export const router = new Router({
         names.push(keyword)
       }
     })
-    return ChatRoomsService.get(members) as any as ChatRooms.Model
+    return ChatRoomsService.getOrThrow(members) as any as ChatRooms.Model
   })
   /**
    * 创建聊天室
