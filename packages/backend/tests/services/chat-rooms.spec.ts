@@ -57,22 +57,22 @@ describe('ChatRooms Service', () => {
     const members = [u0.id, u1.id]
     const { id } = await ChatRoomsService.create(members)
     await expect(ChatRoomsService.exists(id))
-      .to.eventually.equal(true)
+      .to.be.eventually.equal(true)
     await expect(ChatRoomsService.exists(members))
-      .to.eventually.equal(true)
+      .to.be.eventually.equal(true)
     await expect(ChatRoomsService.exists([123, u1.id]))
-      .to.eventually.equal(false)
+      .to.be.eventually.equal(false)
     await expect(ChatRoomsService.exists('623f1b13e11111f3c2debd48'))
-      .to.eventually.equal(false)
+      .to.be.eventually.equal(false)
   })
   it('should delete chat room by id.', async () => {
     const members = [u0.id, u1.id]
     const { id } = await ChatRoomsService.create(members)
     await ChatRoomsService.del(id)
     await expect(ChatRoomsService.get(id))
-      .to.eventually.equal(null)
+      .to.be.eventually.equal(null)
     await expect(ChatRoomsService.del('623f1b13e11111f3c2debd48'))
-      .to.eventually.be.rejectedWith('[404] id 为 \'623f1b13e11111f3c2debd48\' 的聊天室不存在')
+      .to.be.eventually.be.rejectedWith('[404] id 为 \'623f1b13e11111f3c2debd48\' 的聊天室不存在')
   })
   describe('Message', function () {
     it('should push message to target chat room.', async () => {
@@ -112,38 +112,37 @@ describe('ChatRooms Service', () => {
         prevI = i
       }
       await expect(ChatRoomsService.Message.search(id))
-        .to.eventually.have.lengthOf(messages.length)
+        .to.be.eventually.have.lengthOf(messages.length)
       await expect(
         ChatRoomsService.Message.search(id, {
           period: [undefined, new Date(periods[1][1])]
         })
-      ).to.eventually.have.lengthOf(periods[1][0])
+      ).to.be.eventually.have.lengthOf(periods[1][0])
       await expect(
         ChatRoomsService.Message.search(id, {
           period: [new Date(periods[1][1]), undefined]
         })
-      ).to.eventually.have.lengthOf(messages.length - periods[0][0])
+      ).to.be.eventually.have.lengthOf(messages.length - periods[0][0])
       await expect(
         ChatRoomsService.Message.search(id, {
           period: [new Date(periods[1][1]), new Date(periods[2][1])]
         })
-      ).to.eventually.have.lengthOf(periods[2][0] - periods[0][0])
+      ).to.be.eventually.have.lengthOf(periods[2][0] - periods[0][0])
       await expect(
         ChatRoomsService.Message.search(id, { senderId: u0.id })
-      ).to.eventually.have.lengthOf(messages.filter(m => m.sender.id === u0.id).length)
+      ).to.be.eventually.have.lengthOf(messages.filter(m => m.sender.id === u0.id).length)
       await expect(
         ChatRoomsService.Message.search(id, { senderId: u1.id })
-      ).to.eventually.have.lengthOf(messages.filter(m => m.sender.id === u1.id).length)
+      ).to.be.eventually.have.lengthOf(messages.filter(m => m.sender.id === u1.id).length)
       await expect(
         ChatRoomsService.Message.search(id, {
           senderId: u0.id,
           period: [new Date(periods[1][1]), new Date(periods[2][1])]
         })
-      ).to.eventually.have.lengthOf((periods[2][0] - periods[0][0]) * 0.75)
+      ).to.be.eventually.have.lengthOf((periods[2][0] - periods[0][0]) * 0.75)
       await expect(
-        ChatRoomsService.Message.search('623f1b13e11111f3c2debd48'),
-        'throw `NOT_FOUND` error'
-      ).to.be.eventually.rejectedWith('[404] id 为 \'623f1b13e11111f3c2debd48\' 的聊天室不存在')
+        ChatRoomsService.Message.search('623f1b13e11111f3c2debd48')
+      ).to.be.eventually.have.lengthOf(0)
     })
   })
 })

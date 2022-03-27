@@ -66,8 +66,8 @@ export namespace ChatRoomsService {
     await existsOrThrow(id)
     return Model.deleteOne({ _id: id })
   }
+
   export namespace Message {
-    import BaseOut = Users.BaseOut
     export const Model = MessageModel
     export type M = Pick<Messages.Model, 'content'>
     /**
@@ -85,7 +85,7 @@ export namespace ChatRoomsService {
       return new Model({
         ...msg,
         chatRoomId,
-        sender: BaseOut(sender),
+        sender: Users.BaseOut(sender),
         createdAt: new Date()
       }).save()
     }
@@ -107,8 +107,7 @@ export namespace ChatRoomsService {
       /** 发送者 id */
       senderId?: number
     }
-    export async function search(chatRoomId: string, options?: SearchOptions) {
-      await ChatRoomsService.existsOrThrow(chatRoomId)
+    export function search(chatRoomId: string, options?: SearchOptions) {
       const query = <Record<string, any>>{
         ...periodQuery('createdAt', options?.period)
       }

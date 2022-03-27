@@ -1,6 +1,7 @@
 import Schema from 'schemastery'
 import { ChatRooms, Messages, Router } from '@boiling/core'
 import { ChatRoomsService } from '../services/chat-rooms'
+import usePagination from '../hooks/usePagination'
 
 export const router = new Router({
   prefix: '/chat-rooms' as '/chat-rooms'
@@ -41,7 +42,7 @@ export const router = new Router({
   /**
    * 获取聊天室消息列表
    */
-  .get('/:chatRoomId/messages', async ctx => {
+  .get('/:chatRoomId/messages?key&page(number)&num(number)', async ctx => {
     /**
      * 获取最近十条消息
      * 获取时间段消息列表
@@ -57,5 +58,5 @@ export const router = new Router({
      *   发送者信息、消息内容
      */
     const { chatRoomId } = ctx.params
-    return ChatRoomsService.Message.search(chatRoomId)
+    return usePagination(ChatRoomsService.Message, ctx.query)(chatRoomId)
   })
