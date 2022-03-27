@@ -18,4 +18,12 @@ export const chatRoomSchema = new Schema<ChatRooms.Model>({
   }
 })
 
+chatRoomSchema.set('toJSON', {
+  transform: (doc, ret) => {
+    ret.id = ret._id
+    delete ret._id
+    delete ret.__v
+  }
+})
+
 export const ChatRoomModel = model('ChatRoom', chatRoomSchema)

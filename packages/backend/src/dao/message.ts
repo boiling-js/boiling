@@ -37,4 +37,12 @@ const messageSchema = new Schema<Messages.Model>({
   }
 })
 
+messageSchema.set('toJSON', {
+  transform: (doc, ret) => {
+    ret.id = ret._id
+    delete ret._id
+    delete ret.__v
+  }
+})
+
 export const MessageModel = model('Message', messageSchema)
