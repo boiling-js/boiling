@@ -75,9 +75,17 @@ const
     historyMessages.value = await api['chat-room'](chatRoom.value.id).messages
   },
   getChatRoom = async () => {
-    chatRoom.value = await api['chat-rooms'].query({ key: `members:${store.state.user.id},${props.id}` })
+    try {
+      chatRoom.value = await api['chat-rooms'].query({ key: `members:${store.state.user.id},${+props.id}` })
+    } catch (e) {
+      if (e instanceof Error && e.message.match(/^\[404-/)) {
+        chatRoom.value = await api['chat-rooms'].add({
+          members: [store.state.user.id, +props.id]
+        })
+      } else
+        throw e
+    }
   }
-
 onMounted(() => getMessages())
 onDispatch(async m => {
   switch (m.t) {

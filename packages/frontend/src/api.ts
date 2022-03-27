@@ -81,5 +81,5 @@ api.on('resp.rejected', async error => {
     }
   ElMessage.error(msg)
   const config = response?.config
-  throw new Error(`[${ config?.method }]${ config?.url }("${ msg }")`)
+  throw new Error(`[${ response?.status }-${ config?.method }]${ config?.url }("${ msg }")`)
 })
