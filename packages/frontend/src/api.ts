@@ -34,16 +34,17 @@ interface OfficialApi {
       upd(d: { avatar: string }): Promise<void>
     }
   }
-  'chat-rooms': {
+  'chat-rooms': QueryPromise<ChatRooms.Model, any> & {
     /** 创建聊天室 */
     add(d: Pick<ChatRooms.Model, 'members' | 'name' |'avatar'>): Promise<ChatRooms.Model>
   }
   /** 聊天室 */
   'chat-room'(chatRoomId: string): {
-    messages: Promise<Messages.Model> & {
+    message(senderId: number): & {
       /** 发送消息 */
       add(d: { content: string }): Promise<Messages.Model>
     }
+    messages: Promise<Messages.Model[]>
   }
 }
 
