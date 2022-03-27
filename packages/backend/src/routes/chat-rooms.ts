@@ -40,9 +40,12 @@ export const router = new Router({
     const { content } = ctx.request.body
     const m = await ChatRoomsService.Message.create(ctx.params.chatRoomId, ctx.params.senderId, content)
     const { members } = await ChatRoomsService.get(ctx.params.chatRoomId) || {}
-    members?.forEach(memberId =>
+    members?.filter(
+      id => id !== ctx.params.senderId
+    )?.forEach(memberId =>
       clients.get(memberId)?.dispatch('MESSAGE', m)
     )
+    return m
   })
   /**
    * 获取聊天室消息列表
