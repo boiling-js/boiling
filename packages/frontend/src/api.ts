@@ -34,9 +34,11 @@ interface OfficialApi {
       upd(d: { avatar: string }): Promise<void>
     }
   }
-  'chat-rooms': QueryPromise<ChatRooms.Model, any> & {
+  'chat-rooms': QueryPromise<ChatRooms.Model, SearchQuery & {
+    disableToast?: boolean
+  }> & {
     /** 创建聊天室 */
-    add(d: Pick<ChatRooms.Model, 'members' | 'name' |'avatar'>): Promise<ChatRooms.Model>
+    add(d: Pick<ChatRooms.Model, 'members' | 'name' | 'avatar'>): Promise<ChatRooms.Model>
   }
   /** 聊天室 */
   'chat-room'(chatRoomId: string): {
@@ -79,7 +81,8 @@ api.on('resp.rejected', async error => {
       default:
         msg = '未知错误'
     }
-  ElMessage.error(msg)
+  if (!/disableToast=true/.test(response?.request.responseURL))
+    ElMessage.error(msg)
   const config = response?.config
   throw new Error(`[${ response?.status }-${ config?.method }]${ config?.url }("${ msg }")`)
 })

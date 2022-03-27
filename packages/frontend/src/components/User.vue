@@ -65,7 +65,10 @@ const
   getChatRoom = async () => {
     const members = [store.state.user.id, +props.info.id]
     try {
-      return await api['chat-rooms'].query({ key: `members:${ members.join(',') }` })
+      return await api['chat-rooms'].query({
+        disableToast: true,
+        key: `members:${ members.join(',') }`
+      })
     } catch (e) {
       if (e instanceof Error && e.message.match(/^\[404-/)) {
         return await api['chat-rooms'].add({ members })
