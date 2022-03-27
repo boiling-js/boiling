@@ -58,5 +58,7 @@ export const router = new Router({
      *   发送者信息、消息内容
      */
     const { chatRoomId } = ctx.params
-    return usePagination(ChatRoomsService.Message, ctx.query)(chatRoomId)
+    return usePagination(ChatRoomsService.Message, ctx.query, [
+      ['createdAt', -1]
+    ])(chatRoomId)
   })
