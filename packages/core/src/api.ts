@@ -42,7 +42,7 @@ const requestProxy = (a: Api, path: string, cPath = ''): Function => new Proxy((
         case 'query':
           return new Proxy(() => {}, {
             apply(target, thisArg, [ query ]): any {
-              return a.$request.get(`${path}${cPath}?${qs.stringify(query)}`)
+              return a.$request.get(`${path}${cPath}?${qs.stringify(query, { encode: false })}`)
             }
           })
       }
