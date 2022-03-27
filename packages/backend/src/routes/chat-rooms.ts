@@ -38,15 +38,11 @@ export const router = new Router({
    */
   .post(Schema.Pick(Messages.Model, ['content']), Schema.any(), '/:chatRoomId/messages/:senderId(number)', async ctx => {
     const { content } = ctx.request.body
-    await ChatRoomsService.Message.create(ctx.params.chatRoomId, ctx.params.senderId, content)
+    const m = await ChatRoomsService.Message.create(ctx.params.chatRoomId, ctx.params.senderId, content)
     const { members } = await ChatRoomsService.get(ctx.params.chatRoomId) || {}
-    members?.forEach(memberId => {
-      clients.get(memberId)?.dispatch('MESSAGE', {
-        chatRoomId: ctx.params.chatRoomId,
-        senderId: ctx.params.senderId,
-        content
-      })
-    })
+    members?.forEach(memberId =>
+      clients.get(memberId)?.dispatch('MESSAGE', m)
+    )
   })
   /**
    * 获取聊天室消息列表
