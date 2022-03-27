@@ -40,7 +40,7 @@ export const router = new Router({
       extendService(UsersService, 'search', m => m.find({
         id: { $ne: useCurUser(ctx.session).id }
       })), ctx.query
-    )()
+    )(ctx.query.key)
   })
   .get('/:id(number)', async ctx => {
     return UsersService.get(ctx.params.id)
