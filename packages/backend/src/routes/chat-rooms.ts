@@ -10,7 +10,7 @@ export const router = new Router({
    */
   .get(ChatRooms.Model, '?key', async ctx => {
     const { key } = ctx.query
-    const keywords = key.split(' ')
+    const keywords = decodeURI(key).split(' ')
     const names: string[] = []
     const members: number[] = []
     keywords.forEach(keyword => {
