@@ -3,20 +3,20 @@
     <div class="top-bar">
       <span class="icon material-icons"
             @click="$router.back()">arrow_back_ios_new</span>
-      <span>{{ props.id }}</span>
+      <span>{{ props.title }}</span>
     </div>
     <div class="room">
       <div class="content">
         <div
-          v-for="historyMessage in messagePagination?.items"
-          :key="historyMessage.chatRoomId"
+          v-for="msg in messages" :key="msg.id"
           class="item">
           <img
             class="avatar"
-            :src="`/api/${historyMessage.sender.avatar}`">
+            :src="`/api/${msg.sender.avatar}`">
           <div class="message">
-            <div class="time">{{ getLocalTime(historyMessage.createdAt) }}</div>
-            <div class="text">{{ historyMessage.content }}</div>
+            <div>{{ msg.sender.username }}</div>
+            <div class="time">{{ dayjs(msg.createdAt).format('YYYY-MM-DD') }}</div>
+            <div class="text">{{ msg.content }}</div>
           </div>
         </div>
       </div>
@@ -24,7 +24,7 @@
         <el-input
           v-model="editingMessage"
           type="textarea"
-          @keydown.enter="sendMessage"/>
+          @keyup.ctrl.enter="sendMessage"/>
       </div>
     </div>
   </div>
@@ -34,7 +34,7 @@
 import { ElInput } from 'element-plus'
 import { onMounted, ref } from 'vue'
 import dayjs from 'dayjs'
-import { ChatRooms, Messages, Pagination } from '@boiling/core'
+import { Messages } from '@boiling/core'
 import { onDispatch } from '../hooks/useWsClient'
 import { api } from '../api'
 import store from '../store'
@@ -50,50 +50,42 @@ import store from '../store'
  */
 const
   props = defineProps<{
-    id: number
+    id: string
+    title: string
   }>(),
   editingMessage = ref(''),
-  messagePagination = ref<Pagination<Messages.Model[]> | undefined>(undefined),
-  chatRoom = ref<ChatRooms.Model>({
-    id: '',
-    name: undefined,
-    avatar: undefined,
-    members: [],
-    createdAt: undefined
-  }),
-  sendMessage = async () => {
-    await api['chat-room'](`${chatRoom.value.id}`).message(store.state.user.id).add({
-      content: editingMessage.value
-    })
-    await getMessages()
-    editingMessage.value = ''
-  },
-  getLocalTime = (s: string) => {
-    return dayjs(s).format('YYYY-MM-DD HH:mm:ss')
-  },
+  messages = ref<Messages.Model[] | undefined>([]),
   getMessages = async () => {
-    await getChatRoom()
-    messagePagination.value = await api['chat-room'](chatRoom.value.id).messages.query({
-      key: ''
-    })
+    messages.value = messages.value || []
+    const { items } =
+      await api['chat-room'](props.id).messages.query({ key: '' })
+    messages.value.push(...items.reverse())
   },
-  getChatRoom = async () => {
-    try {
-      chatRoom.value = await api['chat-rooms'].query({ key: `members:${store.state.user.id},${+props.id}` })
-    } catch (e) {
-      if (e instanceof Error && e.message.match(/^\[404-/)) {
-        chatRoom.value = await api['chat-rooms'].add({
-          members: [store.state.user.id, +props.id]
+  sendMessage = async () => {
+    if (editingMessage.value) {
+      messages.value = messages.value || []
+      const m =
+        await api['chat-room'](props.id).message(store.state.user.id).add({
+          content: editingMessage.value
         })
-      } else
-        throw e
+      messages.value.push(m)
+      editingMessage.value = ''
     }
   }
+
+/**
+ * 用户打开聊天室，拉取最近的几条消息
+ *   用户向上滚动的时候，拉取更多的消息，加到消息列表的最前面
+ * 用户发送消息后，拿到响应数据，再将响应数据添加到消息列表中
+ * 用户接收消息后，把接收到消息添加到消息列表中
+ */
+
 onMounted(() => getMessages())
 onDispatch(async m => {
   switch (m.t) {
     case 'MESSAGE':
-      await getMessages()
+      messages.value = messages.value || []
+      messages.value.push(m.d)
       break
   }
 })
