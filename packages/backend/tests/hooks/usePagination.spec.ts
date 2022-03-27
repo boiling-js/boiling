@@ -32,23 +32,15 @@ describe('use Pagination', () => {
     await TestModel.deleteMany({})
   })
   it('should get target test data by use pagination.', async () => {
-    let p = await usePagination(TestService, { key: '' })<{ name: string }>()
+    let p = await usePagination(TestService, {})<{ name: string }>('')
     expect(p.count).to.be.eq(48)
     expect(p.items.length).to.be.eq(10)
     expect(p.items[0].name).to.be.eq('test0')
-    p = await usePagination(TestService, { key: '', page: 1 })<{ name: string }>()
+    p = await usePagination(TestService, { page: 1 })<{ name: string }>('')
     expect(p.items.length).to.be.eq(10)
     expect(p.items[0].name).to.be.eq('test10')
-    p = await usePagination(TestService, { key: '', page: 1, num: 15 })<{ name: string }>()
+    p = await usePagination(TestService, { page: 1, num: 15 })<{ name: string }>('')
     expect(p.items.length).to.be.eq(15)
     expect(p.items[0].name).to.be.eq('test15')
-  })
-  it('should get target test data by mapFun.', async () => {
-    const p = await usePagination(TestService, { key: '' })<{ name: string }>(
-      item => (item.name += '-foo') && item
-    )
-    for (let i = 0; i < p.items.length; i++) {
-      expect(p.items[i].name).to.be.eq(`test${i}-foo`)
-    }
   })
 })
