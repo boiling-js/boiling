@@ -16,8 +16,8 @@ describe('ChatRooms Service', () => {
     await UsersService.Model.deleteMany({})
   })
   before(async () => {
-    u0 = await UsersService.add({ username: 'sender', passwordHash: 'sender', avatar: 'sender' })
-    u1 = await UsersService.add({ username: 'receiver', passwordHash: 'receiver', avatar: 'receiver' })
+    u0 = await UsersService.add({ username: '001', passwordHash: '001', avatar: '001' })
+    u1 = await UsersService.add({ username: '002', passwordHash: '002', avatar: '002' })
   })
 
   afterEach(async () => {
