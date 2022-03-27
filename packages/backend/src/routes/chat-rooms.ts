@@ -3,6 +3,7 @@ import { ChatRooms, Messages, Router } from '@boiling/core'
 import { ChatRoomsService } from '../services/chat-rooms'
 import usePagination from '../hooks/usePagination'
 import { clients } from './ws'
+import useCurUser from '../hooks/useCurUser'
 
 export const router = new Router({
   prefix: '/chat-rooms' as '/chat-rooms'
@@ -36,13 +37,12 @@ export const router = new Router({
   /**
    * 添加消息
    */
-  .post(Schema.Pick(Messages.Model, ['content']), Schema.any(), '/:chatRoomId/messages/:senderId(number)', async ctx => {
+  .post(Schema.Pick(Messages.Model, ['content']), Schema.any(), '/:chatRoomId/messages', async ctx => {
     const { content } = ctx.request.body
-    const m = await ChatRoomsService.Message.create(ctx.params.chatRoomId, ctx.params.senderId, content)
+    const senderId = useCurUser(ctx.session).id
+    const m = await ChatRoomsService.Message.create(ctx.params.chatRoomId, senderId, content)
     const { members } = await ChatRoomsService.get(ctx.params.chatRoomId) || {}
-    members?.filter(
-      id => id !== ctx.params.senderId
-    )?.forEach(memberId =>
+    members?.filter(id => id !== senderId)?.forEach(memberId =>
       clients.get(memberId)?.dispatch('MESSAGE', m)
     )
     return m
