@@ -50,22 +50,17 @@ export const router = new Router({
   })
   /**
    * 获取聊天室消息列表
+   *
+   * 排序
+   *   按照时间升降序
+   * 数量
+   *   分页器：页码、单页数目
+   * 时间
+   *   消息创建时间范围
+   * 内容
+   *   发送者信息、消息内容
    */
   .get('/:chatRoomId/messages?key&page(number)&num(number)', async ctx => {
-    /**
-     * 获取最近十条消息
-     * 获取时间段消息列表
-     * 检索消息
-     *
-     * 排序
-     *   按照时间升降序
-     * 数量
-     *   分页器：页码、单页数目
-     * 时间
-     *   消息创建时间范围
-     * 内容
-     *   发送者信息、消息内容
-     */
     const { chatRoomId } = ctx.params
     return usePagination(ChatRoomsService.Message, ctx.query, [
       ['createdAt', -1]
