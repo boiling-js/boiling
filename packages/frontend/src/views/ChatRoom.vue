@@ -32,8 +32,8 @@
 
 <script setup lang="ts">
 import { ElInput } from 'element-plus'
-import { onMounted, reactive, ref } from 'vue'
-import { Messages } from '@boiling/core'
+import { onMounted, ref } from 'vue'
+import { ChatRooms, Messages } from '@boiling/core'
 import { onDispatch } from '../hooks/useWsClient'
 import { api } from '../api'
 import store from '../store'
@@ -52,24 +52,36 @@ const
     id: number
   }>(),
   editingMessage = ref(''),
-  historyMessages = reactive<Messages.Model[]>([]),
+  historyMessages = ref<Messages.Model[]>([]),
+  chatRoom = ref<ChatRooms.Model>({
+    id: '',
+    name: undefined,
+    avatar: undefined,
+    members: [],
+    createdAt: undefined
+  }),
   sendMessage = async () => {
-    await api['chat-room'](`[${new Date().getTime()}]:${store.state.user.id}:${props.id}:`).messages.add({
+    await api['chat-room'](`${chatRoom.value.id}`).message(store.state.user.id).add({
       content: editingMessage.value
     })
+    await getMessages()
     editingMessage.value = ''
   },
   getLocalTime = (nS: string) => {
     return new Date(parseInt(nS)).toLocaleString().replace(/:\d{1,2}$/, ' ')
   },
   getMessages = async () => {
+    await getChatRoom()
+    historyMessages.value = await api['chat-room'](chatRoom.value.id).messages
+  },
+  getChatRoom = async () => {
+    chatRoom.value = await api['chat-rooms'].query({ key: `members:${store.state.user.id},${props.id}` })
   }
 
 onMounted(() => getMessages())
 onDispatch(async m => {
   switch (m.t) {
     case 'MESSAGE':
-      historyMessages.push(m.d)
       break
   }
 })
