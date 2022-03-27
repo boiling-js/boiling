@@ -14,12 +14,12 @@ declare module '@boiling/core' {
 }
 
 describe('Router', () => {
-  const next = () => {}
-  const createCtx = (method: Router.Methods, url: string, body?: any) => <Koa.Context><any>{
-    method, url, path: url.split('?')[0],
-    req: { body }, request: { body }
-  }
   describe('Middleware', () => {
+    const next = () => {}
+    const createCtx = (method: Router.Methods, url: string, body?: any) => <Koa.Context><any>{
+      method, url, path: url.split('?')[0],
+      req: { body }, request: { body }
+    }
     it('should reveal router middlewares.', async () => {
       const r = new Router()
         .get('/0', () => 0)
