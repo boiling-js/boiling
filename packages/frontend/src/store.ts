@@ -33,8 +33,8 @@ export default createStore({
       state.user.friends[index] = friend
     },
     delFriend(state, id: number) {
-      const index = state.user.friends.findIndex(friend => friend.id === id)
-      state.user.friends = state.user.friends.splice(index - 1, 1)
+      const index = state.user.friends.findIndex(iFriend => iFriend.id === id)
+      state.user.friends.splice(index, 1)
     },
     updAvatar(state, avatar: string) {
       state.user.avatar = avatar
