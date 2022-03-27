@@ -107,13 +107,13 @@ export namespace ChatRoomsService {
       /** 发送者 id */
       senderId?: number
     }
-    export function search(chatRoomId: string, options?: SearchOptions) {
-      return Model.find({ chatRoomId }).find(
-        options ? {
-          ...(options.senderId ? { 'sender.id': options.senderId } : {}),
-          ...periodQuery('createdAt', options.period)
-        } : {}
-      )
+    export async function search(chatRoomId: string, options?: SearchOptions) {
+      await ChatRoomsService.existsOrThrow(chatRoomId)
+      const query = <Record<string, any>>{
+        ...periodQuery('createdAt', options?.period)
+      }
+      options?.senderId && (query['sender.id'] = options.senderId)
+      return Model.find({ chatRoomId }).find(options ? query : {})
     }
   }
 }
