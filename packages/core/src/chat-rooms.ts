@@ -26,7 +26,7 @@ export namespace ChatRooms {
     /** 成员列表 */
     members: Schema.array(Number),
     /** 创建时间 */
-    createdAt: Schema.from(Date)
+    createdAt: Schema.from(Date).optional()
   })
   export type Model = Schema.InferS<typeof Model>
 }
