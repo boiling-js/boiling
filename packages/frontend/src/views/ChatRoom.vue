@@ -8,7 +8,7 @@
     <div class="room">
       <div class="content">
         <div
-          v-for="historyMessage in historyMessages"
+          v-for="historyMessage in messagePagination?.items"
           :key="historyMessage.chatRoomId"
           class="item">
           <img
@@ -33,7 +33,8 @@
 <script setup lang="ts">
 import { ElInput } from 'element-plus'
 import { onMounted, ref } from 'vue'
-import { ChatRooms, Messages } from '@boiling/core'
+import dayjs from 'dayjs'
+import { ChatRooms, Messages, Pagination } from '@boiling/core'
 import { onDispatch } from '../hooks/useWsClient'
 import { api } from '../api'
 import store from '../store'
@@ -52,7 +53,7 @@ const
     id: number
   }>(),
   editingMessage = ref(''),
-  historyMessages = ref<Messages.Model[]>([]),
+  messagePagination = ref<Pagination<Messages.Model[]> | undefined>(undefined),
   chatRoom = ref<ChatRooms.Model>({
     id: '',
     name: undefined,
@@ -67,12 +68,14 @@ const
     await getMessages()
     editingMessage.value = ''
   },
-  getLocalTime = (nS: string) => {
-    return new Date(parseInt(nS)).toLocaleString().replace(/:\d{1,2}$/, ' ')
+  getLocalTime = (s: string) => {
+    return dayjs(s).format('YYYY-MM-DD HH:mm:ss')
   },
   getMessages = async () => {
     await getChatRoom()
-    historyMessages.value = await api['chat-room'](chatRoom.value.id).messages
+    messagePagination.value = await api['chat-room'](chatRoom.value.id).messages.query({
+      key: ''
+    })
   },
   getChatRoom = async () => {
     try {
@@ -90,6 +93,7 @@ onMounted(() => getMessages())
 onDispatch(async m => {
   switch (m.t) {
     case 'MESSAGE':
+      await getMessages()
       break
   }
 })

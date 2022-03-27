@@ -44,7 +44,7 @@ interface OfficialApi {
       /** 发送消息 */
       add(d: { content: string }): Promise<Messages.Model>
     }
-    messages: Promise<Messages.Model[]>
+    messages: QueryPromise<Pagination<Messages.Model[]>, SearchQuery>
   }
 }
 

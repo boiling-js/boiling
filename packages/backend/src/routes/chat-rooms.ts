@@ -2,6 +2,7 @@ import Schema from 'schemastery'
 import { ChatRooms, Messages, Router } from '@boiling/core'
 import { ChatRoomsService } from '../services/chat-rooms'
 import usePagination from '../hooks/usePagination'
+import { clients } from './ws'
 
 export const router = new Router({
   prefix: '/chat-rooms' as '/chat-rooms'
@@ -38,6 +39,14 @@ export const router = new Router({
   .post(Schema.Pick(Messages.Model, ['content']), Schema.any(), '/:chatRoomId/messages/:senderId(number)', async ctx => {
     const { content } = ctx.request.body
     await ChatRoomsService.Message.create(ctx.params.chatRoomId, ctx.params.senderId, content)
+    const { members } = await ChatRoomsService.get(ctx.params.chatRoomId) || {}
+    members?.forEach(memberId => {
+      clients.get(memberId)?.dispatch('MESSAGE', {
+        chatRoomId: ctx.params.chatRoomId,
+        senderId: ctx.params.senderId,
+        content
+      })
+    })
   })
   /**
    * 获取聊天室消息列表
