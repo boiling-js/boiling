@@ -114,16 +114,23 @@ export namespace ChatRoomsService {
      * 获取聊天室数据
      */
     export function get(id: string) {
-      return MessageModel.find({ id })
+      return Model.find({ id })
+    }
+
+    /**
+     * 消息是否存在
+     */
+    export function exists(id: string) {
+      return Model.exists({ _id: id })
     }
     /**
      * 删除消息
      * @param id
      */
     export async function del(id: string) {
-      if (!(await MessageModel.exists({ id })))
+      if (!await exists(id))
         throw new HttpError('NOT_FOUND', `id 为 '${ id }' 的消息不存在`)
-      return MessageModel.deleteOne({ id })
+      await Model.deleteOne({ _id: id })
     }
     /**
      * 通过聊天室id删除消息
@@ -131,7 +138,7 @@ export namespace ChatRoomsService {
      */
     export async function delByChatRoomId(chatRoomId: string) {
       await getOrThrow(chatRoomId)
-      return MessageModel.deleteMany({ chatRoomId })
+      await Model.deleteMany({ _id: chatRoomId })
     }
     export interface SearchOptions {
       /**
