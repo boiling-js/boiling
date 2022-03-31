@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose'
 import { Users } from '@boiling/core'
 
-const userSchema = new Schema<Users.Model>({
+export const userSchema = new Schema<Users.Model>({
   id: {
     type: Number,
     unique: true,
@@ -26,10 +26,6 @@ const userSchema = new Schema<Users.Model>({
   status: {
     type: String,
     default: 'offline'
-  },
-  chatRooms: {
-    type: [String],
-    default: []
   },
   friends: {
     type: [{

@@ -1,15 +1,26 @@
 import { Schema, model } from 'mongoose'
-import { Messages } from '@boiling/core'
-import { UserModel } from './user'
+import { Messages, Users } from '@boiling/core'
 
 const messageSchema = new Schema<Messages.Model>({
-  id: {
-    type: String,
-    unique: true,
-    required: true
-  },
   sender: {
-    type: UserModel,
+    type: new Schema<Users.BaseOut>({
+      id: {
+        type: Number,
+        required: true
+      },
+      username: {
+        type: String,
+        required: true
+      },
+      avatar: {
+        type: String,
+        required: true
+      },
+      status: {
+        type: String,
+        default: 'offline'
+      }
+    }),
     required: true
   },
   content: {
@@ -17,12 +28,20 @@ const messageSchema = new Schema<Messages.Model>({
     required: true
   },
   createdAt: {
-    type: String,
+    type: Date,
     required: true
   },
   chatRoomId: {
     type: String,
     required: true
+  }
+})
+
+messageSchema.set('toJSON', {
+  transform: (doc, ret) => {
+    ret.id = ret._id
+    delete ret._id
+    delete ret.__v
   }
 })
 

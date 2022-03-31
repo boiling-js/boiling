@@ -16,7 +16,10 @@ const router = createRouter({
     }, {
       path: '/home/chat-rooms/:id',
       component: () => import('./views/ChatRoom.vue'),
-      props: true
+      props: route => ({
+        id: route.params.id,
+        title: route.query.title
+      })
     }]
   }, {
     path: '/login',

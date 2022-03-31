@@ -2,12 +2,13 @@ import { Users } from '@boiling/core'
 import { UserModel } from '../dao/user'
 import { Seq } from '../utils'
 import fs from 'fs-extra'
+import { ChatRoomsService } from './chat-rooms'
 
 export namespace UsersService {
   export const Model = UserModel
   export type U = Omit<Users.Base, 'id'>
   export async function add(u: U) {
-    if (await exist(u.username))
+    if (await exists(u.username))
       throw new HttpError('CONFLICT', `User with the name "${ u.username }" already exists`)
     return new UserModel(Object.assign({
       id: await Seq.auto('users', 1000)
@@ -55,28 +56,21 @@ export namespace UsersService {
   export function search(key: string) {
     return Model.find({ username: new RegExp(`${key}.*`) })
   }
-  export async function exist(uname: string) {
-    return await UserModel.findOne({ username: uname }) !== null
+  export async function exists(id: number): Promise<boolean>
+  export async function exists(uname: string): Promise<boolean>
+  export async function exists(arg0: string | number) {
+    if (typeof arg0 === 'number')
+      return Model.exists({ id: arg0 })
+    else
+      return Model.exists({ username: arg0 })
   }
-  export async function getAvatar() {
-    const files = (await fs.readdir('./static/img/avatar')).map(f => `/img/avatar/${ f }`)
-    return files
-  }
-  export async function updateAvatar(id: number, avatar: string) {
-    const user = await UsersService.getOrThrow(id)
-    user.avatar = avatar
-    await user.save()
+  export async function getAvatars() {
+    return (await fs.readdir('./static/img/avatar'))
+      .map(f => `/img/avatar/${f}`)
   }
   export async function update(id: number, base: Partial<Users.Base>) {
     const user = await UsersService.getOrThrow(id)
     Object.assign(user, base)
-    await user.save()
-  }
-  export async function addChatRoom(id: number, room: string) {
-    const user = await UsersService.getOrThrow(id)
-    if (user.chatRooms.includes(room))
-      throw new HttpError('CONFLICT', `${ room }聊天室已存在`)
-    user.chatRooms.push(room)
     await user.save()
   }
   export namespace Friends {
@@ -99,7 +93,7 @@ export namespace UsersService {
         tags: [],
         remark: ''
       }, opts) })
-      await user.save()
+      await Promise.all([user.save(), ChatRoomsService.create([user.id, fUid])])
     }
     export async function del(uid: number, fUid: number) {
       const [ user, friend ] = await Promise.all([UsersService.getOrThrow(uid), UsersService.getOrThrow(fUid)])
@@ -108,6 +102,7 @@ export namespace UsersService {
         throw new HttpError('NOT_FOUND', `${ friend.username }不是你的好友`)
       user.friends.splice(index, 1)
       await user.save()
+      // TODO: 删除聊天室 and 删除对应聊天室的消息
     }
     export async function get(uid: number) {
       const target = await UsersService.getOrThrow(uid)

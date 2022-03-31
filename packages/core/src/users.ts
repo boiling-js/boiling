@@ -11,9 +11,9 @@ export namespace Users {
     id: Schema.number(),
     /** 用户名 */
     username: Schema.string(),
-    /** 加密的用户密码 */
-    avatar: Schema.string(),
     /** 用户头像 */
+    avatar: Schema.string(),
+    /** 加密的用户密码 */
     passwordHash: Schema.string(),
     /** 用户状态 */
     status: Status.optional()
@@ -28,9 +28,7 @@ export namespace Users {
     /** 用户好友 */
     friends: Schema.array(Users.Friend),
     /** 用户标签 */
-    tags: Schema.array(Schema.string()),
-    /** 聊天室 id 列表 */
-    chatRooms: Schema.array(Schema.string())
+    tags: Schema.array(Schema.string())
   }))
   export type Model = Schema.InferS<typeof Model>
   /** 用户数据出口 */

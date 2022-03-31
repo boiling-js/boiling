@@ -1,20 +1,17 @@
 import { createStore } from 'vuex'
-import { Users, ChatRooms } from '@boiling/core'
+import { Users } from '@boiling/core'
 import CreatePersistedState from 'vuex-persistedstate'
 import { api } from './api'
 
 export default createStore({
   state: {
     isHiddenLeftSelector: false,
-    chatRoom: <ChatRooms.Base>{
-    },
     user: <Users.Out>{
       id: 0,
       username: '',
       avatar: '',
       tags: [],
       friends: [],
-      chatRooms: [],
       status: 'online'
     }
   },
@@ -36,8 +33,8 @@ export default createStore({
       state.user.friends[index] = friend
     },
     delFriend(state, id: number) {
-      const index = state.user.friends.findIndex(friend => friend.id === id)
-      state.user.friends = state.user.friends.splice(index - 1, 1)
+      const index = state.user.friends.findIndex(iFriend => iFriend.id === id)
+      state.user.friends.splice(index, 1)
     },
     updAvatar(state, avatar: string) {
       state.user.avatar = avatar

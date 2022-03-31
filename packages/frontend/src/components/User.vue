@@ -14,7 +14,9 @@
       class="avatar" :style="{
         backgroundImage: `url(/api${info.avatar})`
       }"/>
-    <div :class="`dot ${info.status}`"></div>
+    <div
+      v-if="type === 'inline'"
+      :class="`dot ${info.status}`"/>
     <div class="info">
       {{ info.remark || info.username }}<span class="id">#{{ info.id }}</span>
     </div>
@@ -23,7 +25,11 @@
       class="operates">
       <span v-if="isFriend"
             class="material-icons"
-            @click="$router.push(`/home/chat-rooms/${ info.id }`)">chat_bubble_outline</span>
+            @click="async () => $router.push(
+              `/home/chat-rooms/${ (await getChatRoom()).id }?title=${ info.remark || info.username }`
+            )">
+        chat_bubble_outline
+      </span>
       <span class="material-icons"
             @click="$refs.configureFriend.show()">{{ isFriend ? 'settings' : 'add' }}</span>
     </div>
@@ -42,6 +48,7 @@ import { computed } from 'vue'
 import { useStore } from 'vuex'
 import ConfigureFriend from './ConfigureFriend.vue'
 import Avatar from './Avatar.vue'
+import { api } from '../api'
 
 const
   store = useStore(),
@@ -54,7 +61,21 @@ const
   isFriend = computed(() => store.state.user.friends.findIndex(
     (item: Users.Out['friends'][number]) => item.id === props.info.id
   ) !== -1),
-  isMe = computed(() => store.state.user.id === props.info.id)
+  isMe = computed(() => store.state.user.id === props.info.id),
+  getChatRoom = async () => {
+    const members = [store.state.user.id, +props.info.id]
+    try {
+      return await api['chat-rooms'].query({
+        disableToast: true,
+        key: `members:${ members.join(',') }`
+      })
+    } catch (e) {
+      if (e instanceof Error && e.message.match(/^\[404-/)) {
+        return await api['chat-rooms'].add({ members })
+      } else
+        throw e
+    }
+  }
 </script>
 
 <style lang="scss" scoped>

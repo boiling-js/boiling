@@ -11,17 +11,11 @@ export namespace Messages {
     /** 内容 */
     content: Schema.string(),
     /** 发送时间 */
-    createdAt: Schema.string(),
+    createdAt: Schema.from(Date),
     /**
      * id
      *
-     * 当聊天室为私聊、讨论组时
-     *   格式为 `[createdAt]:member0Id:member1Id:`
-     *   创建者位于第一个
-     *   createAt 位于第一个方便解构运算
-     *   成员被 `::` 包裹防止搜索时出现歧义
-     * 当聊天室为 channel 时
-     *   格式为 `channelId`
+     * 聊天室id
      */
     chatRoomId: Schema.string()
   })

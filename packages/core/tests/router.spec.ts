@@ -14,12 +14,12 @@ declare module '@boiling/core' {
 }
 
 describe('Router', () => {
-  const next = () => {}
-  const createCtx = (method: Router.Methods, url: string, body?: any) => <Koa.Context><any>{
-    method, url, path: url.split('?')[0],
-    req: { body }, request: { body }
-  }
   describe('Middleware', () => {
+    const next = () => {}
+    const createCtx = (method: Router.Methods, url: string, body?: any) => <Koa.Context><any>{
+      method, url, path: url.split('?')[0],
+      req: { body }, request: { body }
+    }
     it('should reveal router middlewares.', async () => {
       const r = new Router()
         .get('/0', () => 0)
@@ -46,11 +46,21 @@ describe('Router', () => {
     it('should reveal router middlewares with router prefix.', async () => {
       const r = new Router({ prefix: '/users' as '/users' })
         .get(Schema.number(), '/a', () => 2)
+        .post(Schema.string(), '/:b', ({ params }) => params.b)
+        .post(Schema.string(), '/:c/d', ({ params }) => params.c)
       const middleware = r.middleware()
       await expect(middleware(createCtx('get', '/n'), next))
         .to.be.eventually.eq(undefined)
       await expect(middleware(createCtx('get', '/users/a'), next))
         .to.be.eventually.eq(2)
+      await expect(middleware(createCtx('get', '/users/a'), next))
+        .to.be.eventually.eq(2)
+      await expect(middleware(createCtx('post', '/users/1'), next))
+        .to.be.eventually.eq('1')
+      await expect(middleware(createCtx('post', '/users/1/d'), next))
+        .to.be.eventually.eq('1')
+      await expect(middleware(createCtx('post', '/users/:asdi:12sd/d'), next))
+        .to.be.eventually.eq(':asdi:12sd')
     })
     it('should reveal router middlewares with params.', async () => {
       const r = new Router({ prefix: '/users' as '/users' })
@@ -130,11 +140,14 @@ describe('Router', () => {
       url.param.fuu.schema('2')
     })
     describe('Type', () => {
-      it('should resolve no type.', function () {
+      it('should resolve no type.', () => {
         const t0 = resolveType('')
-        t0.schema('1')
-        expect(t0.regex.test('ahhh'))
-          .to.be.eq(true)
+        const strArr = ['1', 'hi:12:12', 'sad.,i7']
+        strArr.forEach(str => {
+          t0.schema(str)
+          expect(t0.regex.test(str))
+            .to.be.eq(true)
+        })
         // @ts-ignore
         expect(t0.schema.bind(null, 1))
           .to.throw('expected string but got 1')

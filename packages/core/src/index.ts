@@ -9,10 +9,12 @@ export interface Pagination<Item> {
   count: number
   items: Item[]
 }
-export interface SearchQuery {
-  key: string
+export interface Paginate {
   num?: number
   page?: number
+}
+export interface SearchQuery extends Paginate {
+  key: string
 }
 
 export * from './users'

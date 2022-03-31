@@ -40,7 +40,7 @@ export const router = new Router({
       extendService(UsersService, 'search', m => m.find({
         id: { $ne: useCurUser(ctx.session).id }
       })), ctx.query
-    )()
+    )(ctx.query.key)
   })
   .get('/:id(number)', async ctx => {
     return UsersService.get(ctx.params.id)
@@ -109,11 +109,11 @@ export const router = new Router({
     console.log(ctx.params)
   })
   .get('/avatars', async () => {
-    return UsersService.getAvatar()
+    return UsersService.getAvatars()
   })
   .patch('/:id(uid)/avatar', async ctx => {
     const { avatar } = ctx.request.body
     if (!avatar)
       throw new HttpError('BAD_REQUEST', '头像不能为空')
-    return UsersService.updateAvatar(useTarget(ctx.session, ctx.params.id), avatar)
+    return UsersService.update(useTarget(ctx.session, ctx.params.id), { avatar })
   })

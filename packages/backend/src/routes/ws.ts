@@ -54,7 +54,7 @@ const waitIdentify = <T extends Messages.PickTarget<Messages.Opcodes.IDENTIFY, M
   })
 })
 
-export const senders = new Map<string, Sender>()
+export const clients = new Map<number, Sender>()
 
 /**
  * 基础流程：
@@ -77,7 +77,7 @@ export const router: Middleware = async (context, next) => {
   const sender = new Sender(ws)
   sender.hello()
   new Promise(async (resolve, reject) => {
-    let uid: string | undefined
+    let uid: number | undefined
     let isIdentified = false
     // 五秒内发送鉴权
     setTimeout(() => {
@@ -139,7 +139,7 @@ export const router: Middleware = async (context, next) => {
         reject(e)
       }
     })
-    uid && senders.set(uid, sender)
+    uid && clients.set(uid, sender)
   }).catch(e => {
     if (e instanceof HttpError)
       ws.close(e.code + 4000, e.msg)

@@ -15,6 +15,7 @@ app.keys = ['hker92hjkugfkerbl.e[gewkg68']
 import { router as WSRouter } from './routes/ws'
 import { router as UsersRouter } from './routes/users'
 import { router as ChannelsRouter } from './routes/channels'
+import { router as ChatRoomsRouter } from './routes/chat-rooms'
 import { Middlewares } from './middlewares'
 
 app.ws.use(WSRouter)
@@ -27,6 +28,7 @@ app
   .use(Middlewares.returnBody)
   .use(UsersRouter.middleware())
   .use(ChannelsRouter.middleware())
+  .use(ChatRoomsRouter.middleware())
 
 const {
   PORT = '8080',
