@@ -27,6 +27,10 @@ export namespace ChatRoomsService {
       createdAt: new Date()
     }).save()
   }
+  /**
+   * 判断聊天室是否存在
+   * @param id 聊天室 id
+   */
   export function exists(id: string): Promise<boolean>
   export function exists(members: number[]): Promise<boolean>
   export function exists(arg0: string | number[]): Promise<boolean>
@@ -37,6 +41,10 @@ export namespace ChatRoomsService {
       return Model.exists({ _id: arg0 })
     }
   }
+  /**
+   * 判断聊天室是否存在且抛出异常
+   * @param arg0
+   */
   export function existsOrThrow(arg0: string | number[]) {
     return exists(arg0).then(exists => {
       if (!exists)
@@ -48,6 +56,11 @@ export namespace ChatRoomsService {
     })
   }
   type GetReturnType = ReturnType<typeof Model.findOne>
+  /**
+   * 获取聊天室 可通过id 或 members（仅限私聊）
+   * @param id 聊天室 id
+   * @param members 聊天室成员
+   */
   export function get(id: string): GetReturnType
   export function get(members: number[]): GetReturnType
   export function get(arg0: string | number[]): GetReturnType
@@ -58,10 +71,18 @@ export namespace ChatRoomsService {
       return Model.findOne({ id: arg0 })
     }
   }
+  /**
+   * 获取聊天室且抛出异常 可通过id 或 members（仅限私聊）
+   * @param arg0
+   */
   export async function getOrThrow(arg0: string | number[]) {
     await existsOrThrow(arg0)
     return get(arg0)
   }
+  /**
+   * 删除聊天室
+   * @param id 聊天室id
+   */
   export async function del(id: string) {
     await existsOrThrow(id)
     return Model.deleteOne({ _id: id })
@@ -95,6 +116,23 @@ export namespace ChatRoomsService {
     export function get(id: string) {
       return MessageModel.find({ id })
     }
+    /**
+     * 删除消息
+     * @param id
+     */
+    export async function del(id: string) {
+      if (!(await MessageModel.exists({ id })))
+        throw new HttpError('NOT_FOUND', `id 为 '${ id }' 的消息不存在`)
+      return MessageModel.deleteOne({ id })
+    }
+    /**
+     * 通过聊天室id删除消息
+     * @param chatRoomId
+     */
+    export async function delByChatRoomId(chatRoomId: string) {
+      await getOrThrow(chatRoomId)
+      return MessageModel.deleteMany({ chatRoomId })
+    }
     export interface SearchOptions {
       /**
        * 时间段
@@ -107,6 +145,12 @@ export namespace ChatRoomsService {
       /** 发送者 id */
       senderId?: number
     }
+
+    /**
+     * 查询消息
+     * @param chatRoomId
+     * @param options
+     */
     export function search(chatRoomId: string, options?: SearchOptions) {
       const query = <Record<string, any>>{
         ...periodQuery('createdAt', options?.period)
