@@ -144,5 +144,28 @@ describe('ChatRooms Service', () => {
         ChatRoomsService.Message.search('623f1b13e11111f3c2debd48')
       ).to.be.eventually.have.lengthOf(0)
     })
+    it('should delete message by id', async () => {
+      const { id } = await ChatRoomsService.create([u0.id, u1.id])
+      const m = await ChatRoomsService.Message.create(id, u0.id, 'hello')
+      expect(m.content).to.equal('hello')
+      await expect(
+        ChatRoomsService.Message.del('623f1b13e11111f3c2debd48'),
+        'throw `NOT_FOUND` error'
+      ).to.be.eventually.rejectedWith('[404] id 为 \'623f1b13e11111f3c2debd48\' 的消息不存在')
+      await ChatRoomsService.Message.del(m.id)
+      await expect(ChatRoomsService.Message.exists(m.id)).to.be.eventually.equal(false)
+    })
+    it('should delete all messages in the chatRoom by chatRoom id ', async () => {
+      const { id } = await ChatRoomsService.create([u0.id, u1.id])
+      for (const msg in ['hi', 'hello', 'world']) {
+        await ChatRoomsService.Message.create(id, u0.id, msg)
+      }
+      await expect(
+        ChatRoomsService.Message.delByChatRoomId('623f1b13e11111f3c2debd48'),
+        'throw `NOT_FOUND` error'
+      ).to.be.eventually.rejectedWith('[404] id 为 \'623f1b13e11111f3c2debd48\' 的聊天室不存在')
+      await ChatRoomsService.Message.delByChatRoomId(id)
+      expect(ChatRoomsService.Message.search(id)).to.be.eventually.have.lengthOf(0)
+    })
   })
 })
