@@ -3,11 +3,19 @@
     <el-tabs tab-position="top" style="height: 200px;">
       <el-tab-pane label="在线">
         <user
+          v-for="friend in friends.filter(item => item.status === 'online')" :key="friend.id"
+          :info="friend"/>
+      </el-tab-pane>
+      <el-tab-pane label="全部">
+        <user
           v-for="friend in friends" :key="friend.id"
           :info="friend"/>
       </el-tab-pane>
-      <el-tab-pane label="全部">全部</el-tab-pane>
-      <el-tab-pane label="离线">离线</el-tab-pane>
+      <el-tab-pane label="离线">
+        <user
+          v-for="friend in friends.filter(item => item.status === 'offline')" :key="friend.id"
+          :info="friend"/>
+      </el-tab-pane>
       <el-tab-pane label="已屏蔽">已屏蔽</el-tab-pane>
     </el-tabs>
   </div>
