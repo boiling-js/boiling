@@ -5,6 +5,7 @@ import cap from 'chai-as-promised'
 use(cap)
 
 import { UsersService } from '../../src/services/users'
+import { ChatRoomsService } from '../../src/services/chat-rooms'
 
 after(() => {
   process.exit(0)
@@ -13,6 +14,8 @@ after(() => {
 describe('Users Service', function () {
   afterEach(async () => {
     await UsersService.Model.deleteMany({})
+    await ChatRoomsService.Model.deleteMany({})
+    await ChatRoomsService.Message.Model.deleteMany({})
   })
   it('should add user.', async function () {
     expect(await UsersService.exists('test')).to.be.eq(false)
@@ -154,8 +157,16 @@ describe('Users Service', function () {
     await UsersService.Friends.add(id, friend1.id)
     await UsersService.Friends.del(id, friend.id)
     const addFriend = await UsersService.Friends.get(id)
+    const chaRoom = await ChatRoomsService.get([id, friend1.id])
+    for (const msg in ['hi', 'hello', 'world']) {
+      await ChatRoomsService.Message.create(chaRoom!.id, friend1.id, msg)
+    }
     expect(addFriend.length).to.be.eq(1)
     expect(addFriend[0].id).to.be.eq(friend1.id)
+    await expect(ChatRoomsService.Message.get(chaRoom!.id)).to.be.eventually.lengthOf(3)
+    await UsersService.Friends.del(id, friend1.id)
+    await expect(UsersService.Friends.get(id)).to.be.eventually.lengthOf(0)
+    await expect(ChatRoomsService.Message.get(chaRoom!.id)).to.be.eventually.lengthOf(0)
   })
   it('should get all avatar', async function () {
     mockFs({

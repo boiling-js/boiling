@@ -85,7 +85,8 @@ export namespace ChatRoomsService {
    */
   export async function del(id: string) {
     await existsOrThrow(id)
-    return Model.deleteOne({ _id: id })
+    await Message.delByChatRoomId(id)
+    await Model.deleteOne({ _id: id })
   }
 
   export namespace Message {
@@ -138,7 +139,7 @@ export namespace ChatRoomsService {
      */
     export async function delByChatRoomId(chatRoomId: string) {
       await getOrThrow(chatRoomId)
-      await Model.deleteMany({ _id: chatRoomId })
+      await Model.deleteMany({ chatRoomId })
     }
     export interface SearchOptions {
       /**
