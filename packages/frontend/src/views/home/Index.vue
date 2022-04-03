@@ -25,8 +25,8 @@
       </div>
       <div class="chat-bar">
         <section @click="$router.push('/home/friends')">好友</section>
-        <section @click="chatType = 'channel'">频道</section>
-        <section @click="chatType = 'group'">讨论组</section>
+        <section @click="$router.push('/home/channels')">频道</section>
+        <section @click="$router.push('/home/groups')">讨论组</section>
         <div class="chats">
           <div class="title">
             私信
