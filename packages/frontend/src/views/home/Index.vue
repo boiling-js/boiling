@@ -44,19 +44,16 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { ElTooltip, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem, ElMessageBox } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
 import SearchUser from '../../components/SearchUser.vue'
 import { useRouter } from 'vue-router'
 
-type ChatType = 'friend' | 'channel' | 'group'
-
 const
   store = useStore(),
   user = computed(() => store.state.user),
-  chatType = ref<ChatType>('friend'),
   status = computed(() => store.state.user.status),
   router = useRouter(),
   updateStatus = async (status: string) => {
