@@ -43,7 +43,7 @@ onMounted(refresh)
 
 <style scoped lang="scss">
 div.friends {
-  padding: 20px;
+  padding: 30px 20px;
   div.el-tab-pane {
     display: flex;
     flex-direction: column;
