@@ -80,6 +80,15 @@ export namespace ChatRoomsService {
     return get(arg0)
   }
   /**
+   * 获取讨论组通过用户id
+   * @param uid 用户id
+   */
+  export async function getGroupByUid(uid: number) {
+    const chatRooms = await Model.find({ members: { $in: [uid], $not: { $size: 2 } } })
+    if (!chatRooms) throw new HttpError('NOT_FOUND', `uid 为 ${ uid } 的讨论组不存在`)
+    return chatRooms
+  }
+  /**
    * 删除聊天室
    * @param id 聊天室id
    */
