@@ -12,6 +12,9 @@
         @click="$refs.createGroup.open"
       >add</span>
     </div>
+    <div class="groups-list">
+
+    </div>
   </div>
   <create-group ref="createGroup"/>
 </template>
@@ -20,7 +23,16 @@
 import { ElInput } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import CreateGroup from '../../components/CreateGroup.vue'
+import { api } from '../../api'
+import { onMounted, ref } from 'vue'
+import { ChatRooms } from '@boiling/core'
 
+const
+  groups = ref<ChatRooms.Model[]>([]),
+  getGroups = async () => {
+  groups.value = await api.user('@me').groups
+}
+onMounted(getGroups)
 </script>
 
 <style lang="scss" scoped>

@@ -17,6 +17,8 @@ interface OfficialApi {
       /** 更改用户状态 */
       upd(d: { status: Users.Status }): Promise<void>
     }
+    /** 获取讨论组 */
+    groups: Promise<ChatRooms.Model[]>
     /** 获取好友列表 */
     friends: Promise<Users.FriendOut[]> & {
       /** 添加好友 */
