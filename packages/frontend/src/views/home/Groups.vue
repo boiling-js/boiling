@@ -13,25 +13,29 @@
       >add</span>
     </div>
     <div class="groups-list">
-
+      <group
+        v-for="group in groups"
+        :key="group.id"
+        :group="group"/>
     </div>
   </div>
   <create-group ref="createGroup"/>
 </template>
 
 <script lang="ts" setup>
+import { onMounted, ref } from 'vue'
 import { ElInput } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
-import CreateGroup from '../../components/CreateGroup.vue'
 import { api } from '../../api'
-import { onMounted, ref } from 'vue'
 import { ChatRooms } from '@boiling/core'
+import CreateGroup from '../../components/CreateGroup.vue'
+import Group from '../../components/Group.vue'
 
 const
   groups = ref<ChatRooms.Model[]>([]),
   getGroups = async () => {
-  groups.value = await api.user('@me').groups
-}
+    groups.value = await api.user('@me').groups
+  }
 onMounted(getGroups)
 </script>
 
