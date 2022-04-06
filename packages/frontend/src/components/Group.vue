@@ -85,18 +85,18 @@ const props = defineProps({
   > div.operates {
     display: flex;
     align-items: center;
-  }
-  > div.operates > span.material-icons {
-    padding: 4px;
-    margin: 0 5px;
-    cursor: pointer;
-    background-color: var(--bg-color);
-    border-radius: 6px;
-    opacity: 0.5;
-    transition: 0.3s;
-    &:hover {
-      opacity: 1;
+    > span.material-icons {
+      padding: 4px;
+      margin: 0 5px;
+      cursor: pointer;
+      border-radius: 6px;
+      opacity: 0.5;
+      transition: 0.3s;
+      &:hover {
+        opacity: 1;
+      }
     }
   }
 }
+
 </style>
