@@ -4,7 +4,10 @@
       class="avatar" :style="{
         backgroundImage: `url(/api${group.avatar})`
       }">
-      <div class="avatar-shadow"> 更换头像 </div>
+      <div
+        class="avatar-shadow"
+        @click="$refs.avatar.show"
+      > 更换头像 </div>
     </div>
     <div class="info">
       {{ props.group.name }}
@@ -20,12 +23,14 @@
     </div>
     <configure-group ref="configureGroup"/>
   </div>
+  <avatar ref="avatar"/>
 </template>
 
 <script setup lang="ts">
 import { defineProps } from 'vue'
 import { ChatRooms } from '@boiling/core'
 import ConfigureGroup from './ConfigureGroup.vue'
+import Avatar from './Avatar.vue'
 
 const props = defineProps({
   group: {
