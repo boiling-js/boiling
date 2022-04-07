@@ -3,7 +3,9 @@
     <div
       class="avatar" :style="{
         backgroundImage: `url(/api${group.avatar})`
-      }"/>
+      }">
+      <div class="avatar-shadow"> 更换头像 </div>
+    </div>
     <div class="info">
       {{ props.group.name }}
     </div>
@@ -14,14 +16,16 @@
         chat_bubble_outline
       </span>
       <span class="material-icons"
-            @click="() => {}">settings</span>
+            @click="$refs.configureGroup.open">settings</span>
     </div>
+    <configure-group ref="configureGroup"/>
   </div>
 </template>
 
 <script setup lang="ts">
 import { defineProps } from 'vue'
 import { ChatRooms } from '@boiling/core'
+import ConfigureGroup from './ConfigureGroup.vue'
 
 const props = defineProps({
   group: {
@@ -41,7 +45,6 @@ const props = defineProps({
   padding: 10px;
   margin: 10px;
   color: var(--color-text-regular);
-  cursor: pointer;
   border-radius: 6px;
   transition: 0.3s;
   &:hover {
@@ -56,6 +59,7 @@ const props = defineProps({
     height: var(--size);
     line-height: var(--size);
     text-align: center;
+    cursor: pointer;
     background-size: cover;
     border-radius: 50%;
     > div.avatar-shadow {
@@ -63,7 +67,7 @@ const props = defineProps({
       width: var(--size);
       height: var(--size);
       font-size: 11px;
-      background-color: #2f3237;
+      background-color: #151414;
       border-radius: 50%;
       opacity: 0;
     }
