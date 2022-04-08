@@ -4,9 +4,8 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "build": "ts-node ../../scripts/pre-build.ts & tsc -p tsconfig.pro.json",
-    "start:pro": "yarn build && node -r dotenv/config dist/index.js",
-    "start:dev": "nodemon -r dotenv/config src/index.ts"
+    "build": "ts-node ../../scripts/pre-build.ts && tsc -p tsconfig.pro.json",
+    "start": "node start.js"
   },
   "dependencies": {
     "@boiling/core": "^0.1.0",

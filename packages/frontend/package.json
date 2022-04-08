@@ -4,11 +4,11 @@
   "main": "dist/index.html",
   "license": "MIT",
   "scripts": {
-    "start": "electron -r ts-node/register scripts/electron-runner.ts"
+    "start": "vite",
+    "build": "vite build"
   },
   "dependencies": {
     "axios": "^0.24.0",
-    "electron": "^16.0.5",
     "element-plus": "^1.2.0-beta.6",
     "vue": "^3.2.26",
     "vue-router": "^4.0.12",
