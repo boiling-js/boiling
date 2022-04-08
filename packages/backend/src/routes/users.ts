@@ -7,6 +7,7 @@ import usePagination from '../hooks/usePagination'
 import extendService from '../hooks/extendService'
 import useTarget from '../hooks/useTarget'
 import useCurUser from '../hooks/useCurUser'
+import { ChatRoomsService } from '../services/chat-rooms'
 
 declare module '@boiling/core' {
   interface PathParams {
@@ -116,4 +117,10 @@ export const router = new Router({
     if (!avatar)
       throw new HttpError('BAD_REQUEST', '头像不能为空')
     return UsersService.update(useTarget(ctx.session, ctx.params.id), { avatar })
+  })
+  /**
+   * 获取用户讨论组
+   */
+  .get('/:id(uid)/groups', async ctx => {
+    return ChatRoomsService.getGroupByUid(useTarget(ctx.session, ctx.params.id))
   })

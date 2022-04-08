@@ -25,8 +25,8 @@
       </div>
       <div class="chat-bar">
         <section @click="$router.push('/home/friends')">好友</section>
-        <section @click="chatType = 'channel'">频道</section>
-        <section @click="chatType = 'group'">讨论组</section>
+        <section @click="$router.push('/home/channels')">频道</section>
+        <section @click="$router.push('/home/groups')">讨论组</section>
         <div class="chats">
           <div class="title">
             私信
@@ -44,19 +44,16 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { ElTooltip, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem, ElMessageBox } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
 import SearchUser from '../../components/SearchUser.vue'
 import { useRouter } from 'vue-router'
 
-type ChatType = 'friend' | 'channel' | 'group'
-
 const
   store = useStore(),
   user = computed(() => store.state.user),
-  chatType = ref<ChatType>('friend'),
   status = computed(() => store.state.user.status),
   router = useRouter(),
   updateStatus = async (status: string) => {

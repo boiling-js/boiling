@@ -1,6 +1,9 @@
 <template>
   <div class="title-bar">
-    <div class="name"><img width="16" src="../assets/img/favicon.svg" alt="主页">Boiling</div>
+    <div class="name" @click="$router.push('/home')">
+      <img width="16" src="../assets/img/favicon.svg" alt="主页">
+      Boiling
+    </div>
     <div class="opts">
       <div class="circle-btn min" @click="min"/>
       <div class="circle-btn max" @click="max"/>

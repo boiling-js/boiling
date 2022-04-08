@@ -11,13 +11,15 @@ after(() => {
   process.exit(0)
 })
 describe('ChatRooms Service', () => {
-  let u0: Users.Base, u1: Users.Base
+  let u0: Users.Base, u1: Users.Base, u2: Users.Base, u3: Users.Base
   after(async () => {
     await UsersService.Model.deleteMany({})
   })
   before(async () => {
     u0 = await UsersService.add({ username: '001', passwordHash: '001', avatar: '001' })
     u1 = await UsersService.add({ username: '002', passwordHash: '002', avatar: '002' })
+    u2 = await UsersService.add({ username: '003', passwordHash: '003', avatar: '003' })
+    u3 = await UsersService.add({ username: '004', passwordHash: '004', avatar: '004' })
   })
 
   afterEach(async () => {
@@ -73,6 +75,17 @@ describe('ChatRooms Service', () => {
       .to.be.eventually.equal(null)
     await expect(ChatRoomsService.del('623f1b13e11111f3c2debd48'))
       .to.be.eventually.be.rejectedWith('[404] id 为 \'623f1b13e11111f3c2debd48\' 的聊天室不存在')
+  })
+  it('should get groups by uid', async () => {
+    await Promise.all([
+      ChatRoomsService.create([u0.id, u1.id]),
+      ChatRoomsService.create([u0.id, u2.id, u3.id]),
+      ChatRoomsService.create([u0.id, u1.id, u3.id])
+    ])
+    const groups = await ChatRoomsService.getGroupByUid(u0.id)
+    expect(groups).to.have.lengthOf(2)
+    expect(groups[0].members).to.be.deep.equal([u0.id, u2.id, u3.id])
+    expect(groups[1].members).to.be.deep.equal([u0.id, u1.id, u3.id])
   })
   describe('Message', function () {
     it('should push message to target chat room.', async () => {
@@ -143,6 +156,29 @@ describe('ChatRooms Service', () => {
       await expect(
         ChatRoomsService.Message.search('623f1b13e11111f3c2debd48')
       ).to.be.eventually.have.lengthOf(0)
+    })
+    it('should delete message by id', async () => {
+      const { id } = await ChatRoomsService.create([u0.id, u1.id])
+      const m = await ChatRoomsService.Message.create(id, u0.id, 'hello')
+      expect(m.content).to.equal('hello')
+      await expect(
+        ChatRoomsService.Message.del('623f1b13e11111f3c2debd48'),
+        'throw `NOT_FOUND` error'
+      ).to.be.eventually.rejectedWith('[404] id 为 \'623f1b13e11111f3c2debd48\' 的消息不存在')
+      await ChatRoomsService.Message.del(m.id)
+      await expect(ChatRoomsService.Message.exists(m.id)).to.be.eventually.equal(false)
+    })
+    it('should delete all messages in the chatRoom by chatRoom id ', async () => {
+      const { id } = await ChatRoomsService.create([u0.id, u1.id])
+      for (const msg in ['hi', 'hello', 'world']) {
+        await ChatRoomsService.Message.create(id, u0.id, msg)
+      }
+      await expect(
+        ChatRoomsService.Message.delByChatRoomId('623f1b13e11111f3c2debd48'),
+        'throw `NOT_FOUND` error'
+      ).to.be.eventually.rejectedWith('[404] id 为 \'623f1b13e11111f3c2debd48\' 的聊天室不存在')
+      await ChatRoomsService.Message.delByChatRoomId(id)
+      expect(ChatRoomsService.Message.search(id)).to.be.eventually.have.lengthOf(0)
     })
   })
 })

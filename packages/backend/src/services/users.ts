@@ -100,9 +100,10 @@ export namespace UsersService {
       const index = user.friends.findIndex((item) => item.id === fUid)
       if (index === -1)
         throw new HttpError('NOT_FOUND', `${ friend.username }不是你的好友`)
+      const chatRoom = await ChatRoomsService.get([user.id, fUid])
+      await ChatRoomsService.del(chatRoom!.id)
       user.friends.splice(index, 1)
       await user.save()
-      // TODO: 删除聊天室 and 删除对应聊天室的消息
     }
     export async function get(uid: number) {
       const target = await UsersService.getOrThrow(uid)

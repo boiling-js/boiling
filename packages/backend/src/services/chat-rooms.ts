@@ -80,12 +80,22 @@ export namespace ChatRoomsService {
     return get(arg0)
   }
   /**
+   * 获取讨论组通过用户id
+   * @param uid 用户id
+   */
+  export async function getGroupByUid(uid: number) {
+    const chatRooms = await Model.find({ members: { $in: [uid], $not: { $size: 2 } } })
+    if (!chatRooms) throw new HttpError('NOT_FOUND', `uid 为 ${ uid } 的讨论组不存在`)
+    return chatRooms
+  }
+  /**
    * 删除聊天室
    * @param id 聊天室id
    */
   export async function del(id: string) {
     await existsOrThrow(id)
-    return Model.deleteOne({ _id: id })
+    await Message.delByChatRoomId(id)
+    await Model.deleteOne({ _id: id })
   }
 
   export namespace Message {
@@ -114,16 +124,23 @@ export namespace ChatRoomsService {
      * 获取聊天室数据
      */
     export function get(id: string) {
-      return MessageModel.find({ id })
+      return Model.find({ id })
+    }
+
+    /**
+     * 消息是否存在
+     */
+    export function exists(id: string) {
+      return Model.exists({ _id: id })
     }
     /**
      * 删除消息
      * @param id
      */
     export async function del(id: string) {
-      if (!(await MessageModel.exists({ id })))
+      if (!await exists(id))
         throw new HttpError('NOT_FOUND', `id 为 '${ id }' 的消息不存在`)
-      return MessageModel.deleteOne({ id })
+      await Model.deleteOne({ _id: id })
     }
     /**
      * 通过聊天室id删除消息
@@ -131,7 +148,7 @@ export namespace ChatRoomsService {
      */
     export async function delByChatRoomId(chatRoomId: string) {
       await getOrThrow(chatRoomId)
-      return MessageModel.deleteMany({ chatRoomId })
+      await Model.deleteMany({ chatRoomId })
     }
     export interface SearchOptions {
       /**
