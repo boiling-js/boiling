@@ -1,17 +1,21 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-export default defineConfig({
-  server: {
-    port: 17980,
-    proxy: {
-      '/api': {
-        ws: true,
-        target: 'http://localhost:32141',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+export default defineConfig(({ mode }) => {
+  process.env = Object.assign({}, process.env, loadEnv(mode, process.cwd()))
+
+  return {
+    server: {
+      port: Number(process.env.VITE_PORT) || 3000,
+      proxy: {
+        '/api': {
+          ws: true,
+          target: process.env.VITE_API_TARGET,
+          changeOrigin: true,
+          rewrite: path => path.replace(/^\/api/, '')
+        }
       }
-    }
-  },
-  plugins: [vue()]
+    },
+    plugins: [ vue() ]
+  }
 })
