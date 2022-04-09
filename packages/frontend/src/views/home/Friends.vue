@@ -1,13 +1,13 @@
 <template>
   <el-tabs class="friends" tab-position="top">
-    <el-tab-pane label="在线">
-      <user
-        v-for="friend in friends.filter(item => item.status === 'online')" :key="friend.id"
-        :info="friend"/>
-    </el-tab-pane>
     <el-tab-pane label="全部">
       <user
         v-for="friend in friends" :key="friend.id"
+        :info="friend"/>
+    </el-tab-pane>
+    <el-tab-pane label="在线">
+      <user
+        v-for="friend in friends.filter(item => item.status === 'online')" :key="friend.id"
         :info="friend"/>
     </el-tab-pane>
     <el-tab-pane label="离线">

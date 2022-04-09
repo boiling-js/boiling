@@ -11,8 +11,8 @@
       </el-form-item>
       <el-form-item label="性别">
         <el-select v-model="form.sex" placeholder="点击选择性别">
-          <el-option label="男" value="male"></el-option>
-          <el-option label="女" value="female"></el-option>
+          <el-option label="男" value="male"/>
+          <el-option label="女" value="female"/>
         </el-select>
       </el-form-item>
       <el-form-item label="出生日期">
@@ -20,7 +20,7 @@
           v-model="form.birthday"
           type="date"
           placeholder="选择出生日期"
-        ></el-date-picker>
+        />
       </el-form-item>
       <el-form-item label="个人简介">
         <el-input v-model="form.desc" type="textarea" rows="6"/>

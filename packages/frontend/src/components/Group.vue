@@ -7,7 +7,9 @@
       <div
         class="avatar-shadow"
         @click="$refs.avatar.show"
-      > 更换头像 </div>
+      >
+        更换头像
+      </div>
     </div>
     <div class="info">
       {{ props.group.name }}

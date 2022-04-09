@@ -20,7 +20,7 @@
           <div class="name"> {{ user.username }} </div>
         </div>
         <el-tooltip content="用户设置">
-          <el-icon @click="$router.push('/edit-personnel')" :size="24"><tools/></el-icon>
+          <el-icon :size="24" @click="$router.push('/edit-personnel')"><tools/></el-icon>
         </el-tooltip>
       </div>
       <div class="chat-bar">
