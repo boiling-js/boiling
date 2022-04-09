@@ -7,18 +7,9 @@
     </div>
     <div class="room">
       <div ref="content" class="content">
-        <div
-          v-for="msg in messages" :key="msg.id"
-          class="item">
-          <img class="avatar"
-               :alt="`@${msg.sender.name}`"
-               :src="`/api/${msg.sender.avatar}`">
-          <div class="message">
-            <div>{{ msg.sender.username }}</div>
-            <div class="time">{{ dayjs(msg.createdAt).format('YYYY-MM-DD') }}</div>
-            <div class="text">{{ msg.content }}</div>
-          </div>
-        </div>
+        <template v-for="(msg, index) in messages" :key="msg.id">
+          <message v-model="messages[index]"/>
+        </template>
       </div>
       <message-sender v-model:chat-room-id="$props.id"
                       @content-change="keepBottom"
@@ -29,11 +20,11 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import dayjs from 'dayjs'
 import { Messages } from '@boiling/core'
 import { onDispatch } from '../hooks/useWsClient'
 import { api } from '../api'
 import MessageSender from '../components/MessageSender.vue'
+import Message from '../components/Message.vue'
 
 /**
  * 用户加好友的时候接口中默认创建一个聊天室
@@ -120,31 +111,12 @@ div.chat {
     height: calc(100% - 110px);
     > div.content {
       @include scroll-bar;
-      > .item {
-        display: flex;
-        margin-bottom: 10px;
-        > .avatar {
-          margin-right: 15px;
-          width: 45px;
-          height: 45px;
-          border-radius: 50%;
-        }
-        > .message {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          > .time {
-            color: #ccc;
-            font-size: 12px;
-          }
-          > .text {
-            margin-top: 5px;
-            color: #fff;
-            font-size: 14px;
-            word-break: break-all;
-          }
-        }
-      }
+
+      display: flex;
+      flex-grow: 1;
+      padding: 10px;
+      flex-direction: column;
+      row-gap: 10px;
     }
     > div.message-sender {
       margin: 5px 10px;
