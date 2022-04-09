@@ -6,7 +6,7 @@
       <span>{{ props.title }}</span>
     </div>
     <div class="room">
-      <div class="content">
+      <div ref="content" class="content">
         <div
           v-for="msg in messages" :key="msg.id"
           class="item">
@@ -21,6 +21,7 @@
         </div>
       </div>
       <message-sender v-model:chat-room-id="$props.id"
+                      @content-change="keepBottom"
                       @sended="m => messages.push(m)"/>
     </div>
   </div>
@@ -48,12 +49,22 @@ const
     id: string
     title: string
   }>(),
+  content = ref<HTMLDivElement | null>(null),
   messages = ref<Messages.Model[] | undefined>([]),
   getMessages = async () => {
     messages.value = messages.value || []
     const { items } =
       await api['chat-room'](props.id).messages.query({ key: '' })
     messages.value.push(...items.reverse())
+  },
+  keepBottom = () => {
+    const element = content.value
+    const isBottom = !!element && Math.abs(element.scrollHeight - element.clientHeight - element.scrollTop) < 10
+    if (element && isBottom) {
+      setTimeout(() => {
+        element.scrollTop = element.scrollHeight
+      }, 0)
+    }
   }
 
 /**
@@ -63,7 +74,16 @@ const
  * 用户接收消息后，把接收到消息添加到消息列表中
  */
 
-onMounted(() => getMessages())
+onMounted(() => {
+  getMessages()
+
+  const element = content.value
+  if (element) {
+    setTimeout(() => {
+      element.scrollTop = element.scrollHeight
+    }, 10)
+  }
+})
 onDispatch(async m => {
   switch (m.t) {
     case 'MESSAGE':

@@ -18,7 +18,7 @@
 
 <script lang="ts" setup>
 import { ElInput } from 'element-plus'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { Messages } from '@boiling/core'
 
 import { api } from '../api'
@@ -28,7 +28,9 @@ const props = defineProps<{
 }>()
 const emits = defineEmits<{
   (e: 'sended', message: Messages.Model): void
+  (e: 'content-change'): void
 }>()
+
 const
   content = ref(''),
   send = async () => {
@@ -39,6 +41,10 @@ const
       emits('sended', m)
     }
   }
+
+watch(content, () => {
+  emits('content-change')
+})
 </script>
 
 <style lang="scss" scoped>
