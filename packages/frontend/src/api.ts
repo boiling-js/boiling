@@ -44,11 +44,10 @@ interface OfficialApi {
   }
   /** 聊天室 */
   'chat-room'(chatRoomId: string): {
-    message(senderId: number): & {
+    messages: QueryPromise<Pagination<Messages.Model>, SearchQuery> & {
       /** 发送消息 */
       add(d: { content: string }): Promise<Messages.Model>
     }
-    messages: QueryPromise<Pagination<Messages.Model>, SearchQuery>
   }
 }
 

@@ -22,24 +22,21 @@
           </div>
         </el-scrollbar>
       </div>
-      <div class="message-input">
-        <el-input
-          v-model="editingMessage"
-          type="textarea"
-          @keyup.ctrl.enter="sendMessage"/>
-      </div>
+      <message-sender v-model:chat-room-id="$props.id"
+                      class="message-input"
+                      @sended="m => messages.push(m)"/>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ElInput, ElScrollbar } from 'element-plus'
+import { ElScrollbar } from 'element-plus'
 import { onMounted, ref } from 'vue'
 import dayjs from 'dayjs'
 import { Messages } from '@boiling/core'
 import { onDispatch } from '../hooks/useWsClient'
 import { api } from '../api'
-import store from '../store'
+import MessageSender from '../components/MessageSender.vue'
 
 /**
  * 用户加好友的时候接口中默认创建一个聊天室
@@ -55,24 +52,12 @@ const
     id: string
     title: string
   }>(),
-  editingMessage = ref(''),
   messages = ref<Messages.Model[] | undefined>([]),
   getMessages = async () => {
     messages.value = messages.value || []
     const { items } =
       await api['chat-room'](props.id).messages.query({ key: '' })
     messages.value.push(...items.reverse())
-  },
-  sendMessage = async () => {
-    if (editingMessage.value) {
-      messages.value = messages.value || []
-      const m =
-        await api['chat-room'](props.id).message(store.state.user.id).add({
-          content: editingMessage.value
-        })
-      messages.value.push(m)
-      editingMessage.value = ''
-    }
   }
 
 /**
@@ -94,7 +79,7 @@ onDispatch(async m => {
 </script>
 
 <style scoped lang="scss">
-.chat {
+div.chat {
   display: flex;
   flex-direction: column;
   width: 100%;
