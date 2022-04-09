@@ -9,14 +9,14 @@
   },
   "dependencies": {
     "axios": "^0.24.0",
-    "element-plus": "^1.2.0-beta.6",
+    "element-plus": "^2.1.8",
     "vue": "^3.2.26",
     "vue-router": "^4.0.12",
     "vuex": "^4.0.2",
     "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
-    "@element-plus/icons-vue": "^0.2.4",
+    "@element-plus/icons-vue": "^1.1.4",
     "@vitejs/plugin-vue": "^2.0.1",
     "sass": "^1.45.1",
     "vite": "^2.7.6"
