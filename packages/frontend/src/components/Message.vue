@@ -8,7 +8,7 @@
         <span class="uname">{{ modelValue.sender.username }}</span>
         <span class="ctime">{{ dayjs(modelValue.createdAt).format('YYYY-MM-DD') }}</span>
       </div>
-      <p class="text">{{ modelValue.content }}</p>
+      <div class="text">{{ modelValue.content }}</div>
     </div>
   </div>
 </template>
@@ -35,7 +35,7 @@ div.message {
     display: flex;
     flex-grow: 1;
     flex-direction: column;
-    justify-content: center;
+    justify-content: start;
     > div.title {
       display: flex;
       column-gap: 5px;
@@ -44,10 +44,11 @@ div.message {
       font-size: 14px;
       > span.ctime { font-size: 10px; }
     }
-    > p.text {
+    > div.text {
       margin-top: 5px;
       color: #fff;
       font-size: 14px;
+      white-space: pre-wrap;
     }
   }
 }
