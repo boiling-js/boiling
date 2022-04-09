@@ -54,7 +54,7 @@ export const router = new Router({
         if (u === null)
           throw new HttpError('NOT_FOUND', '用户不存在')
         if (!Security.match(password, u.passwordHash))
-          throw new HttpError('UNAUTHORIZED', '密码错误')
+          throw new HttpError('UNPROCESSABLE_ENTITY', '密码错误')
         const user = u.toJSON()
         if (ctx.session)
           ctx.session.curUser = <Users.Out><any>user
