@@ -112,15 +112,14 @@ export const router = new Router({
   .get('/avatars', async () => {
     return UsersService.getAvatars()
   })
+  /** 更新用户头像 */
   .patch('/:id(uid)/avatar', async ctx => {
     const { avatar } = ctx.request.body
     if (!avatar)
       throw new HttpError('BAD_REQUEST', '头像不能为空')
     return UsersService.update(useTarget(ctx.session, ctx.params.id), { avatar })
   })
-  /**
-   * 获取用户讨论组
-   */
-  .get('/:id(uid)/groups', async ctx => {
+  /** 获取用户讨论组 */
+  .get('/:id(uid)/groups', ctx => {
     return ChatRoomsService.getGroupByUid(useTarget(ctx.session, ctx.params.id))
   })
