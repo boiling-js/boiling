@@ -1,11 +1,7 @@
 import { app, ipcMain, BrowserWindow } from 'electron'
-import { createServer } from 'vite'
 import * as path from 'path'
 
 async function createWindow() {
-  const viteServer = await createServer({
-    configFile: path.join(__dirname, '../vite.config.ts')
-  })
   const mainWindow = new BrowserWindow({
     icon: path.join(__dirname, '../../../public/favicon.ico'),
     width: 1200,
@@ -18,10 +14,10 @@ async function createWindow() {
       preload: path.join(__dirname, 'preload.js')
     }
   })
-  await viteServer.listen()
-  await mainWindow.loadURL(`http://127.0.0.1:${
-    viteServer.config.server.port
-  }`)
+  if (!process.env.VITE_PORT) {
+    throw new Error('Not configured VITE_PORT.')
+  }
+  await mainWindow.loadURL(`http://127.0.0.1:${process.env.VITE_PORT}`)
   mainWindow.webContents.openDevTools({
     mode: 'detach'
   })

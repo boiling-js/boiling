@@ -115,6 +115,9 @@ describe('Api', function () {
     await foo.guilds.catch(error => {
       expect(error.message).to.equal('test2-404event')
     })
+
+    foo.off('resp.fulfilled')
+    foo.off('resp.rejected')
   })
 
   it('should parse query string.', async () => {

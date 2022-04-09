@@ -77,6 +77,10 @@ export class Api {
     this.events[event] = cb
   }
 
+  off<E extends keyof Api.EventMap>(event: E) {
+    delete this.events[event]
+  }
+
   emit<E extends keyof Api.EventMap>(event: E, ...args: Parameters<Api.EventMap[E]>) {
     if (event in this.events)
       // @ts-ignore

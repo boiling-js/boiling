@@ -1,0 +1,11 @@
+{
+  "name": "@boiling/electron",
+  "version": "0.1.0",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron -r dotenv/config -r ts-node/register src/runner.ts"
+  },
+  "dependencies": {
+    "electron": "^16.0.5"
+  }
+}
