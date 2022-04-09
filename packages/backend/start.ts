@@ -6,7 +6,7 @@ async function main() {
 
   switch (process.env.NODE_ENV) {
     case 'production':
-      if (await doCommand('yarn', 'build'.split(' ')) !== 0)
+      if (await doCommand('yarn', [ 'build' ]) !== 0)
         return
 
       cmd = 'node'
@@ -17,6 +17,6 @@ async function main() {
       target = 'src/index.ts'
       break
   }
-  cmd && await doCommand(cmd, `-r dotenv/config ${ target }`.split(' '))
+  cmd && target && await doCommand(cmd, [ target ])
 }
 main().then(undefined)
