@@ -2,12 +2,15 @@
   <div class="message-sender">
     <div class="top-bar">
       <div class="options">
+        <span class="material-icons" v-text="'emoji_emotions'"/>
         <span class="material-icons" v-text="'image'"/>
+        <span class="material-icons" v-text="'gif_box'"/>
         <span class="material-icons" v-text="'upload_file'"/>
       </div>
     </div>
     <el-input v-model="content"
               type="textarea"
+              placeholder="说点什么吧~"
               :autosize="{
                 minRows: 1,
                 maxRows: 10
@@ -69,6 +72,9 @@ div.message-sender {
     padding: 8px;
     border: none;
     resize: none;
+    &::placeholder {
+      color: var(--el-text-color-primary);
+    }
   }
 }
 </style>
