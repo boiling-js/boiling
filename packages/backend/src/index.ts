@@ -8,15 +8,18 @@ import { resolve } from 'path'
 
 import './global'
 import DAOMain from './dao'
-
-const app = websockify(new Koa())
-app.keys = ['hker92hjkugfkerbl.e[gewkg68']
+import { configDotenv } from '@boiling/utils'
 
 import { router as WSRouter } from './routes/ws'
 import { router as UsersRouter } from './routes/users'
 import { router as ChannelsRouter } from './routes/channels'
 import { router as ChatRoomsRouter } from './routes/chat-rooms'
 import { Middlewares } from './middlewares'
+
+configDotenv()
+
+const app = websockify(new Koa())
+app.keys = ['hker92hjkugfkerbl.e[gewkg68']
 
 app.ws.use(WSRouter)
 app
@@ -31,8 +34,8 @@ app
   .use(ChatRoomsRouter.middleware())
 
 const {
-  PORT = '8080',
-  HOST = 'localhost'
+  BACKEND_PORT: PORT = '8080',
+  BACKEND_HOST: HOST = 'localhost'
 } = process.env
 app.listen(+PORT, HOST, async () => {
   // connect mongodb database

@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 import path from 'path'
 
-const cwd = process.cwd()
+const cwd = path.resolve(process.cwd(), '../../')
 
 export const configDotenv = () => {
   dotenv.config({
