@@ -6,7 +6,13 @@
         <span class="material-icons" v-text="'image'"/>
         <span class="material-icons" v-text="'gif_box'"/>
         <span class="material-icons" v-text="'upload_file'"/>
+        <span class="material-icons" v-text="'code'"/>
       </div>
+      <el-tooltip content="CTRL + Enter" placement="top">
+        <el-button class="send" type="primary" size="small">
+          <span class="material-icons" v-text="'send'"/>
+        </el-button>
+      </el-tooltip>
     </div>
     <el-input v-model="content"
               type="textarea"
@@ -20,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ElInput } from 'element-plus'
+import { ElInput, ElButton, ElTooltip } from 'element-plus'
 import { ref, watch } from 'vue'
 import { Messages } from '@boiling/core'
 
@@ -56,6 +62,7 @@ div.message-sender {
   > div.top-bar {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 0.5rem 0;
     > div.options {
       display: flex;
@@ -64,6 +71,9 @@ div.message-sender {
         cursor: pointer;
         user-select: none;
       }
+    }
+    > button.el-button.send :deep(span.material-icons) {
+      font-size: 1rem;
     }
   }
   > :deep(div.el-textarea) textarea {
