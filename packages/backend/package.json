@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "ts-node ../../scripts/pre-build.ts && tsc -p tsconfig.pro.json",
-    "start": "node start.js"
+    "start": "ts-node start.ts"
   },
   "dependencies": {
     "@boiling/core": "^0.1.0",

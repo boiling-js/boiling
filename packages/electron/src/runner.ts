@@ -1,9 +1,10 @@
 import { app, ipcMain, BrowserWindow } from 'electron'
 import * as path from 'path'
+import { configDotenv } from '@boiling/utils'
 
 async function createWindow() {
   const mainWindow = new BrowserWindow({
-    icon: path.join(__dirname, '../../../public/favicon.ico'),
+    icon: path.join(__dirname, '../static/favicon.ico'),
     width: 1200,
     height: 800,
     minWidth: 940,
@@ -33,7 +34,9 @@ async function createWindow() {
     }
   })
 }
+
 async function main() {
+  configDotenv()
   await app.whenReady()
   await createWindow()
   app.on('activate', () => {
@@ -44,6 +47,7 @@ async function main() {
       app.quit()
   })
 }
+
 main().catch(() => {
   console.error('Failed to start the application.')
   process.exit(1)
