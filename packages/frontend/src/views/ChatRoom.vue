@@ -7,30 +7,26 @@
     </div>
     <div class="room">
       <div class="content">
-        <el-scrollbar class="scrollbar">
-          <div
-            v-for="msg in messages" :key="msg.id"
-            class="item">
-            <img
-              class="avatar"
-              :src="`/api/${msg.sender.avatar}`">
-            <div class="message">
-              <div>{{ msg.sender.username }}</div>
-              <div class="time">{{ dayjs(msg.createdAt).format('YYYY-MM-DD') }}</div>
-              <div class="text">{{ msg.content }}</div>
-            </div>
+        <div
+          v-for="msg in messages" :key="msg.id"
+          class="item">
+          <img class="avatar"
+               :alt="`@${msg.sender.name}`"
+               :src="`/api/${msg.sender.avatar}`">
+          <div class="message">
+            <div>{{ msg.sender.username }}</div>
+            <div class="time">{{ dayjs(msg.createdAt).format('YYYY-MM-DD') }}</div>
+            <div class="text">{{ msg.content }}</div>
           </div>
-        </el-scrollbar>
+        </div>
       </div>
       <message-sender v-model:chat-room-id="$props.id"
-                      class="message-input"
                       @sended="m => messages.push(m)"/>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ElScrollbar } from 'element-plus'
+<script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import dayjs from 'dayjs'
 import { Messages } from '@boiling/core'
@@ -78,7 +74,8 @@ onDispatch(async m => {
 })
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
+@import "../assets/scroll-bar";
 div.chat {
   display: flex;
   flex-direction: column;
@@ -88,7 +85,6 @@ div.chat {
     display: flex;
     align-items: center;
     padding: 0 20px;
-    width: calc(100% - 40px);
     height: 68px;
     border-bottom: 2px solid #202225;
     > span.icon {
@@ -98,45 +94,40 @@ div.chat {
   }
   > div.room {
     display: flex;
+    flex: 1 1;
     flex-direction: column;
     flex-grow: 1;
-    row-gap: 10px;
-    padding: 20px;
-    width: calc(100% - 40px);
     height: calc(100% - 110px);
     > div.content {
-      flex-grow: 1;
-      height: calc(100% - 60px);
-      .el-scrollbar__view {
-        > .item {
+      @include scroll-bar;
+      > .item {
+        display: flex;
+        margin-bottom: 10px;
+        > .avatar {
+          margin-right: 15px;
+          width: 45px;
+          height: 45px;
+          border-radius: 50%;
+        }
+        > .message {
           display: flex;
-          margin-bottom: 10px;
-          > .avatar {
-            margin-right: 15px;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
+          flex-direction: column;
+          justify-content: center;
+          > .time {
+            color: #ccc;
+            font-size: 12px;
           }
-          > .message {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            > .time {
-              color: #ccc;
-              font-size: 12px;
-            }
-            > .text {
-              margin-top: 5px;
-              color: #fff;
-              font-size: 14px;
-              word-break: break-all;
-            }
+          > .text {
+            margin-top: 5px;
+            color: #fff;
+            font-size: 14px;
+            word-break: break-all;
           }
         }
       }
     }
-    > div.message-input {
-      height: 60px;
+    > div.message-sender {
+      margin: 5px 10px;
     }
   }
 }

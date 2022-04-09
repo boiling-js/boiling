@@ -23,7 +23,7 @@ module.exports = {
     }],
     'selector-combinator-space-after': ['always'],
     'selector-pseudo-class-no-unknown': [true, {
-      ignorePseudoClasses: ['deep']
+      ignorePseudoClasses: ['deep', 'horizontal']
     }],
     'selector-list-comma-newline-after': ['always-multi-line'],
     'rule-empty-line-before': ['never-multi-line'],
