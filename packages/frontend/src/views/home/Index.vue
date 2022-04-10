@@ -163,6 +163,7 @@ div.contain {
     }
   }
   > div.container {
+    position: relative;
     flex-grow: 1;
     background-color: var(--color-auxi-placeholder);
   }

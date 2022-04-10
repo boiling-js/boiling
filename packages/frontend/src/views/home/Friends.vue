@@ -16,18 +16,34 @@
         :info="friend"/>
     </el-tab-pane>
   </el-tabs>
+  <div class="filters">
+    <el-select v-model="selectTags"
+               multiple
+               placeholder="选择指定标签">
+      <el-option
+        v-for="item in [{ value: 0, label: '客户' }]" :key="item.value"
+        :value="item.value"
+        :label="item.label"
+      />
+    </el-select>
+    <el-input
+      placeholder="搜索好友"
+      :prefix-icon="Search"/>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { Users } from '@boiling/core'
 import { onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
-import { ElTabs, ElTabPane } from 'element-plus'
+import { ElTabs, ElTabPane, ElSelect, ElInput } from 'element-plus'
+import { Search } from '@element-plus/icons-vue'
 import { api } from '../../api'
 import User from '../../components/User.vue'
 
 const
   store = useStore(),
+  selectTags = ref([]),
   friends = ref<Users.FriendOut[]>([]),
   refresh = async () => {
     friends.value = await api.user('@me').friends
@@ -64,5 +80,14 @@ div.friends {
       }
     }
   }
+}
+div.filters {
+  display: flex;
+  position: absolute;
+  column-gap: 10px;
+  top: 30px;
+  right: 20px;
+  height: 40px;
+  align-items: center;
 }
 </style>
