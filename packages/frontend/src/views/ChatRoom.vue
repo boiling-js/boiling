@@ -41,7 +41,7 @@ const
     title: string
   }>(),
   content = ref<HTMLDivElement | null>(null),
-  messages = ref<Messages.Model[] | undefined>([]),
+  messages = ref<Messages.Model[]>([]),
   getMessages = async () => {
     messages.value = messages.value || []
     const { items } =
