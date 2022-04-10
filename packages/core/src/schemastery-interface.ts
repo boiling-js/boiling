@@ -3,12 +3,15 @@ import Schema from 'schemastery'
 type Dict<T = any, K extends string = string> = {
   [key in K]?: T
 }
-type KeysOfType<T, SelectedType> = {
+type KeysOfType<T, SelectedType> = Exclude<{
   [key in keyof T]: SelectedType extends T[key] ? key : never
-}[keyof T]
-type Optional<T> = Partial<Pick<T, KeysOfType<T, undefined>>>
-type Required<T> = Omit<T, KeysOfType<T, undefined>>
-export type OptionalUndefined<T> = Optional<T> & Required<T>
+}[keyof T], undefined>
+export type OptionalUndefined<
+  T,
+  UndefiendKeys extends keyof T = KeysOfType<T, undefined>
+> =
+  & Partial<Pick<T, UndefiendKeys>>
+  & Omit<T, UndefiendKeys>
 
 declare module 'schemastery' {
   interface Schema<S = any, T = S> {
