@@ -1,7 +1,7 @@
 <template>
   <div class="message">
     <img class="avatar"
-         :alt="`@${modelValue.sender.name}`"
+         :alt="`@${modelValue.sender.username}`"
          :src="`/api/${modelValue.sender.avatar}`">
     <div class="content">
       <div class="title">
