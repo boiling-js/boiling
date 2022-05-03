@@ -2,14 +2,25 @@
   <div class="message-sender">
     <div class="top-bar">
       <div class="options">
-        <span class="material-icons" v-text="'emoji_emotions'"/>
+        <el-popover
+          placement="top-start"
+          :width="200"
+          trigger="click">
+          <emoticons/>
+          <template #reference>
+            <span class="material-icons" v-text="'emoji_emotions'"/>
+          </template>
+        </el-popover>
         <span class="material-icons" v-text="'image'"/>
         <span class="material-icons" v-text="'gif_box'"/>
         <span class="material-icons" v-text="'upload_file'"/>
         <span class="material-icons" v-text="'code'"/>
       </div>
       <el-tooltip content="CTRL + Enter" placement="top">
-        <el-button class="send" type="primary" size="small">
+        <el-button class="send"
+                   type="primary"
+                   size="small"
+                   @click="send">
           <span class="material-icons" v-text="'send'"/>
         </el-button>
       </el-tooltip>
@@ -26,11 +37,12 @@
 </template>
 
 <script lang="ts" setup>
-import { ElInput, ElButton, ElTooltip } from 'element-plus'
+import { ElInput, ElButton, ElTooltip, ElPopover } from 'element-plus'
 import { ref, watch } from 'vue'
 import { Messages } from '@boiling/core'
 
 import { api } from '../api'
+import Emoticons from './Emoticons.vue'
 
 const props = defineProps<{
   chatRoomId: string
@@ -67,7 +79,7 @@ div.message-sender {
     > div.options {
       display: flex;
       column-gap: 0.5rem;
-      > span {
+      > :deep(span) {
         cursor: pointer;
         user-select: none;
       }
