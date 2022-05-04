@@ -9,7 +9,7 @@
       />
       <span
         class="material-icons md-light add"
-        @click="$refs.createGroup.open"
+        @click="$refs.selMembers.open"
       >add</span>
     </div>
     <div class="groups-list">
@@ -19,22 +19,32 @@
         :group="group"/>
     </div>
   </div>
-  <create-group ref="createGroup"/>
+  <sel-members
+    ref="selMembers"
+    @confirm="(fIds) => createGroup(fIds)"
+  />
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { ElInput } from 'element-plus'
+import { ElInput, ElMessage } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import { api } from '../../api'
 import { ChatRooms } from '@boiling/core'
-import CreateGroup from '../../components/CreateGroup.vue'
+import SelMembers from '../../components/SelMembers.vue'
 import Group from '../../components/Group.vue'
 
 const
   groups = ref<ChatRooms.Model[]>([]),
   getGroups = async () => {
     groups.value = await api.user('@me').groups
+  },
+  createGroup = async (members: number[]) => {
+    await api['chat-rooms'].add({ members: members, name: members.join(',') })
+    ElMessage({
+      message: `${members.join(',')}聊天室创建成功！`,
+      type: 'success'
+    })
   }
 onMounted(getGroups)
 </script>

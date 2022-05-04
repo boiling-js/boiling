@@ -10,16 +10,25 @@
       <el-form-item label="群名：">
         <el-input v-model="form.name" />
       </el-form-item>
-      <el-form-item label="好友：">
+      <el-form-item label="成员：">
         <div
           v-for="member in members"
           :key="member.id"
           class="friend">
-          <div class="avatar"
-               :style="{
-                 backgroundImage: `url(/api${member.avatar})`
-               }"/>
+          <el-avatar
+            :src="`/api${member.avatar}`"
+          />
           <div class="name">{{ member.remark || member.username }}</div>
+        </div>
+        <div class="friend">
+          <el-avatar>
+            <span
+              class="material-icons md-light add"
+              @click="$refs.selMembers.open(members.map(member => member.id))">
+              add
+            </span>
+          </el-avatar>
+          <div class="name">添加</div>
         </div>
       </el-form-item>
     </el-form>
@@ -43,14 +52,19 @@
         <el-button type="primary" @click="show = false">确认</el-button>
       </span>
     </template>
+    <sel-members
+      ref="selMembers"
+      @confirm="(fIds) => addMembers(fIds)"
+    />
   </el-dialog>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { ref } from 'vue'
-import { ElDialog, ElForm, ElInput, ElFormItem, ElButton, ElDivider } from 'element-plus'
+import { ElDialog, ElForm, ElInput, ElFormItem, ElButton, ElDivider, ElAvatar } from 'element-plus'
 import { ChatRooms, Users } from '@boiling/core'
 import { api } from '../api'
+import SelMembers from './SelMembers.vue'
 
 const
   show = ref<Boolean>(false),
@@ -60,7 +74,10 @@ const
     members.value = await api['chat-room'](data.id).members
     show.value = true
   },
-  form = ref<ChatRooms.Model>()
+  form = ref<ChatRooms.Model>(),
+  addMembers = (fIds: number[]) => {
+    console.log(fIds)
+  }
 
 defineExpose({ open })
 </script>
@@ -75,11 +92,8 @@ defineExpose({ open })
       flex-direction: column;
       align-items: center;
       margin: 0 10px;
-      > div.avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background-size: cover;
+      &:last-child {
+        cursor: pointer;
       }
     }
   }

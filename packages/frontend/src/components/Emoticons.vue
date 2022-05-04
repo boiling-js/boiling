@@ -11,8 +11,7 @@
         </div>
       </el-scrollbar>
     </div>
-    <div class="list">
-    </div>
+    <div class="list"/>
   </div>
 </template>
 
