@@ -56,7 +56,7 @@ const
   show = ref<Boolean>(false),
   members = ref<Users.Out[]>([]),
   open = async (data: ChatRooms.Model) => {
-    form.value = data
+    form.value = JSON.parse(JSON.stringify(data))
     members.value = await api['chat-room'](data.id).members
     show.value = true
   },
