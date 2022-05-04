@@ -6,7 +6,7 @@
           placement="top-start"
           :width="200"
           trigger="click">
-          <emoticons/>
+          <emoticons @emoji-sel="(e)=> content += e"/>
           <template #reference>
             <span class="material-icons" v-text="'emoji_emotions'"/>
           </template>
