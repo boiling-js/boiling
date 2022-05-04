@@ -65,3 +65,10 @@ export const router = new Router({
       ['createdAt', -1]
     ])(chatRoomId)
   })
+  /**
+   * 获取聊天室成员列表
+   */
+  .get('/:chatRoomId/members', async ctx => {
+    const { chatRoomId } = ctx.params
+    return ChatRoomsService.User.get(chatRoomId)
+  })

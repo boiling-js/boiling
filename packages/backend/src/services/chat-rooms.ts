@@ -176,4 +176,17 @@ export namespace ChatRoomsService {
       return Model.find({ chatRoomId }).find(options ? query : {})
     }
   }
+
+  export namespace User {
+    /**
+     * 获取聊天室的用户列表
+     * @param chatRoomId
+     */
+    export async function get(chatRoomId: string) {
+      const chatRoom = await ChatRoomsService.getOrThrow(chatRoomId)
+      return Promise.all(
+        (chatRoom?.members ?? []).map(id => UsersService.getOrThrow(id))
+      )
+    }
+  }
 }

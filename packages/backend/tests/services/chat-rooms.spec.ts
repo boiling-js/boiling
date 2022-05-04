@@ -181,4 +181,15 @@ describe('ChatRooms Service', () => {
       expect(ChatRoomsService.Message.search(id)).to.be.eventually.have.lengthOf(0)
     })
   })
+  describe('User', function () {
+    it('should get all users by chatRoomId', async () => {
+      const { id } = await ChatRoomsService.create([u0.id, u1.id])
+      const users = await ChatRoomsService.User.get(id)
+      expect(users.map(u => u.toJSON()))
+        .to.be.deep.equal(
+          // @ts-ignore
+          [u0, u1].map(u => u.toJSON())
+      )
+    })
+  })
 })
