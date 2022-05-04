@@ -97,7 +97,15 @@ export namespace ChatRoomsService {
     await Message.delByChatRoomId(id)
     await Model.deleteOne({ _id: id })
   }
-
+  /**
+   * 更新聊天室
+   * @param id 聊天室id
+   * @param options
+   */
+  export async function update(id: string, options: Partial<Pick<M, 'name' | 'avatar' | 'members'>>) {
+    await existsOrThrow(id)
+    await Model.updateOne({ _id: id }, options)
+  }
   export namespace Message {
     export const Model = MessageModel
     export type M = Pick<Messages.Model, 'content'>

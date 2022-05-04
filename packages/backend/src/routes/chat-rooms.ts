@@ -72,3 +72,11 @@ export const router = new Router({
     const { chatRoomId } = ctx.params
     return ChatRoomsService.User.get(chatRoomId)
   })
+  /**
+   * 更新聊天室
+   */
+  .patch(Schema.Pick(ChatRooms.Model, ['name', 'avatar']), Schema.any(), '/:chatRoomId',  async ctx => {
+    const { chatRoomId } = ctx.params
+    const { name, avatar } = ctx.request.body
+    return ChatRoomsService.update(chatRoomId, { name, avatar })
+  })

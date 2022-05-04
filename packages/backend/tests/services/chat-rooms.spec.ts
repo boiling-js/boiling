@@ -87,6 +87,17 @@ describe('ChatRooms Service', () => {
     expect(groups[0].members).to.be.deep.equal([u0.id, u2.id, u3.id])
     expect(groups[1].members).to.be.deep.equal([u0.id, u1.id, u3.id])
   })
+  it('should update chatRoom' ,async () => {
+    const members = [u0.id, u1.id]
+    const { id } = await ChatRoomsService.create(members)
+    await ChatRoomsService.update(id, {
+      name: 'test',
+      avatar: 'test'
+    })
+    const chatRoom = await ChatRoomsService.get(id)
+    expect(chatRoom?.name).to.equal('test')
+    expect(chatRoom?.avatar).to.equal('test')
+  })
   describe('Message', function () {
     it('should push message to target chat room.', async () => {
       const { id } = await ChatRoomsService.create([u0.id, u1.id])
