@@ -11,9 +11,15 @@
         <el-input v-model="form.name" />
       </el-form-item>
       <el-form-item label="好友：">
-        <div class="friend">
-          <div class="avatar">头像</div>
-          <div class="name">名字</div>
+        <div
+          v-for="member in members"
+          :key="member.id"
+          class="friend">
+          <div class="avatar"
+               :style="{
+                 backgroundImage: `url(/api${member.avatar})`
+               }"/>
+          <div class="name">{{ member.remark || member.username }}</div>
         </div>
       </el-form-item>
     </el-form>
@@ -41,23 +47,21 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 import { ElDialog, ElForm, ElInput, ElFormItem, ElButton, ElDivider } from 'element-plus'
+import { ChatRooms, Users } from '@boiling/core'
+import { api } from '../api'
+
 const
   show = ref<Boolean>(false),
-  open = () => {
+  members = ref<Users.Out[]>([]),
+  open = async (data: ChatRooms.Model) => {
+    form.value = data
+    members.value = await api['chat-room'](data.id).members
     show.value = true
   },
-  form = reactive({
-    name: '',
-    region: '',
-    date1: '',
-    date2: '',
-    delivery: false,
-    type: [],
-    resource: '',
-    desc: ''
-  })
+  form = ref<ChatRooms.Model>()
+
 defineExpose({ open })
 </script>
 
@@ -75,6 +79,7 @@ defineExpose({ open })
         width: 50px;
         height: 50px;
         border-radius: 50%;
+        background-size: cover;
       }
     }
   }

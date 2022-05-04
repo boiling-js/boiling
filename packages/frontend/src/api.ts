@@ -48,6 +48,7 @@ interface OfficialApi {
       /** 发送消息 */
       add(d: { content: string }): Promise<Messages.Model>
     }
+    members: Promise<Users.Out[]>
   }
 }
 

@@ -21,7 +21,7 @@
         chat_bubble_outline
       </span>
       <span class="material-icons"
-            @click="$refs.configureGroup.open">settings</span>
+            @click="$refs.configureGroup.open(props.group)">settings</span>
     </div>
     <configure-group ref="configureGroup"/>
   </div>
