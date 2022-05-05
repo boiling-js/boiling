@@ -38,18 +38,21 @@
       :is-friend="isFriend"
       :info="info"/>
     <avatar
-      ref="avatar"/>
+      ref="avatar"
+      @selAvatar="(selAvatar) => changeAvatar(selAvatar)"/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Users } from '@boiling/core'
 import { computed } from 'vue'
 import { useStore } from 'vuex'
+import { ElMessageBox } from 'element-plus'
+import { Users } from '@boiling/core'
+import { api } from '../api'
 import ConfigureFriend from './ConfigureFriend.vue'
 import Avatar from './Avatar.vue'
-import { api } from '../api'
 
+computed(() => store.state.user.avatar)
 const
   store = useStore(),
   props = withDefaults(defineProps<{
@@ -75,6 +78,15 @@ const
       } else
         throw e
     }
+  },
+  changeAvatar = async (avatar: string) => {
+    await ElMessageBox.confirm(
+      '是否确认更换头像？', '确认', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      }
+    )
+    await store.dispatch('updAvatar', avatar)
   }
 </script>
 
