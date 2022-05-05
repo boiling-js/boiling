@@ -27,6 +27,16 @@ export const userSchema = new Schema<Users.Model>({
     type: String,
     default: 'offline'
   },
+  birthday: {
+    type: String
+  },
+  sex: {
+    type: String,
+    default: 'female'
+  },
+  desc: {
+    type: String
+  },
   friends: {
     type: [{
       id: Number,

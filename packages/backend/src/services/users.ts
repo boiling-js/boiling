@@ -68,7 +68,7 @@ export namespace UsersService {
     return (await fs.readdir('./static/img/avatar'))
       .map(f => `/img/avatar/${f}`)
   }
-  export async function update(id: number, base: Partial<Users.Base>) {
+  export async function update(id: number, base: Partial<Users.UpdateOut>) {
     const user = await UsersService.getOrThrow(id)
     Object.assign(user, base)
     await user.save()

@@ -119,6 +119,13 @@ export const router = new Router({
       throw new HttpError('BAD_REQUEST', '头像不能为空')
     return UsersService.update(useTarget(ctx.session, ctx.params.id), { avatar })
   })
+  /** 更新用户信息 */
+  .patch('/:id(uid)', async ctx => {
+    const { username, sex, birthday, desc } = ctx.request.body
+    return UsersService.update(useTarget(ctx.session, ctx.params.id), {
+      username, sex, birthday, desc
+    })
+  })
   /** 获取用户讨论组 */
   .get('/:id(uid)/groups', ctx => {
     return ChatRoomsService.getGroupByUid(useTarget(ctx.session, ctx.params.id))
