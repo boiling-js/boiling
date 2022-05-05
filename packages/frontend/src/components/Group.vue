@@ -17,7 +17,9 @@
     <div
       class="operates">
       <span class="material-icons"
-            @click="()=>{}">
+            @click="$router.push(
+              `/home/chat-rooms/${ group.id }?title=${ group.name}`
+            )">
         chat_bubble_outline
       </span>
       <span class="material-icons"
