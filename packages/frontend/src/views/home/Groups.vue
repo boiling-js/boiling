@@ -9,7 +9,7 @@
       />
       <span
         class="material-icons md-light add"
-        @click="$refs.selMembers.open"
+        @click="$refs.selMembers.open([])"
       >add</span>
     </div>
     <div class="groups-list">

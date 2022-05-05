@@ -21,7 +21,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="show = false">取消</el-button>
-          <el-button type="primary" @click="emits('confirm', fIds)">确认</el-button>
+          <el-button type="primary" @click="confirm">确认</el-button>
         </span>
       </template>
     </el-dialog>
@@ -36,7 +36,7 @@ import { Users } from '@boiling/core'
 
 const
   emits = defineEmits<{
-    (e: 'confirm', fIds: number[]): void
+    (e: 'confirm', fIds: number[], fSel: Users.FriendOut[]): void
   }>(),
   show = ref<Boolean>(false),
   friends = ref<Users.FriendOut[]>([]),
@@ -54,6 +54,10 @@ const
     show.value = true
   },
   close = () => {
+    show.value = false
+  },
+  confirm = () => {
+    emits('confirm', fIds.value, friends.value.filter(f => fIds.value.includes(f.id)))
     show.value = false
   }
 

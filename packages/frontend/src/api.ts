@@ -44,11 +44,16 @@ interface OfficialApi {
   }
   /** 聊天室 */
   'chat-room'(chatRoomId: string): {
+    upd(d: {
+      name?: string
+      avatar?: string
+      members?: string[]
+    }): Promise<void>
     messages: QueryPromise<Pagination<Messages.Model>, SearchQuery> & {
       /** 发送消息 */
       add(d: { content: string }): Promise<Messages.Model>
     }
-    members: Promise<Users.Out[]>
+    members: Promise<Users.FriendOut[]>
   }
 }
 

@@ -49,12 +49,12 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="show = false">取消</el-button>
-        <el-button type="primary" @click="show = false">确认</el-button>
+        <el-button type="primary" @click="confirm">确认</el-button>
       </span>
     </template>
     <sel-members
       ref="selMembers"
-      @confirm="(fIds) => addMembers(fIds)"
+      @confirm="(fIds, fSel) => addMembers(fIds, fSel)"
     />
   </el-dialog>
 </template>
@@ -68,15 +68,22 @@ import SelMembers from './SelMembers.vue'
 
 const
   show = ref<Boolean>(false),
-  members = ref<Users.Out[]>([]),
+  members = ref<Users.FriendOut[]>([]),
   open = async (data: ChatRooms.Model) => {
     form.value = JSON.parse(JSON.stringify(data))
-    members.value = await api['chat-room'](data.id).members
+    members.value = await api['chat-room'](form.value?.id ?? '').members
     show.value = true
   },
   form = ref<ChatRooms.Model>(),
-  addMembers = (fIds: number[]) => {
-    console.log(fIds)
+  addMembers = (fIds: number[], fSel: Users.FriendOut[]) => {
+    members.value = members.value.concat(fSel.filter(f => !members.value.some(m => m.id === f.id)))
+  },
+  confirm = () => {
+    api['chat-room'](form.value?.id ?? '').upd({
+      name: form.value?.name,
+      members: members.value.map(m => m.id.toString())
+    })
+    show.value = false
   }
 
 defineExpose({ open })
