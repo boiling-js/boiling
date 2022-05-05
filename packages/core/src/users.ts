@@ -4,7 +4,9 @@ export namespace Users {
   export const Status = Schema.union<'online' | 'leave' | 'offline' | 'noDisturb'>([
     'online', 'leave', 'offline', 'noDisturb'
   ])
+  export const Sex = Schema.union<'female' | 'male'>(['female', 'male'])
   export type Status = Schema.InferS<typeof Status>
+  export type Sex = Schema.InferS<typeof Sex>
   /** 基础数据 */
   export const Base = Schema.interface({
     /** 用户唯一 id */
@@ -12,16 +14,26 @@ export namespace Users {
     /** 用户名 */
     username: Schema.string(),
     /** 用户头像 */
-    avatar: Schema.string(),
+    avatar: Schema.string().optional(),
     /** 加密的用户密码 */
     passwordHash: Schema.string(),
     /** 用户状态 */
-    status: Status.optional()
+    status: Status.optional(),
+    /** 性别 */
+    sex: Sex.optional(),
+    /** 出生日期 */
+    birthday: Schema.string().optional(),
+    /** 描述 */
+    desc: Schema.string().optional()
   })
   export type Base = Schema.InferS<typeof Base>
   /** 基础数据出口 */
   export const BaseOut = Schema.Omit(Base, ['passwordHash'])
   export type BaseOut = Schema.InferS<typeof BaseOut>
+
+  /** 可更新数据 */
+  export const UpdateOut = Schema.Pick(Base, ['username', 'avatar', 'sex', 'birthday', 'desc', 'status'])
+  export type UpdateOut = Schema.InferS<typeof UpdateOut>
 
   /** 数据库模型 */
   export const Model = Users.Base.and(Schema.interface({
