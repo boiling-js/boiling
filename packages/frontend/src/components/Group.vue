@@ -25,7 +25,9 @@
     </div>
     <configure-group ref="configureGroup"/>
   </div>
-  <avatar ref="avatar"/>
+  <avatar
+    ref="avatar"
+    @selAvatar="(selAvatar) => changeAvatar(selAvatar)"/>
 </template>
 
 <script setup lang="ts">
@@ -33,13 +35,26 @@ import { defineProps } from 'vue'
 import { ChatRooms } from '@boiling/core'
 import ConfigureGroup from './ConfigureGroup.vue'
 import Avatar from './Avatar.vue'
+import { ElMessageBox } from 'element-plus'
+import { api } from '../api'
 
 const props = defineProps({
   group: {
     type: ChatRooms.Model,
     required: true
   }
-})
+}),
+  changeAvatar = async (avatar: string) => {
+    await ElMessageBox.confirm(
+      '是否确认更换头像？', '确认', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      }
+    )
+    await api['chat-room'](props.group.id).upd({
+      avatar
+    })
+  }
 </script>
 
 <style scoped lang="scss">
