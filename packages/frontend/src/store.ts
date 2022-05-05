@@ -41,6 +41,9 @@ export default createStore({
     },
     updStatus(state, status: Users.Status) {
       state.user.status = status
+    },
+    update(state, user: Users.UpdateOut) {
+      state.user = { ...state.user, ...user }
     }
   },
   actions: {
@@ -68,6 +71,10 @@ export default createStore({
     async updStatus(context, status: Users.Status) {
       await api.user('@me').status.upd({ status })
       context.commit('updStatus', status)
+    },
+    async update(context, user: Users.UpdateOut) {
+      await api.user('@me').upd(user)
+      context.commit('update', user)
     }
   },
   plugins: [CreatePersistedState()]

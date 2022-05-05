@@ -11,11 +11,13 @@ interface OfficialApi {
   }
   /** 获取指定用户 */
   user(id: number | '@me'): {
+    upd(d: Users.UpdateOut): Promise<void>
     status: {
       /** 登录用户并设置用户状态 */
       add(d: Users.Login): Promise<Users.Out>
       /** 更改用户状态 */
       upd(d: { status: Users.Status }): Promise<void>
+
     }
     /** 获取讨论组 */
     groups: Promise<ChatRooms.Model[]>

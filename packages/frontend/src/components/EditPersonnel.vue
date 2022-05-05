@@ -2,12 +2,12 @@
   <div class="edit-personnel">
     <el-page-header :icon="ArrowLeft" title="返回" content="编辑个人信息" @back="$router.push('/home')" />
     <user
-      :info="$store.state.user"
+      :info="store.state.user"
       :type="'popup'"/>
     <el-form ref="editPersonnelForm" :model="form" label-width="90px">
       <el-form-item label="用户名">
         <el-input
-          v-model="form.name"/>
+          v-model="form.username"/>
       </el-form-item>
       <el-form-item label="性别">
         <el-select v-model="form.sex" placeholder="点击选择性别">
@@ -34,29 +34,44 @@
 </template>
 
 <script lang="ts" setup>
-import { ElPageHeader, ElForm,ElFormItem, ElSelect, ElOption, ElDatePicker, ElInput, ElButton } from 'element-plus'
+import {
+  ElPageHeader,
+  ElForm,
+  ElFormItem,
+  ElSelect,
+  ElOption,
+  ElDatePicker,
+  ElInput,
+  ElButton,
+  ElMessage
+} from 'element-plus'
 import { ArrowLeft } from '@element-plus/icons-vue'
-import { onMounted, onUnmounted, reactive } from 'vue'
-import User from './User.vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import store from '../store'
+import { Users } from '@boiling/core'
 
-// do not use same name with ref
-const form = reactive({
-  name: '',
-  sex: '',
+const
+  user = computed(() => store.state.user),
+  form = ref<Users.UpdateOut>({
+  username: '',
+  sex: 'female',
   birthday: '',
-  delivery: false,
-  type: [],
-  resource: '',
   desc: ''
 })
 
-const onSubmit = () => {
-  console.log('submit!')
+const onSubmit = async () => {
+  await store.dispatch('update', form.value)
+  ElMessage.success('更新成功！')
 }
 
 onMounted(() => {
   store.commit('setLeftSelectorHidden', true)
+  form.value = {
+    username: user.value.username,
+    sex: user.value.sex,
+    birthday: user.value.birthday,
+    desc: user.value.desc
+  }
 })
 onUnmounted(() => {
   store.commit('toggleLeftSelector')
