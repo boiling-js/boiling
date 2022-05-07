@@ -99,9 +99,9 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 .register-box {
-  $w: 50vh;
-  $h: 55vh;
-  $p: 40px;
+  $w: 35vh;
+  $h: 50vh;
+  $p: 20px;
   > .register {
     position: fixed;
     top: calc(50vh - #{$h} / 2 - #{$p});

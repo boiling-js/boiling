@@ -62,7 +62,7 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 .login {
-  $w: 580px;
+  $w: 250px;
   $h: 320px;
   $p: 35px;
 
