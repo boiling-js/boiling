@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import { ElTooltip, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem, ElMessageBox } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'

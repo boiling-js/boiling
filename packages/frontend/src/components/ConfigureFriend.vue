@@ -3,7 +3,7 @@
     v-model="isShow"
     class="configure-friend"
     title="好友设置"
-    width="60%">
+    width="85%">
     <el-form ref="formRef" :model="settingUserForm" label-width="60px">
       <el-form-item label="备注：">
         <el-input v-model="settingUserForm.remark"/>

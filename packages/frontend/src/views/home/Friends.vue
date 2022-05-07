@@ -16,7 +16,8 @@
         :info="friend"/>
     </el-tab-pane>
   </el-tabs>
-  <div class="filters">
+<!--  暂不支持搜索好友 -->
+<!--  <div class="filters">
     <el-select v-model="selectTags"
                multiple
                placeholder="选择指定标签">
@@ -29,7 +30,7 @@
     <el-input
       placeholder="搜索好友"
       :prefix-icon="Search"/>
-  </div>
+  </div>-->
 </template>
 
 <script lang="ts" setup>
