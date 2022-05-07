@@ -37,14 +37,14 @@
 import { Users } from '@boiling/core'
 import { onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
-import { ElTabs, ElTabPane, ElSelect, ElInput } from 'element-plus'
-import { Search } from '@element-plus/icons-vue'
+import { ElTabs, ElTabPane } from 'element-plus'
+// import { Search } from '@element-plus/icons-vue'
 import { api } from '../../api'
 import User from '../../components/User.vue'
 
 const
   store = useStore(),
-  selectTags = ref([]),
+  // selectTags = ref([]),
   friends = ref<Users.FriendOut[]>([]),
   refresh = async () => {
     friends.value = await api.user('@me').friends
