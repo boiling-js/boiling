@@ -4,6 +4,26 @@
     class="configure-friend"
     title="好友设置"
     width="85%">
+    <el-divider content-position="left">基本信息</el-divider>
+    <div class="basic-info">
+      <div class="info">
+        <div class="label">账号：</div>
+        <div class="content">{{ info.id }}</div>
+      </div>
+      <div class="info">
+        <div class="label">昵称：</div>
+        <div class="content">{{ info.username }}</div>
+      </div>
+      <div class="info">
+        <div class="label">性别：</div>
+        <div class="content">{{ info.sex === 'female' ? '女' : '男' }}</div>
+      </div>
+      <div class="info">
+        <div class="label">出生日期：</div>
+        <div class="content">{{ info.birthday }}</div>
+      </div>
+    </div>
+    <el-divider content-position="left">设置操作</el-divider>
     <el-form ref="formRef" :model="settingUserForm" label-width="60px">
       <el-form-item label="备注：">
         <el-input v-model="settingUserForm.remark"/>
@@ -174,6 +194,12 @@ defineExpose({ show })
     > div.el-button {
       float: right;
     }
+  }
+}
+.basic-info {
+  > div.info {
+    display: flex;
+    margin: 10px 0;
   }
 }
 </style>
