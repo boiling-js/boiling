@@ -81,7 +81,7 @@ div.contain {
   > div.sidebar {
     display: flex;
     flex-direction: column;
-    width: 240px;
+    min-width: 240px;
     background-color: var(--color-auxi-regular);
     > div.chat-bar {
       display: flex;
