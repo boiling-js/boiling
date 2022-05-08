@@ -80,8 +80,13 @@ div.message-sender {
       display: flex;
       column-gap: 0.5rem;
       > :deep(span) {
+        color: #fff;
         cursor: pointer;
+        transition: 0.3s;
         user-select: none;
+        &:hover {
+          color: var(--color-text-primary);
+        }
       }
     }
     > button.el-button.send :deep(span.material-icons) {
