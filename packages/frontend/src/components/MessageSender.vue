@@ -4,7 +4,7 @@
       <div class="options">
         <el-popover
           placement="top-start"
-          :width="200"
+          :width="210"
           trigger="click">
           <emoticons @emoji-sel="(e)=> content += e"/>
           <template #reference>
