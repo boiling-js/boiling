@@ -94,7 +94,8 @@ const
     }
   },
   addFile = (type: 'image' | 'image/gif' | 'unknown') => {
-    srcList.value.push('https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg')
+    if (type === 'image')
+      srcList.value.push('https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg')
   }
 
 watch(content, () => {
