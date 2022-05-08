@@ -1,7 +1,7 @@
 <template>
   <div class="edit-personnel">
     <el-page-header :icon="ArrowLeft" title="返回" content="编辑个人信息" @back="$router.push('/home')" />
-    <user
+    <user-info
       :info="store.state.user"
       :type="'popup'"/>
     <el-form ref="editPersonnelForm" :model="form" label-width="90px">
@@ -49,6 +49,7 @@ import { ArrowLeft } from '@element-plus/icons-vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import store from '../store'
 import { Users } from '@boiling/core'
+import UserInfo from './User.vue'
 
 const
   user = computed(() => store.state.user),
