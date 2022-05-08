@@ -41,7 +41,7 @@ div.emoticons {
       border-radius: 4px;
       transition: 0.3s;
       &:hover {
-        background: #eee;
+        background-color: var(--color-auxi-placeholder);
       }
     }
   }
@@ -51,18 +51,23 @@ div.emoticons {
     justify-content: start;
     align-items: center;
     padding-top: 10px;
-    padding-bottom: 5px;
     > span.material-icons {
-      width: 30px;
+      padding-bottom: 10px;
+      width: 34px;
       color: #fff;
       text-align: center;
       cursor: pointer;
+      border-radius: 4px;
+      transition: 0.3s;
       user-select: none;
+      &:hover {
+        background-color: var(--color-auxi-placeholder);
+      }
     }
     > div.sel-border {
       position: absolute;
-      bottom: 0;
-      left: 10px;
+      bottom: 4px;
+      left: 12px;
       width: 10px;
       height: 4px;
       background-color: var(--color-primary);
