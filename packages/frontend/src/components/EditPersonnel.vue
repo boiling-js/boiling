@@ -4,7 +4,7 @@
     <user-info
       :info="store.state.user"
       :type="'popup'"/>
-    <el-form ref="editPersonnelForm" :model="form" label-width="90px">
+    <el-form ref="editPersonnelForm" :model="form" label-width="80px">
       <el-form-item label="用户名">
         <el-input
           v-model="form.username"/>
@@ -94,9 +94,9 @@ onUnmounted(() => {
     bottom: 60px;
   }
   > .user {
-    float: right;
-    margin: 0 40px;
-    width: 40%;
+    margin-left: 90px;
+    margin-bottom: 20px;
+    width: calc(100% - 110px);
   }
 }
 </style>

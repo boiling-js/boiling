@@ -2,7 +2,7 @@
   <el-dialog
     v-model="showDialog"
     title="更换头像"
-    width="920px">
+    width="70%">
     <el-scrollbar height="500px">
       <img
         v-for="(item, index) in avatars"
