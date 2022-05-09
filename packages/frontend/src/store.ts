@@ -3,10 +3,17 @@ import { Users } from '@boiling/core'
 import CreatePersistedState from 'vuex-persistedstate'
 import { api } from './api'
 
-export default createStore({
+export interface State {
+  sidebarVisiable: boolean
+  isHiddenLeftSelector: boolean
+  user: Users.Out
+}
+
+export default createStore<State>({
   state: {
+    sidebarVisiable: false,
     isHiddenLeftSelector: false,
-    user: <Users.Out>{
+    user: {
       id: 0,
       username: '',
       avatar: '',
@@ -16,6 +23,9 @@ export default createStore({
     }
   },
   mutations: {
+    toggleSidebarVisiable(state) {
+      state.sidebarVisiable = !state.sidebarVisiable
+    },
     setLeftSelectorHidden(state, isHidden) {
       state.isHiddenLeftSelector = isHidden
     },

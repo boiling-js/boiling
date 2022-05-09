@@ -64,8 +64,8 @@ div.container {
     align-items: center;
   }
   > div.l {
-    width: 70px;
     height: 100%;
+    min-width: 70px;
   }
   > div.r {
     flex-grow: 1;

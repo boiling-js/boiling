@@ -1,6 +1,6 @@
 <template>
   <div class="contain">
-    <div v-if="showSidebar" class="sidebar">
+    <div v-show="$store.state.sidebarVisiable" class="sidebar">
       <div class="self-bar">
         <div class="avatar">
           <el-dropdown trigger="click">
@@ -36,13 +36,6 @@
         </div>
       </div>
     </div>
-    <div
-      class="bar-btn"
-      :style="{left: `${showSidebar ? '240px' : '0'}`}"
-      @click="pullMenu"
-    >
-      <span class="material-icons md-light">menu</span>
-    </div>
     <div class="container">
       <router-view/>
     </div>
@@ -51,7 +44,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { ElTooltip, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem, ElMessageBox } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
@@ -63,7 +56,6 @@ const
   user = computed(() => store.state.user),
   status = computed(() => store.state.user.status),
   router = useRouter(),
-  showSidebar = ref<Boolean>(true),
   updateStatus = async (status: string) => {
     if (status === 'offline') {
       await ElMessageBox.confirm(
@@ -79,20 +71,17 @@ const
       }).catch()
     }
     await store.dispatch('updStatus', status)
-  },
-  pullMenu = () => {
-    showSidebar.value = !showSidebar.value
   }
 </script>
 
 <style lang="scss" scoped>
 div.contain {
-  display: flex;
   position: relative;
+  display: flex;
   > div.sidebar {
     display: flex;
     flex-direction: column;
-    width: 240px;
+    min-width: 240px;
     background-color: var(--color-auxi-regular);
     > div.chat-bar {
       display: flex;
@@ -173,19 +162,6 @@ div.contain {
         }
       }
     }
-  }
-  > div.bar-btn {
-    position: absolute;
-    left: 240px;
-    top: calc(50% - 60px);
-    width: 30px;
-    height: 60px;
-    line-height: 72px;
-    text-align: center;
-    border-radius: var(--border-radius);
-    background-color: var(--color-auxi-regular);
-    z-index: 10;
-    cursor: pointer;
   }
   > div.container {
     position: relative;
