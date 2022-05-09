@@ -29,7 +29,11 @@
         <el-input v-model="settingUserForm.remark"/>
       </el-form-item>
       <el-form-item label="标签：">
-        <el-select v-model="settingUserForm.tags" multiple placeholder="请选择标签">
+        <el-select
+          v-model="settingUserForm.tags"
+          multiple
+          placeholder="请选择标签"
+          style="margin-right: 10px;">
           <el-option v-for="item in tags" :key="item"
                      :label="item" :value="item"/>
         </el-select>
@@ -38,12 +42,12 @@
           ref="tagInputRef"
           v-model="tagInputValue"
           class="ml-1 w-20"
-          style="margin-left: 10px; width: 90px;"
+          style="margin: 5px 0; width: 90px;"
           @keyup.enter="handleInputConfirm"
           @blur="tagInputVisible = false"/>
         <el-button
           v-else
-          class="button-new-tag" style="margin-left: 10px; width: 90px;" @click="showInput">
+          class="button-new-tag" style="margin: 5px 0; width: 90px;" @click="showInput">
           + 新标签
         </el-button>
       </el-form-item>
