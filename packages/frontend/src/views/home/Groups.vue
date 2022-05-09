@@ -16,7 +16,8 @@
       <group
         v-for="group in groups"
         :key="group.id"
-        :group="group"/>
+        :group="group"
+        @update="getGroups"/>
     </div>
   </div>
   <sel-members

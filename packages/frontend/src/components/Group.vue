@@ -33,19 +33,23 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
+import { defineEmits, defineProps } from 'vue'
 import { ChatRooms } from '@boiling/core'
 import ConfigureGroup from './ConfigureGroup.vue'
 import Avatar from './Avatar.vue'
 import { ElMessageBox } from 'element-plus'
 import { api } from '../api'
 
-const props = defineProps({
-  group: {
-    type: ChatRooms.Model,
-    required: true
-  }
-}),
+const
+  props = defineProps({
+    group: {
+      type: ChatRooms.Model,
+      required: true
+    }
+  }),
+  emits = defineEmits<{
+    (e: 'update'): void
+  }>(),
   changeAvatar = async (avatar: string) => {
     await ElMessageBox.confirm(
       '是否确认更换头像？', '确认', {
@@ -56,6 +60,7 @@ const props = defineProps({
     await api['chat-room'](props.group.id).upd({
       avatar
     })
+    emits('update')
   }
 </script>
 
