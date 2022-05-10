@@ -26,6 +26,7 @@
             <span class="material-icons" v-text="'emoji_emotions'"/>
           </template>
         </el-popover>
+        <input ref="selFile" type="file" style="display: none;">
         <span class="material-icons"
               @click="() => addFile('image')"
               v-text="'image'"/>
@@ -71,6 +72,7 @@ const emits = defineEmits<{
 
 const
   content = ref(''),
+  selFile = ref<HTMLInputElement | null>(null),
   srcList = ref<string[]>([
     'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
     'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
@@ -94,8 +96,15 @@ const
     }
   },
   addFile = (type: 'image' | 'image/gif' | 'unknown') => {
-    if (type === 'image')
-      srcList.value.push('https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg')
+    if (!selFile.value)
+      return
+    selFile.value.accept = {
+      image: 'image/png, image/jpeg',
+      'image/gif': 'image/gif',
+      unknown: '*/*'
+    }[type]
+    selFile.value.click()
+    // upload to server
   }
 
 watch(content, () => {
