@@ -4,7 +4,8 @@ import websockify from 'koa-websocket'
 import bodyParser from 'koa-bodyparser'
 import staticMiddleware from 'koa-static'
 import logger from 'koa-logger'
-import { resolve } from 'path'
+import path, { resolve } from 'path'
+import koaBody from 'koa-body'
 
 import './global'
 import DAOMain from './dao'
@@ -24,6 +25,16 @@ app.keys = ['hker92hjkugfkerbl.e[gewkg68']
 app.ws.use(WSRouter)
 app
   .use(staticMiddleware(resolve(__dirname, '../static')))
+  .use(koaBody({
+    // 支持文件格式
+    multipart: true,
+    formidable: {
+      // 上传目录
+      uploadDir: path.join(__dirname, 'static/uploads'),
+      // 保留文件扩展名
+      keepExtensions: true
+    }
+  }))
   .use(logger())
   .use(bodyParser())
   .use(session(app))
