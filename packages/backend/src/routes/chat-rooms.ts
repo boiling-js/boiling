@@ -4,7 +4,6 @@ import { ChatRoomsService } from '../services/chat-rooms'
 import usePagination from '../hooks/usePagination'
 import { clients } from './ws'
 import useCurUser from '../hooks/useCurUser'
-import path from 'path'
 
 export const router = new Router({
   prefix: '/chat-rooms' as '/chat-rooms'
