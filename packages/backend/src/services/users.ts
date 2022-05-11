@@ -1,6 +1,6 @@
 import { Users } from '@boiling/core'
 import { UserModel } from '../dao/user'
-import { Seq } from '../utils'
+import { Security, Seq } from '../utils'
 import fs from 'fs-extra'
 import { ChatRoomsService } from './chat-rooms'
 
@@ -71,6 +71,19 @@ export namespace UsersService {
   export async function update(id: number, base: Partial<Users.UpdateOut>) {
     const user = await UsersService.getOrThrow(id)
     Object.assign(user, base)
+    await user.save()
+  }
+  /**
+   * 更新密码
+   * @param id
+   * @param oldPwd
+   * @param newPwd
+   */
+  export async function updatePassword(id: number, oldPwd: string, newPwd: string) {
+    const user = await UsersService.getOrThrow(id)
+    if (!Security.match(oldPwd, user.passwordHash))
+      throw new HttpError('UNPROCESSABLE_ENTITY', '密码错误')
+    user.passwordHash = Security.encrypt(newPwd)
     await user.save()
   }
   export namespace Friends {
