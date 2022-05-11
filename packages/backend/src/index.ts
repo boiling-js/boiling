@@ -29,7 +29,10 @@ app
   .use(staticMiddleware(staticPath))
   .use(logger())
   .use(koaBody({
-    multipart: true
+    multipart: true,
+    formidable: {
+      hashAlgorithm: 'md5'
+    }
   }))
   .use(session(app))
   .use(Middlewares.handleErrors)
