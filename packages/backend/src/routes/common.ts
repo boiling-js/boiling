@@ -13,14 +13,15 @@ export const router = new Router({
     }, [] as File[])
     return await Promise.all(files.map(async file => {
       const ext = require('mime-types').extension(file.mimetype)
-      const targetPath = path.resolve(staticPath, 'uploads', `${ file.hash }.${ ext }`)
+      const filename = `${ file.hash }.${ ext }`
+      const targetPath = path.resolve(staticPath, 'uploads', filename)
       if (await pathExists(targetPath))
-        return targetPath
+        return filename
 
       return new Promise<string>((resolve, reject) => {
         if (!file.hash)
           throw new Error('file.hash is not defined')
-        cp(file.filepath, targetPath, err => err ? reject(err) : resolve(targetPath))
+        cp(file.filepath, targetPath, err => err ? reject(err) : resolve(filename))
       })
     }))
   })
