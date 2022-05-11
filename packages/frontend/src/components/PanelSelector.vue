@@ -2,12 +2,12 @@
   <div class="wrapper">
     <div class="panel-selector">
       <el-tooltip placement="bottom" content="主页">
-        <div class="select">
+        <div class="select" @click="$router.push('/home')">
           <img width="36" src="../assets/img/favicon.svg" alt="主页">
         </div>
       </el-tooltip>
       <el-tooltip placement="bottom" content="探索">
-        <div class="select">
+        <div class="select" @click="$router.push('/share')">
           <el-icon :size="24" color="#fff"><compass/></el-icon>
         </div>
       </el-tooltip>

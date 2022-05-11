@@ -40,19 +40,19 @@
   <el-dialog v-model="pwd.show" title="更改密码">
     <el-form :model="pwd" label-width="100px" label-position="top">
       <el-form-item label="当前密码">
-        <el-input v-model="pwd.oldPwd" autocomplete="off" />
+        <el-input v-model="pwd.oldPwd" type="password"/>
       </el-form-item>
       <el-form-item label="新密码">
-        <el-input v-model="pwd.newPwd" autocomplete="off" />
+        <el-input v-model="pwd.newPwd" type="password" />
       </el-form-item>
       <el-form-item label="确认新密码">
-        <el-input v-model="pwd.confirmPwd" autocomplete="off" />
+        <el-input v-model="pwd.confirmPwd" type="password"/>
       </el-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="pwd.show = false">取消</el-button>
-        <el-button type="primary" @click="pwd.show = false">确认</el-button>
+        <el-button type="primary" @click="changePwd">确认</el-button>
       </span>
     </template>
   </el-dialog>
@@ -83,6 +83,7 @@ import store from '../store'
 import { Users } from '@boiling/core'
 import Avatar from './Avatar.vue'
 import { ElMessageBox } from 'element-plus'
+import { api } from '../api'
 
 type PWD = {
   show: boolean
@@ -119,6 +120,17 @@ const
       }
     )
     await store.dispatch('updAvatar', avatar)
+  },
+  changePwd = async () => {
+    if (pwd.value.newPwd !== pwd.value.confirmPwd) {
+      ElMessage.error('两次输入的密码不一致！')
+      return
+    }
+    await api.user('@me').password.upd({
+      oldPwd: pwd.value.oldPwd, newPwd: pwd.value.newPwd
+    })
+    ElMessage.success('密码更改成功！')
+    pwd.value.show = false
   }
 
 onMounted(() => {
