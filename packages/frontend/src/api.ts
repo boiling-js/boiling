@@ -12,6 +12,9 @@ interface OfficialApi {
   /** 获取指定用户 */
   user(id: number | '@me'): {
     upd(d: Users.UpdateOut): Promise<void>
+    password: {
+      upd(d: { oldPwd: string, newPwd: string }): Promise<void>
+    }
     status: {
       /** 登录用户并设置用户状态 */
       add(d: Users.Login): Promise<Users.Out>
@@ -56,6 +59,7 @@ interface OfficialApi {
       add(d: { content: string }): Promise<Messages.Model>
     }
     members: Promise<Users.FriendOut[]>
+    files: Promise<void>
   }
 }
 
