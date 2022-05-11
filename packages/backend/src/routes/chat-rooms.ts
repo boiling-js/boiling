@@ -81,15 +81,3 @@ export const router = new Router({
     const { name, avatar, members } = ctx.request.body
     return ChatRoomsService.update(chatRoomId, { name, avatar, members })
   })
-  /**
-   * 上传文件
-   */
-  .post('/:chatRoomId/files', async ctx => {
-    const { chatRoomId } = ctx.params
-    console.log('chatRoomId', chatRoomId)
-    // @ts-ignore
-    const file = ctx.request.files.file
-    console.log('file', file)
-    const basename = path.basename(file?.path)
-    ctx.body = { 'url': `${ctx.origin}/uploads/${basename}` }
-  })
