@@ -8,14 +8,35 @@
         <span class="uname">{{ modelValue.sender.username }}</span>
         <span class="ctime">{{ dayjs(modelValue.createdAt).format('YYYY-MM-DD') }}</span>
       </div>
-      <div class="text">{{ modelValue.content }}</div>
+      <div class="text" v-html="marked(modelValue.content)"/>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import '../assets/nord.scss'
+import { marked } from 'marked'
+import hljs from 'highlight.js'
 import dayjs from 'dayjs'
 import { Messages } from '@boiling/core'
+
+marked.setOptions({
+  highlight(
+    code: string, lang: string, _callback?: (error: any, code?: string) => void
+  ): string | void {
+    if (lang !== '') {
+      return hljs.highlight(code, { language: lang }).value
+    }
+    return hljs.highlightAuto(code).value
+  },
+  pedantic: false,
+  gfm: true,
+  breaks: false,
+  sanitize: false,
+  smartLists: true,
+  smartypants: false,
+  xhtml: false
+})
 
 defineProps<{
   modelValue: Messages.Model
@@ -49,6 +70,9 @@ div.message {
       color: #fff;
       font-size: 14px;
       white-space: pre-wrap;
+      :deep(pre), :deep(p) {
+        margin: 0;
+      }
     }
   }
 }
