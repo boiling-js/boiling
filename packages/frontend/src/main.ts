@@ -9,6 +9,13 @@ import store from './store'
 
 const app = createApp(App)
 
+window.osMeta = {
+  isDesktop: !!window?.desktop
+}
+if (window.osMeta.isDesktop) {
+  window.osMeta.type = desktop?.type
+}
+
 app.config.globalProperties = {
   $logger: new Proxy(console, {
     get(target, prop: string) {
