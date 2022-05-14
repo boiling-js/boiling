@@ -1,4 +1,4 @@
-/// <reference types="vite/client" />
+/// <reference types="vite/client.d.ts" />
 
 type OSType = 'Linux' | 'Darwin' | 'Windows_NT';
 
@@ -24,9 +24,6 @@ export declare global {
 
 declare module '*.vue' {
   import { DefineComponent } from 'vue'
-  declare global {
-    export declare const desktop: Desktop | undefined
-  }
   const component: DefineComponent<{}, {}, any>
   export default component
 }
