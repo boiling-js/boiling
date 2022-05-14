@@ -7,9 +7,8 @@ const router = createRouter({
   }, {
     path: '/home',
     name: 'home',
+    redirect: '/home/friends',
     component: () => import('./views/home/Index.vue'),
-    // TODO 好友、讨论组、频道 管理页面
-    // TODO 好友聊天页面
     children: [{
       path: '/home/friends',
       component: () => import('./views/home/Friends.vue')
