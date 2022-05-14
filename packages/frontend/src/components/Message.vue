@@ -73,6 +73,19 @@ div.message {
       :deep(pre), :deep(p) {
         margin: 0;
       }
+      :deep(pre) {
+        padding: 10px;
+        background-color: var(--color-auxi-regular);
+        border: 1px solid var(--color-auxi-primary);
+        border-radius: 5px;
+      }
+      :deep(img) {
+        margin-top: 10px;
+        max-width: 360px;
+        &:not(:last-child) {
+          margin-bottom: 10px;
+        }
+      }
     }
   }
 }
