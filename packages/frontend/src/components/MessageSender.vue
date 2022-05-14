@@ -73,20 +73,7 @@ const emits = defineEmits<{
 const
   content = ref(''),
   selFile = ref<HTMLInputElement | null>(null),
-  srcList = ref<string[]>([
-    'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
-    'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
-    'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
-    'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
-    'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
-    'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
-    'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
-    'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
-    'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
-    'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
-    'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
-    'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg'
-  ]),
+  srcList = ref<string[]>([]),
   send = async () => {
     if (content.value.trim()) {
       const m =
@@ -103,8 +90,22 @@ const
       'image/gif': 'image/gif',
       unknown: '*/*'
     }[type]
+    selFile.value.onchange = () => {
+      if (!selFile.value)
+        return
+
+      const formData = new FormData()
+      for (let i = 0; i < (selFile.value.files?.length ?? 0); i++) {
+        const file = selFile.value.files?.[i]
+        file && formData.append(`file-${ i }`, file)
+      }
+      fetch('/api/common/upload', { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then((files: string[]) => {
+          srcList.value.push(...files.map(f => `/api/uploads/${ f }`))
+        })
+    }
     selFile.value.click()
-    // upload to server
   }
 
 watch(content, () => {

@@ -61,25 +61,31 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
+@media only screen and (max-width: 600px) {
+  div.login {
+    --w: 250px;
+  }
+}
 .login {
-  $w: 250px;
-  $h: 320px;
-  $p: 35px;
+  --w: 450px;
+  --h: 320px;
+  --p: 35px;
 
   background-image: url("../assets/img/bg/1.png");
   background-position: center;
   background-size: cover;
   > .login-box {
     position: fixed;
-    top: calc(50vh - #{$h} / 2 - #{$p});
-    left: calc(50% - #{$w} / 2 - #{$p});
-    padding: $p;
-    width: $w;
-    height: $h;
+    top: calc(50vh - var(--h) / 2 - var(--p));
+    left: calc(50% - var(--w) / 2 - var(--p));
+    padding: var(--p);
+    width: var(--w);
+    height: var(--h);
     color: var(--color-text-primary);
     background-color: var(--color-auxi-primary);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
+    transition: 0.3s;
     > .title {
       text-align: center;
     }
@@ -98,7 +104,7 @@ onUnmounted(() => {
     }
     > .el-button {
       margin: 10px 0;
-      width: $w;
+      width: var(--w);
     }
     > .register {
       font-size: 10px;

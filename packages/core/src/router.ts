@@ -189,7 +189,7 @@ export namespace Router {
     query: Query
     params: Param
   } & {
-    [r in 'req' | 'request']: { body: Body }
+    [r in 'req' | 'request']: Koa.Request & { body: Body }
   }
   export type Methods = 'get' | 'post' | 'put' | 'delete' | 'del' | 'patch' | 'head'
   export const methods = ['get', 'post', 'put', 'delete', 'del', 'patch', 'head']
