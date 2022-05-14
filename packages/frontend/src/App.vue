@@ -33,30 +33,44 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-html { margin: 0; }
-body { margin: 5px; }
+html, body { margin: 0; }
 #app {
+  /* stylelint-disable length-zero-no-unit */
+  --title-bar-height: 0px;
+  /* stylelint-enable length-zero-no-unit */
+
   display: flex;
-  height: calc(100vh - 10px);
+  height: 100vh;
   overflow: hidden;
   font-family: "Avenir", "Helvetica", "Arial", sans-serif;
   -webkit-font-smoothing: antialiased;
-  border-radius: 6px;
-  box-shadow: 0 0 5px rgb(0 0 0 / 80%);
   flex-direction: column;
   justify-content: space-between;
+  div.title-bar {
+    display: none;
+  }
+  &.is-desktop {
+    --title-bar-height: 26px;
+
+    margin: 5px;
+    height: calc(100vh - 10px);
+    border-radius: 6px;
+    box-shadow: 0 0 5px rgb(0 0 0 / 80%);
+    div.title-bar {
+      display: flex;
+    }
+  }
 }
 </style>
 
 <style lang="scss" scoped>
-$h: 26px;
 div.title-bar {
-  min-height: $h;
+  min-height: var(--title-bar-height);
 }
 div.container {
   display: flex;
   width: 100%;
-  height: calc(100% - #{$h});
+  height: calc(100% - var(--title-bar-height));
   justify-content: space-between;
   background-color: var(--color-auxi-primary);
   &.loading {
