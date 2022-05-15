@@ -126,7 +126,7 @@ export namespace UsersService {
         )?.toJSON(), {
           tags: friend.tags,
           remark: friend.remark
-        }))
+        }) as any as Users.FriendOut)
       )
     }
     export async function update(uid: number, fUid: number, opts: Opts) {

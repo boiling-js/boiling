@@ -114,9 +114,14 @@ div.chat {
 
       display: flex;
       flex-grow: 1;
-      padding: 10px;
       flex-direction: column;
-      row-gap: 10px;
+      > div.message {
+        padding: 10px 10px 0;
+        transition: 0.3s;
+        &:hover {
+          background-color: var(--color-auxi-regular);
+        }
+      }
     }
     > div.message-sender {
       margin: 5px 10px;

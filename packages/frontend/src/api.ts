@@ -41,7 +41,7 @@ interface OfficialApi {
       upd(d: { avatar: string }): Promise<void>
     }
   }
-  'chat-rooms': QueryPromise<ChatRooms.Model, SearchQuery & {
+  'chat-rooms': QueryPromise<Pagination<ChatRooms.Model>, SearchQuery & {
     disableToast?: boolean
   }> & {
     /** 创建聊天室 */

@@ -75,10 +75,15 @@ const
   selFile = ref<HTMLInputElement | null>(null),
   srcList = ref<string[]>([]),
   send = async () => {
-    if (content.value.trim()) {
+    if (content.value.trim() || srcList.value.length) {
+      let mContent = content.value.trim()
+      if (srcList.value.length > 0) {
+        mContent += '\n' + srcList.value.map(src => `![image](${ src })`).join('\n')
+      }
       const m =
-        await api['chat-room'](props.chatRoomId).messages.add({ content: content.value })
+        await api['chat-room'](props.chatRoomId).messages.add({ content: mContent })
       content.value = ''
+      srcList.value = []
       emits('sended', m)
     }
   },

@@ -1,9 +1,10 @@
 import Schema from 'schemastery'
-import { ChatRooms, Messages, Router } from '@boiling/core'
+import { ChatRooms, Messages, Pagination, Router } from '@boiling/core'
 import { ChatRoomsService } from '../services/chat-rooms'
 import usePagination from '../hooks/usePagination'
 import { clients } from './ws'
 import useCurUser from '../hooks/useCurUser'
+import extendService from '../hooks/extendService'
 
 export const router = new Router({
   prefix: '/chat-rooms' as '/chat-rooms'
@@ -11,21 +12,10 @@ export const router = new Router({
   /**
    * 获取聊天室
    */
-  .get(ChatRooms.Model, '?key', ctx => {
-    const { key } = ctx.query
-    const keywords = decodeURI(key).split(' ')
-    const names: string[] = []
-    const members: number[] = []
-    keywords.forEach(keyword => {
-      const [type, content] = keyword.split(':')
-      if (!!content && type === 'members') {
-        const ids = content.split(',').map(id => parseInt(id))
-        members.push(...ids)
-      } else {
-        names.push(keyword)
-      }
-    })
-    return ChatRoomsService.getOrThrow(members) as any as ChatRooms.Model
+  .get(Pagination(ChatRooms.Model), '?key&page(number)&num(number)', ctx => {
+    return usePagination(
+      extendService(ChatRoomsService, 'search', m => m), ctx.query
+    )(decodeURI(ctx.query.key))
   })
   /**
    * 创建聊天室
