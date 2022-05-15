@@ -79,6 +79,27 @@ export namespace ChatRoomsService {
     await existsOrThrow(arg0)
     return get(arg0)
   }
+  export function search(key: string) {
+    const keywords = key.split(' ')
+    const names: string[] = []
+    const members: number[] = []
+    keywords.forEach(keyword => {
+      const [ type, content ] = keyword.split(':')
+      if (!!content && type === 'members') {
+        const ids = content.split(',').map(id => parseInt(id))
+        members.push(...ids)
+      } else {
+        names.push(keyword)
+      }
+    })
+    const filter: Parameters<typeof Model.find>[0] = {
+      name: { $regex: new RegExp(names.map(n => `(.*${ n }.*)`).join('|')) },
+    }
+    if (members.length > 0) {
+      filter['members'] = { $in: members }
+    }
+    return Model.find(filter)
+  }
   /**
    * 获取讨论组通过用户id
    * @param uid 用户id

@@ -77,6 +77,24 @@ describe('ChatRooms Service', () => {
     await expect(ChatRoomsService.del('623f1b13e11111f3c2debd48'))
       .to.be.eventually.be.rejectedWith('[404] id 为 \'623f1b13e11111f3c2debd48\' 的聊天室不存在')
   })
+  it('should search chat room by name or members.', async function () {
+    await ChatRoomsService.create([ u0.id, u1.id ], { name: 'foo' })
+    await ChatRoomsService.create([ u0.id, u2.id ], { name: 'fuu' })
+    await ChatRoomsService.create([ u0.id, u3.id ], { name: 'bar' })
+    await ChatRoomsService.create([ u1.id, u3.id ], { name: 'ber' })
+    expect(
+      await ChatRoomsService.search('f').count()
+    ).to.be.eq(2)
+    expect(
+      await ChatRoomsService.search('f b').count()
+    ).to.be.eq(4)
+    expect(
+      await ChatRoomsService.search('foo b').count()
+    ).to.be.eq(3)
+    expect(
+      await ChatRoomsService.search(`f b members:${u0.id}`).count()
+    ).to.be.eq(3)
+  })
   it('should get groups by uid', async () => {
     await Promise.all([
       ChatRoomsService.create([u0.id, u1.id]),
