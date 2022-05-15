@@ -11,7 +11,7 @@ after(() => {
   process.exit(0)
 })
 describe('ChatRooms Service', () => {
-  let u0: Users.Base, u1: Users.Base, u2: Users.Base, u3: Users.Base
+  let u0: Users.Base, u1: Users.Base, u2: Users.Base, u3: Users.Base, u4: Users.Base
   after(async () => {
     await UsersService.Model.deleteMany({})
   })
@@ -20,6 +20,7 @@ describe('ChatRooms Service', () => {
     u1 = await UsersService.add({ username: '002', passwordHash: '002', avatar: '002' })
     u2 = await UsersService.add({ username: '003', passwordHash: '003', avatar: '003' })
     u3 = await UsersService.add({ username: '004', passwordHash: '004', avatar: '004' })
+    u4 = await UsersService.add({ username: '005', passwordHash: '005', avatar: '005' })
   })
 
   afterEach(async () => {
@@ -82,10 +83,13 @@ describe('ChatRooms Service', () => {
       ChatRoomsService.create([u0.id, u2.id, u3.id]),
       ChatRoomsService.create([u0.id, u1.id, u3.id])
     ])
-    const groups = await ChatRoomsService.getGroupByUid(u0.id)
-    expect(groups).to.have.lengthOf(2)
+    const groups = await ChatRoomsService.getGroups(u0.id)
+    expect(groups).to.be.have.lengthOf(2)
     expect(groups[0].members).to.be.deep.equal([u0.id, u2.id, u3.id])
     expect(groups[1].members).to.be.deep.equal([u0.id, u1.id, u3.id])
+    expect(
+      await ChatRoomsService.getGroups(u4.id)
+    ).to.be.have.lengthOf(0)
   })
   it('should update chatRoom' ,async () => {
     const members = [u0.id, u1.id]
