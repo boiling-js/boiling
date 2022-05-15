@@ -93,7 +93,7 @@ export namespace ChatRoomsService {
       }
     })
     const filter: Parameters<typeof Model.find>[0] = {
-      name: { $regex: new RegExp(names.map(n => `(.*${ n }.*)`).join('|')) },
+      name: { $regex: new RegExp(names.map(n => `(.*${ n }.*)`).join('|')) }
     }
     if (members.length > 0) {
       filter['members'] = { $in: members }

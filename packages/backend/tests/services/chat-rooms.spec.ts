@@ -92,7 +92,10 @@ describe('ChatRooms Service', () => {
       await ChatRoomsService.search('foo b').count()
     ).to.be.eq(3)
     expect(
-      await ChatRoomsService.search(`f b members:${u0.id}`).count()
+      await ChatRoomsService.search(`f b members:${ u0.id }`).count()
+    ).to.be.eq(3)
+    expect(
+      await ChatRoomsService.search(`members:${ u0.id }`).count()
     ).to.be.eq(3)
   })
   it('should get groups by uid', async () => {
