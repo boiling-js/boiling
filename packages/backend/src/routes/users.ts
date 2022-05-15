@@ -94,7 +94,7 @@ export const router = new Router({
       ctx.params.targetId
     )
   })
-  .get('/:id(uid)/friends', ctx => {
+  .get(Schema.array(Users.FriendOut), '/:id(uid)/friends?key&page(number)&num(number)', ctx => {
     return UsersService.Friends.get(useTarget(ctx.session, ctx.params.id))
   })
   .post('/:id(uid)/tag', ctx => {
@@ -130,9 +130,7 @@ export const router = new Router({
   .get('/:id(uid)/groups', ctx => {
     return ChatRoomsService.getGroupByUid(useTarget(ctx.session, ctx.params.id))
   })
-  /**
-   * 更改密码
-   */
+  /** 更改密码 */
   .patch('/:id(uid)/password', ctx => {
     const { oldPwd, newPwd } = ctx.request.body
     return  UsersService.updatePassword(useTarget(ctx.session, ctx.params.id), oldPwd, newPwd)
