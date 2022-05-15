@@ -8,6 +8,7 @@
         <span class="uname">{{ modelValue.sender.username }}</span>
         <span class="ctime">{{ dayjs(modelValue.createdAt).format('YYYY-MM-DD') }}</span>
       </div>
+      <!-- eslint-disable-next-line vue/no-v-html -->
       <div class="text" v-html="marked(modelValue.content)"/>
     </div>
   </div>
