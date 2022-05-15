@@ -128,10 +128,10 @@ export const router = new Router({
   })
   /** 获取用户讨论组 */
   .get('/:id(uid)/groups', ctx => {
-    return ChatRoomsService.getGroupByUid(useTarget(ctx.session, ctx.params.id))
+    return ChatRoomsService.getGroups(useTarget(ctx.session, ctx.params.id))
   })
   /** 更改密码 */
   .patch('/:id(uid)/password', ctx => {
     const { oldPwd, newPwd } = ctx.request.body
-    return  UsersService.updatePassword(useTarget(ctx.session, ctx.params.id), oldPwd, newPwd)
+    return UsersService.updatePassword(useTarget(ctx.session, ctx.params.id), oldPwd, newPwd)
   })
