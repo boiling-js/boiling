@@ -12,7 +12,7 @@
         </div>
       </el-tooltip>
       <el-tooltip placement="bottom" content="创建">
-        <div class="select">
+        <div class="select" @click="$router.push('/create-channel')">
           <el-icon :size="24" color="#fff"><plus/></el-icon>
         </div>
       </el-tooltip>
