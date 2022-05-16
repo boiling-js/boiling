@@ -3,7 +3,7 @@
     <div class="content">
       <div class="title">新建频道</div>
       <div class="avatar-uploader" @click="upload">
-        <img v-if="channel.avatar" :src="channel.avatar" class="avatar" />
+        <img v-if="channel.avatar" :src="channel.avatar" class="avatar" >
         <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
         <input ref="selFile" type="file" style="display: none;">
       </div>
@@ -21,7 +21,7 @@
       </el-form>
       <div class="bottom">
         <el-button @click="$router.push('/home')">取消</el-button>
-        <el-button type="primary" @click="() => {}">确认</el-button>
+        <el-button type="primary" @click="create">确认</el-button>
       </div>
     </div>
     <avatar/>
@@ -30,10 +30,11 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import {  ElIcon, ElForm, ElFormItem, ElInput, ElButton } from 'element-plus'
+import {  ElIcon, ElForm, ElFormItem, ElInput, ElButton, ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { Channels } from '@boiling/core'
 import Avatar from './Avatar.vue'
+import { api } from '../api'
 
 const
   channel = ref<Pick<Channels.Model, 'name' | 'avatar' | 'description'>>({
@@ -62,6 +63,10 @@ const
         })
     }
     selFile.value?.click()
+  },
+  create = async () => {
+    await api.channels.add(channel.value)
+    ElMessage.success('创建成功')
   }
 </script>
 
