@@ -5,7 +5,9 @@ export namespace Channels {
     /** id */
     id: Schema.string(),
     /** name */
-    name: Schema.string()
+    name: Schema.string(),
+    /** rules */
+    rules: Schema.array(Schema.string())
   })
   export type MemberMeta = Schema.InferS<typeof MemberMeta>
   export const ChatRoomMeta = Schema.interface({
@@ -23,13 +25,13 @@ export namespace Channels {
     /** 名称 */
     name: Schema.string(),
     /** 头像 */
-    avatar: Schema.string().optional(),
+    avatar: Schema.string(),
     /** 成员列表 */
     members: Schema.array(MemberMeta),
     /** 聊天室列表 */
     chatrooms: Schema.array(ChatRoomMeta).optional(),
     /** 介绍信息 */
-    description: Schema.string(),
+    description: Schema.string().optional(),
     /** 创建时间 */
     createdAt: Schema.from(Date).optional()
   })
