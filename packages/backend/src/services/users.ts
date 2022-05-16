@@ -32,6 +32,19 @@ export namespace UsersService {
     user.tags.splice(index, 1)
     await user.save()
   }
+  export function exists(id: number): Promise<boolean>
+  export function exists(uname: string): Promise<boolean>
+  export function exists(arg0: number | string): Promise<boolean>
+  export function exists(arg0: number | string) {
+    if (typeof arg0 === 'number')
+      return Model.exists({ id: arg0 })
+    else
+      return Model.exists({ username: arg0 })
+  }
+  export async function existsOrThrow(arg0: number | string) {
+    if (!await exists(arg0))
+      throw new HttpError('NOT_FOUND', `id 为 '${ arg0 }' 的用户不存在`)
+  }
   type GetReturnType = ReturnType<typeof Model.findOne>
   export function get(id: number): GetReturnType
   export function get(username: string): GetReturnType
@@ -55,14 +68,6 @@ export namespace UsersService {
   }
   export function search(key: string) {
     return Model.find({ username: new RegExp(`${key}.*`) })
-  }
-  export async function exists(id: number): Promise<boolean>
-  export async function exists(uname: string): Promise<boolean>
-  export async function exists(arg0: string | number) {
-    if (typeof arg0 === 'number')
-      return Model.exists({ id: arg0 })
-    else
-      return Model.exists({ username: arg0 })
   }
   export async function getAvatars() {
     return (await fs.readdir('./static/img/avatar'))
