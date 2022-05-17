@@ -44,6 +44,9 @@ const router = createRouter({
   }, {
     path: '/edit-personnel',
     component: () => import('./components/EditPersonnel.vue')
+  }, {
+    path: '/create-channel',
+    component: () => import('./components/CreateChannel.vue')
   }]
 })
 

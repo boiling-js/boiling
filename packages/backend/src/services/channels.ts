@@ -25,13 +25,13 @@ export namespace ChannelsService {
    * 判断频道是否存在
    */
   export function exists(id: string) {
-    return Model.exists({ id })
+    return Model.exists({ _id: id })
   }
   /**
    * 判断频道是否存在，不存在抛出异常
    */
-  export function existsOrThrow(id: string) {
-    if (!exists(id))
+  export async function existsOrThrow(id: string) {
+    if (!await exists(id))
       throw new HttpError(
         'NOT_FOUND',  `id 为 '${ id }' 的频道不存在`
       )
@@ -40,7 +40,7 @@ export namespace ChannelsService {
    * 通过频道 id 获取频道
    */
   export async function get(id: string) {
-    return Model.findOne({ id })
+    return Model.findOne({ _id: id })
   }
   /**
    * 通过频道 id 获取频道，不存在抛出异常
@@ -52,16 +52,26 @@ export namespace ChannelsService {
   /**
    * 通过频道名称或者简介搜索频道
    */
-  export function search() {
+  export function search(key: string) {
+    return Model.find({
+      $or: [
+        { name: { $regex: key, $options: 'i' } },
+        { description: { $regex: key, $options: 'i' } }
+      ]
+    })
   }
   /**
    * 删除解散频道
    */
-  export function del() {
+  export async function del(id: string) {
+    await existsOrThrow(id)
+    await Model.deleteOne({ _id: id })
   }
   /**
    * 更新频道基础信息
    */
-  export function update() {
+  export async function update(id: string, options: Partial<Pick<M, 'name' | 'avatar' | 'members' | 'description'>>) {
+    await existsOrThrow(id)
+    await Model.updateOne({ _id: id }, options)
   }
 }

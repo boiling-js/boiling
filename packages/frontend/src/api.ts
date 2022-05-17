@@ -1,4 +1,14 @@
-import { Api, attachApi, ChatRooms, Messages, Pagination, QueryPromise, SearchQuery, Users } from '@boiling/core'
+import {
+  Api,
+  attachApi,
+  Channels,
+  ChatRooms,
+  Messages,
+  Pagination,
+  QueryPromise,
+  SearchQuery,
+  Users
+} from '@boiling/core'
 import { ElMessage } from 'element-plus'
 
 interface OfficialApi {
@@ -60,6 +70,10 @@ interface OfficialApi {
     }
     members: Promise<Users.FriendOut[]>
     files: Promise<void>
+  }
+  /** 频道 */
+  channels:  QueryPromise<Pagination<Channels.Model>, SearchQuery> & {
+    add(d: Pick<Channels.Model, 'name' | 'avatar' | 'description'>): Promise<Channels.Model>
   }
 }
 
