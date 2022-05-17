@@ -17,7 +17,12 @@
         </div>
       </el-tooltip>
       <el-divider/>
-      <div class="select"/>
+      <div v-for="channel in channels?.items"
+           :key="channel.id"
+           class="select"
+      >
+        <img width="36" :src="channel.avatar" alt="主页">
+      </div>
       <div class="select"/>
       <div class="select"/>
       <div class="select"/>
@@ -42,6 +47,15 @@
 <script lang="ts" setup>
 import { ElDivider, ElTooltip, ElIcon } from 'element-plus'
 import { Compass, Plus, ArrowRight } from '@element-plus/icons-vue'
+import { Channels, Pagination } from '@boiling/core'
+import { onMounted, ref } from 'vue'
+import { api } from '../api'
+
+const channels = ref<Pagination<Channels.Model>>()
+
+onMounted(async () => {
+  channels.value = await api.channels.query({ key: '' })
+})
 </script>
 
 <style lang="scss" scoped>
