@@ -61,3 +61,11 @@ export const router = new Router({
     ) throw new HttpError('UNAUTHORIZED', '无权限删除该频道')
     return ChannelsService.del(channelId)
   })
+  /**
+   * 添加子频道
+   */
+  .post(Schema.Pick(Channels.SubChannelMeta, ['subTitle']), Schema.any(), '/:channelId/subChannel', async ctx => {
+    const { channelId } = ctx.params
+    const { subTitle } = ctx.request.body
+    return ChannelsService.addSubChannel(channelId, subTitle)
+  })

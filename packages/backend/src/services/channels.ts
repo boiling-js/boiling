@@ -75,4 +75,11 @@ export namespace ChannelsService {
     await existsOrThrow(id)
     await Model.updateOne({ _id: id }, options)
   }
+  /**
+   * 添加子频道
+   */
+  export async function addSubChannel(id: string, subTitle: string) {
+    await existsOrThrow(id)
+    await Model.updateOne({ _id: id }, { $push: { subChannel: { subTitle } } })
+  }
 }
