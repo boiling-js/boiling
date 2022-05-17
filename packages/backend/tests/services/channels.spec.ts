@@ -44,9 +44,11 @@ describe('Channels Service', () => {
     await Promise.all([
       ChannelsService.create(u0.id, { name: 'name', avatar: 'avatar', description: 'des' }),
       ChannelsService.create(u0.id, { name: 'name1', avatar: 'avatar1', description: 'description1' }),
-      ChannelsService.create(u0.id, { name: 'name2', avatar: 'avatar2', description: 'description2' })
+      ChannelsService.create(u0.id, { name: 'name2', avatar: 'avatar2', description: 'description2' }),
+      ChannelsService.create(u0.id, { name: 'nb111', avatar: 'avatar2', description: 'description2' })
     ])
     expect(await ChannelsService.search('test')).to.be.have.lengthOf(0)
     expect(await ChannelsService.search('name')).to.be.have.lengthOf(3)
+    expect(await ChannelsService.search('')).to.be.have.lengthOf(4)
   })
 })
