@@ -25,6 +25,13 @@ const router = createRouter({
         id: route.params.id,
         title: route.query.title
       })
+    }, {
+      path: '/home/channel/:id',
+      component: () => import('./views/Channel.vue'),
+      props: route => ({
+        id: route.params.id,
+        title: route.query.title
+      })
     }]
   }, {
     path: '/login',
