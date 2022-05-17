@@ -36,3 +36,28 @@ export const router = new Router({
     const { channelId } = ctx.params
     return ChannelsService.get(channelId)
   })
+  /**
+   * 更新频道信息
+   */
+  .patch('/:channelId', async ctx => {
+    const { channelId } = ctx.params
+    const { name, avatar, description, members } = ctx.request.body
+    return ChannelsService.update(channelId, {
+      name,
+      avatar,
+      description,
+      members
+    })
+  })
+  /**
+   * 删除频道
+   */
+  .delete('/:channelId', async ctx => {
+    const { channelId } = ctx.params
+    const channel = await ChannelsService.getOrThrow(channelId)
+    if (
+      !channel.members
+        .every(m => m.id === useCurUser(ctx.session).id && m.rules?.includes('owner'))
+    ) throw new HttpError('UNAUTHORIZED', '无权限删除该频道')
+    return ChannelsService.del(channelId)
+  })

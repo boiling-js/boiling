@@ -47,7 +47,7 @@ export namespace ChannelsService {
    */
   export async function getOrThrow(id: string) {
     await existsOrThrow(id)
-    return get(id)
+    return get(id) as Promise<Exclude<Awaited<ReturnType<typeof get>>, null>>
   }
   /**
    * 通过频道名称或者简介搜索频道
