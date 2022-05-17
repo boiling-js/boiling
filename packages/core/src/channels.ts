@@ -5,9 +5,9 @@ export namespace Channels {
     /** id */
     id: Schema.string(),
     /** name */
-    name: Schema.string(),
+    name: Schema.string().optional(),
     /** rules */
-    rules: Schema.array(Schema.string())
+    rules: Schema.array(Schema.string()).default([])
   })
   export type MemberMeta = Schema.InferS<typeof MemberMeta>
   export const ChatRoomMeta = Schema.interface({
