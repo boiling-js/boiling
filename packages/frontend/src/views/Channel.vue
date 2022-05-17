@@ -3,17 +3,43 @@
     <div class="classify">
       <div class="title">{{ props.title }}</div>
       <img class="avatar" :src="channel?.avatar" alt="">
-      <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick" />
+      <div class="subTitle">
+        频道
+        <span class="add material-icons md-light"
+              @click="subChannelForm.show = true">add</span>
+      </div>
+      <el-tree :data="subChannels" :props="defaultProps" @node-click="handleNodeClick">
+        <template #default="{ node }">
+          {{ node.label }}
+          <span class="add material-icons md-light"
+                @click="() => {}">add</span>
+        </template>
+      </el-tree>
     </div>
-    <div class="content">
-
-    </div>
+    <div class="content"/>
+    <el-dialog
+      v-model="subChannelForm.show"
+      title="创建子频道">
+      <el-form
+        label-width="100px"
+        :model="subChannelForm">
+        <el-form-item label="标题">
+          <el-input v-model="subChannelForm.subTitle" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="subChannelForm.show = false">取消</el-button>
+          <el-button type="primary" @click="createSubChannel">确认</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { nextTick, onMounted, ref } from 'vue'
-import { ElTree } from 'element-plus'
+import { ElTree, ElDialog, ElButton, ElForm, ElFormItem, ElInput, ElMessage } from 'element-plus'
 import { Channels } from '@boiling/core'
 import { api } from '../api'
 
@@ -22,85 +48,42 @@ const
     id: string
     title: string
   }>(),
-  channel = ref<Channels.Model>()
+  defaultProps = {
+    children: 'chatRooms',
+    label: 'subTitle'
+  },
+  channel = ref<Channels.Model>(),
+  subChannels = ref<Channels.SubChannelMeta[]>([]),
+  subChannelForm = ref<{
+    show: boolean,
+    subTitle: string,
+  }>({
+    show: false,
+    subTitle: ''
+  })
+const
+  getChannel = async () => {
+    channel.value = await api.channel(props.id)
+    subChannels.value = channel.value.subChannel
+  },
+  createSubChannel = async () => {
+    await api.channel(props.id).subChannel.add({
+      subTitle: subChannelForm.value.subTitle
+    })
+    await getChannel()
+    subChannelForm.value.show = false
+    ElMessage.success('创建成功')
+  }
 
 onMounted(() => {
   nextTick(async () => {
-    channel.value = await api.channel(props.id)
+    await getChannel()
   })
 })
-
-interface Tree {
-  label: string
-  children?: Tree[]
-}
-
-const handleNodeClick = (data: Tree) => {
+const handleNodeClick = (data: Channels.SubChannelMeta) => {
   console.log(data)
 }
 
-const data: Tree[] = [
-  {
-    label: 'Level one 1',
-    children: [
-      {
-        label: 'Level two 1-1',
-        children: [
-          {
-            label: 'Level three 1-1-1'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    label: 'Level one 2',
-    children: [
-      {
-        label: 'Level two 2-1',
-        children: [
-          {
-            label: 'Level three 2-1-1'
-          }
-        ]
-      },
-      {
-        label: 'Level two 2-2',
-        children: [
-          {
-            label: 'Level three 2-2-1'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    label: 'Level one 3',
-    children: [
-      {
-        label: 'Level two 3-1',
-        children: [
-          {
-            label: 'Level three 3-1-1'
-          }
-        ]
-      },
-      {
-        label: 'Level two 3-2',
-        children: [
-          {
-            label: 'Level three 3-2-1'
-          }
-        ]
-      }
-    ]
-  }
-]
-
-const defaultProps = {
-  children: 'children',
-  label: 'label'
-}
 </script>
 
 <style lang="scss" scoped>
@@ -127,9 +110,28 @@ const defaultProps = {
       height: 200px;
       opacity: .8;
     }
+    > div.subTitle {
+      margin-top: 10px;
+      padding: 0 10px;
+      height: 30px;
+      line-height: 30px;
+      font-size: 13px;
+      font-weight: bold;
+      color: var(--color-text-primary);
+       .add {
+         margin-top: 3px;
+         float: right;
+         cursor: pointer;
+       }
+    }
     .el-tree {
-      margin-top: 20px;
       background: none;
+      :deep(.el-tree-node__content) {
+        .add {
+          margin-left: auto;
+          margin-right: 10px;
+        }
+      }
     }
   }
   > div.content {

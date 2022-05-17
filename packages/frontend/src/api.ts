@@ -76,13 +76,20 @@ interface OfficialApi {
     add(d: Pick<Channels.Model, 'name' | 'avatar' | 'description'>): Promise<Channels.Model>
   }
   channel(channelId: string): Promise<Channels.Model> & {
+    /** 更新频道 */
     upd(d: {
       name?: string
       avatar?: string
       description?: string
       members?: Channels.MemberMeta[]
     }): Promise<void>
+    /** 删除频道 */
     del(): Promise<void>
+    /** 子频道 */
+    subChannel: {
+      /** 创建子频道 */
+      add(d: {subTitle: string}): Promise<void>
+    }
   }
 }
 
