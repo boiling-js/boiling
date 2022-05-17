@@ -20,17 +20,11 @@
       <div v-for="channel in channels?.items"
            :key="channel.id"
            class="select"
-      >
+           @click="() => $router.push(
+             `/home/channel/${ channel.id }?title=${ channel.name }`
+           )">
         <img width="36" :src="channel.avatar" alt="主页">
       </div>
-      <div class="select"/>
-      <div class="select"/>
-      <div class="select"/>
-      <div class="select"/>
-      <div class="select"/>
-      <div class="select"/>
-      <div class="select"/>
-      <div class="select"/>
     </div>
     <div :class="{
            'control-sidebar': true,
