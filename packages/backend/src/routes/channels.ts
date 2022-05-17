@@ -9,7 +9,7 @@ export const router = new Router({
   prefix: '/channels'
 })
   /**
-   * 获取聊天室
+   * 获取频道列表
    */
   .get(Pagination(Channels.Model), '?key&page(number)&num(number)', ctx => {
     // @ts-ignore
@@ -28,4 +28,11 @@ export const router = new Router({
       avatar,
       description
     })
+  })
+  /**
+   * 通过频道id获取频道信息
+   */
+  .get('/:channelId', async ctx => {
+    const { channelId } = ctx.params
+    return ChannelsService.get(channelId)
   })
