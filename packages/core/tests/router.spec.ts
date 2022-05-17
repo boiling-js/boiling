@@ -78,6 +78,8 @@ describe('Router', () => {
       const middleware = r.middleware()
       await expect(middleware(createCtx('get', '/users/a?name=ahh'), next))
         .to.be.eventually.eq('ahh')
+      await expect(middleware(createCtx('get', '/users/a?name='), next))
+        .to.be.eventually.eq(undefined)
     })
     it('should reveal router middlewares by interface.', async () => {
       const r = new Router({ prefix: '/users' as '/users' })
