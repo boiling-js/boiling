@@ -79,8 +79,10 @@ interface OfficialApi {
     upd(d: {
       name?: string
       avatar?: string
-      members?: string[]
+      description?: string
+      members?: Channels.MemberMeta[]
     }): Promise<void>
+    del(): Promise<void>
   }
 }
 
