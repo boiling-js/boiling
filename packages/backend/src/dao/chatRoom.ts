@@ -2,6 +2,9 @@ import { Schema, model } from 'mongoose'
 import { ChatRooms } from '@boiling/core'
 
 export const chatRoomSchema = new Schema<ChatRooms.Model>({
+  channelId: {
+    type: String
+  },
   name: {
     type: String
   },
