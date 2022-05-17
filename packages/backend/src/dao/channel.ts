@@ -9,7 +9,7 @@ export const channelSchema = new Schema<Channels.Model>({
     type: String
   },
   members: [{
-    id: { type: String, required: true },
+    id: { type: Number, required: true },
     name: { type: String }
   }],
   chatrooms: [{
