@@ -1,21 +1,20 @@
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { configDotenv } from '@boiling/utils'
 
-export default defineConfig(({ mode }) => {
-  process.env = Object.assign({}, process.env, loadEnv(mode, process.cwd()))
+configDotenv()
 
-  return {
-    server: {
-      port: Number(process.env.VITE_PORT) || 3000,
-      proxy: {
-        '/api': {
-          ws: true,
-          target: process.env.VITE_API_TARGET,
-          changeOrigin: true,
-          rewrite: path => path.replace(/^\/api/, '')
-        }
+export default defineConfig({
+  server: {
+    port: Number(process.env.VITE_PORT) || 3000,
+    proxy: {
+      '/api': {
+        ws: true,
+        target: `http://${ process.env.BACKEND_HOST }:${ process.env.BACKEND_PORT }`,
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, '')
       }
-    },
-    plugins: [ vue() ]
-  }
+    }
+  },
+  plugins: [ vue() ]
 })

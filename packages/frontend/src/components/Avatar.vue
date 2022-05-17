@@ -2,7 +2,7 @@
   <el-dialog
     v-model="showDialog"
     title="更换头像"
-    width="920px">
+    width="70%">
     <el-scrollbar height="500px">
       <img
         v-for="(item, index) in avatars"
@@ -14,25 +14,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { ElDialog, ElMessageBox, ElScrollbar } from 'element-plus'
+import { onMounted, ref } from 'vue'
+import { ElDialog, ElScrollbar } from 'element-plus'
 import { api } from '../api'
-import store from '../store'
 
-computed(() => store.state.user.avatar)
-const showDialog = ref<Boolean>(false),
+const
+  emits = defineEmits<{
+    (e: 'selAvatar', avatar: string): void
+  }>(),
+  showDialog = ref<Boolean>(false),
   avatars = ref<string[]>([]),
   show = () => {
     showDialog.value = true
   },
   selAvatar = async (avatar: string) => {
-    await ElMessageBox.confirm(
-      '是否确认更换头像？', '确认', {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消'
-      }
-    )
-    await store.dispatch('updAvatar', avatar)
+    emits('selAvatar', avatar)
     showDialog.value = false
   }
 

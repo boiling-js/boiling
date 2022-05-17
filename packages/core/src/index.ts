@@ -17,6 +17,7 @@ export interface SearchQuery extends Paginate {
   key: string
 }
 
+export * from './channels'
 export * from './users'
 export * from './messages'
 export * from './chat-rooms'

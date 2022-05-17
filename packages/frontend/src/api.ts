@@ -1,4 +1,14 @@
-import { Api, attachApi, ChatRooms, Messages, Pagination, QueryPromise, SearchQuery, Users } from '@boiling/core'
+import {
+  Api,
+  attachApi,
+  Channels,
+  ChatRooms,
+  Messages,
+  Pagination,
+  QueryPromise,
+  SearchQuery,
+  Users
+} from '@boiling/core'
 import { ElMessage } from 'element-plus'
 
 interface OfficialApi {
@@ -11,11 +21,16 @@ interface OfficialApi {
   }
   /** 获取指定用户 */
   user(id: number | '@me'): {
+    upd(d: Users.UpdateOut): Promise<void>
+    password: {
+      upd(d: { oldPwd: string, newPwd: string }): Promise<void>
+    }
     status: {
       /** 登录用户并设置用户状态 */
       add(d: Users.Login): Promise<Users.Out>
       /** 更改用户状态 */
       upd(d: { status: Users.Status }): Promise<void>
+
     }
     /** 获取讨论组 */
     groups: Promise<ChatRooms.Model[]>
@@ -36,7 +51,7 @@ interface OfficialApi {
       upd(d: { avatar: string }): Promise<void>
     }
   }
-  'chat-rooms': QueryPromise<ChatRooms.Model, SearchQuery & {
+  'chat-rooms': QueryPromise<Pagination<ChatRooms.Model>, SearchQuery & {
     disableToast?: boolean
   }> & {
     /** 创建聊天室 */
@@ -44,11 +59,37 @@ interface OfficialApi {
   }
   /** 聊天室 */
   'chat-room'(chatRoomId: string): {
-    message(senderId: number): & {
+    upd(d: {
+      name?: string
+      avatar?: string
+      members?: string[]
+    }): Promise<void>
+    messages: QueryPromise<Pagination<Messages.Model>, SearchQuery> & {
       /** 发送消息 */
       add(d: { content: string }): Promise<Messages.Model>
     }
-    messages: QueryPromise<Pagination<Messages.Model>, SearchQuery>
+    members: Promise<Users.FriendOut[]>
+    files: Promise<void>
+  }
+  /** 频道 */
+  channels:  QueryPromise<Pagination<Channels.Model>, SearchQuery> & {
+    add(d: Pick<Channels.Model, 'name' | 'avatar' | 'description'>): Promise<Channels.Model>
+  }
+  channel(channelId: string): Promise<Channels.Model> & {
+    /** 更新频道 */
+    upd(d: {
+      name?: string
+      avatar?: string
+      description?: string
+      members?: Channels.MemberMeta[]
+    }): Promise<void>
+    /** 删除频道 */
+    del(): Promise<void>
+    /** 子频道 */
+    subChannel: {
+      /** 创建子频道 */
+      add(d: {subTitle: string}): Promise<void>
+    }
   }
 }
 

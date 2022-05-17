@@ -8,6 +8,15 @@ import router from './router'
 import store from './store'
 
 const app = createApp(App)
+const appElement = document.querySelector<HTMLDivElement>('#app')
+
+window.osMeta = {
+  isDesktop: !!window?.desktop
+}
+if (window.osMeta.isDesktop) {
+  appElement?.classList.add('is-desktop')
+  window.osMeta.type = desktop?.type
+}
 
 app.config.globalProperties = {
   $logger: new Proxy(console, {

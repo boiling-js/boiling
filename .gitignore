@@ -5,6 +5,8 @@ temp
 .cache
 .env
 
+packages/backend/static/uploads
+
 yarn.lock
 node_modules/
 npm-debug.log

@@ -3,13 +3,37 @@
     v-model="isShow"
     class="configure-friend"
     title="好友设置"
-    width="60%">
+    width="85%">
+    <el-divider content-position="left">基本信息</el-divider>
+    <div class="basic-info">
+      <div class="info">
+        <div class="label">账号：</div>
+        <div class="content">{{ info.id }}</div>
+      </div>
+      <div class="info">
+        <div class="label">昵称：</div>
+        <div class="content">{{ info.username }}</div>
+      </div>
+      <div class="info">
+        <div class="label">性别：</div>
+        <div class="content">{{ info.sex === 'female' ? '女' : '男' }}</div>
+      </div>
+      <div class="info">
+        <div class="label">出生日期：</div>
+        <div class="content">{{ info.birthday }}</div>
+      </div>
+    </div>
+    <el-divider content-position="left">设置操作</el-divider>
     <el-form ref="formRef" :model="settingUserForm" label-width="60px">
       <el-form-item label="备注：">
         <el-input v-model="settingUserForm.remark"/>
       </el-form-item>
       <el-form-item label="标签：">
-        <el-select v-model="settingUserForm.tags" multiple placeholder="请选择标签">
+        <el-select
+          v-model="settingUserForm.tags"
+          multiple
+          placeholder="请选择标签"
+          style="margin-right: 10px;">
           <el-option v-for="item in tags" :key="item"
                      :label="item" :value="item"/>
         </el-select>
@@ -18,12 +42,12 @@
           ref="tagInputRef"
           v-model="tagInputValue"
           class="ml-1 w-20"
-          style="margin-left: 10px; width: 90px;"
+          style="margin: 5px 0; width: 90px;"
           @keyup.enter="handleInputConfirm"
           @blur="tagInputVisible = false"/>
         <el-button
           v-else
-          class="button-new-tag" style="margin-left: 10px; width: 90px;" @click="showInput">
+          class="button-new-tag" style="margin: 5px 0; width: 90px;" @click="showInput">
           + 新标签
         </el-button>
       </el-form-item>
@@ -174,6 +198,12 @@ defineExpose({ show })
     > div.el-button {
       float: right;
     }
+  }
+}
+.basic-info {
+  > div.info {
+    display: flex;
+    margin: 10px 0;
   }
 }
 </style>

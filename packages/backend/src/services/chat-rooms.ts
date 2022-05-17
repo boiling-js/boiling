@@ -79,14 +79,35 @@ export namespace ChatRoomsService {
     await existsOrThrow(arg0)
     return get(arg0)
   }
+  export function search(key: string) {
+    const keywords = key.split(' ')
+    const names: string[] = []
+    const members: number[] = []
+    keywords.forEach(keyword => {
+      const [ type, content ] = keyword.split(':')
+      if (!!content && type === 'members') {
+        const ids = content.split(',').map(id => parseInt(id))
+        members.push(...ids)
+      } else {
+        names.push(keyword)
+      }
+    })
+    const filter: Parameters<typeof Model.find>[0] = {
+      name: { $regex: new RegExp(names.map(n => `(.*${ n }.*)`).join('|')) }
+    }
+    if (members.length > 0) {
+      filter['members'] = { $in: members }
+    }
+    return Model.find(filter)
+  }
   /**
    * 获取讨论组通过用户id
    * @param uid 用户id
    */
-  export async function getGroupByUid(uid: number) {
-    const chatRooms = await Model.find({ members: { $in: [uid], $not: { $size: 2 } } })
-    if (!chatRooms) throw new HttpError('NOT_FOUND', `uid 为 ${ uid } 的讨论组不存在`)
-    return chatRooms
+  export async function getGroups(uid: number) {
+    return Model.find({
+      members: { $in: [ uid ], $not: { $size: 2 } }
+    })
   }
   /**
    * 删除聊天室
@@ -97,7 +118,15 @@ export namespace ChatRoomsService {
     await Message.delByChatRoomId(id)
     await Model.deleteOne({ _id: id })
   }
-
+  /**
+   * 更新聊天室
+   * @param id 聊天室id
+   * @param options
+   */
+  export async function update(id: string, options: Partial<Pick<M, 'name' | 'avatar' | 'members'>>) {
+    await existsOrThrow(id)
+    await Model.updateOne({ _id: id }, options)
+  }
   export namespace Message {
     export const Model = MessageModel
     export type M = Pick<Messages.Model, 'content'>
@@ -174,6 +203,19 @@ export namespace ChatRoomsService {
       }
       options?.senderId && (query['sender.id'] = options.senderId)
       return Model.find({ chatRoomId }).find(options ? query : {})
+    }
+  }
+
+  export namespace User {
+    /**
+     * 获取聊天室的用户列表
+     * @param chatRoomId
+     */
+    export async function get(chatRoomId: string) {
+      const chatRoom = await ChatRoomsService.getOrThrow(chatRoomId)
+      return Promise.all(
+        (chatRoom?.members ?? []).map(id => UsersService.getOrThrow(id))
+      )
     }
   }
 }

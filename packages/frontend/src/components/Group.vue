@@ -7,7 +7,9 @@
       <div
         class="avatar-shadow"
         @click="$refs.avatar.show"
-      > 更换头像 </div>
+      >
+        更换头像
+      </div>
     </div>
     <div class="info">
       {{ props.group.name }}
@@ -15,29 +17,51 @@
     <div
       class="operates">
       <span class="material-icons"
-            @click="()=>{}">
+            @click="$router.push(
+              `/home/chat-rooms/${ group.id }?title=${ group.name}`
+            )">
         chat_bubble_outline
       </span>
       <span class="material-icons"
-            @click="$refs.configureGroup.open">settings</span>
+            @click="$refs.configureGroup.open(props.group)">settings</span>
     </div>
     <configure-group ref="configureGroup"/>
   </div>
-  <avatar ref="avatar"/>
+  <avatar
+    ref="avatar"
+    @selAvatar="(selAvatar) => changeAvatar(selAvatar)"/>
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
+import { defineEmits, defineProps } from 'vue'
 import { ChatRooms } from '@boiling/core'
 import ConfigureGroup from './ConfigureGroup.vue'
 import Avatar from './Avatar.vue'
+import { ElMessageBox } from 'element-plus'
+import { api } from '../api'
 
-const props = defineProps({
-  group: {
-    type: ChatRooms.Model,
-    required: true
+const
+  props = defineProps({
+    group: {
+      type: ChatRooms.Model,
+      required: true
+    }
+  }),
+  emits = defineEmits<{
+    (e: 'update'): void
+  }>(),
+  changeAvatar = async (avatar: string) => {
+    await ElMessageBox.confirm(
+      '是否确认更换头像？', '确认', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      }
+    )
+    await api['chat-room'](props.group.id).upd({
+      avatar
+    })
+    emits('update')
   }
-})
 </script>
 
 <style scoped lang="scss">
@@ -52,6 +76,7 @@ const props = defineProps({
   color: var(--color-text-regular);
   border-radius: 6px;
   transition: 0.3s;
+  border-bottom: 1px solid var(--color-auxi-secondary);
   &:hover {
     background-color: var(--bg-color);
     opacity: 1;

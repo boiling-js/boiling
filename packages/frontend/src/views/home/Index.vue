@@ -1,6 +1,6 @@
 <template>
   <div class="contain">
-    <div class="sidebar">
+    <div v-show="$store.state.sidebarVisiable" class="sidebar">
       <div class="self-bar">
         <div class="avatar">
           <el-dropdown trigger="click">
@@ -20,7 +20,7 @@
           <div class="name"> {{ user.username }} </div>
         </div>
         <el-tooltip content="用户设置">
-          <el-icon @click="$router.push('/edit-personnel')" :size="24"><tools/></el-icon>
+          <el-icon :size="24" @click="$router.push('/edit-personnel')"><tools/></el-icon>
         </el-tooltip>
       </div>
       <div class="chat-bar">
@@ -33,6 +33,12 @@
             <span class="add material-icons md-light"
                   @click="$refs.searchUser.show">add</span>
           </div>
+          <template v-for="chatRoom in chatRooms" :key="chatRoom.id">
+            <div class="chat-room" @click="$router.push(`/home/chat-rooms/${ chatRoom.id }?title=${ chatRoom.name }`)">
+              <img class="avatar" :src="chatRoom.avatar" :alt="chatRoom.id">
+              {{ chatRoom.name }}
+            </div>
+          </template>
         </div>
       </div>
     </div>
@@ -44,18 +50,21 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 import { ElTooltip, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem, ElMessageBox } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
+import { ChatRooms } from '@boiling/core'
 import SearchUser from '../../components/SearchUser.vue'
-import { useRouter } from 'vue-router'
+import { api } from '../../api'
 
 const
   store = useStore(),
+  router = useRouter(),
   user = computed(() => store.state.user),
   status = computed(() => store.state.user.status),
-  router = useRouter(),
+  chatRooms = ref<ChatRooms.Model[]>([]),
   updateStatus = async (status: string) => {
     if (status === 'offline') {
       await ElMessageBox.confirm(
@@ -72,47 +81,28 @@ const
     }
     await store.dispatch('updStatus', status)
   }
+
+onMounted(async () => {
+  chatRooms.value = (
+    await api['chat-rooms'].query({
+      key: `members:${ user.value.id }`,
+      num: 999,
+      page: 0
+    })
+  ).items
+})
 </script>
 
 <style lang="scss" scoped>
 div.contain {
+  position: relative;
   display: flex;
   > div.sidebar {
     display: flex;
     flex-direction: column;
-    width: 240px;
+    max-width: 240px;
+    min-width: 240px;
     background-color: var(--color-auxi-regular);
-    > div.chat-bar {
-      display: flex;
-      flex-direction: column;
-      padding: 10px;
-      flex-grow: 1;
-      > section {
-        padding: 10px;
-        height: 20px;
-        line-height: 20px;
-        color: var(--color-text-regular);
-        cursor: pointer;
-        border-radius: 5px;
-        transition: 0.5s;
-        user-select: none;
-        &:hover, &.active {
-          background-color: var(--color-auxi-secondary);
-        }
-      }
-      > div.chats {
-        margin-top: 10px;
-        > div.title {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          color: var(--color-text-primary);
-          font-size: 12px;
-          user-select: none;
-          > span.add { cursor: pointer; }
-        }
-      }
-    }
     > div.self-bar {
       display: flex;
       justify-content: center;
@@ -161,8 +151,60 @@ div.contain {
         }
       }
     }
+    > div.chat-bar {
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      flex-grow: 1;
+      > section {
+        padding: 10px;
+        height: 20px;
+        line-height: 20px;
+        color: var(--color-text-regular);
+        cursor: pointer;
+        border-radius: 5px;
+        transition: 0.5s;
+        user-select: none;
+        &:hover, &.active {
+          background-color: var(--color-auxi-secondary);
+        }
+      }
+      > div.chats {
+        margin-top: 10px;
+        > div.title {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          color: var(--color-text-primary);
+          font-size: 12px;
+          user-select: none;
+          > span.add {
+            cursor: pointer;
+          }
+        }
+        > div.chat-room {
+          display: flex;
+          align-items: center;
+          column-gap: 5px;
+          padding: 5px;
+          font-size: 12px;
+          cursor: pointer;
+          border-radius: 4px;
+          transition: 0.3s;
+          &:hover {
+            background-color: var(--color-auxi-secondary);
+          }
+          > img.avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+          }
+        }
+      }
+    }
   }
   > div.container {
+    position: relative;
     flex-grow: 1;
     background-color: var(--color-auxi-placeholder);
   }

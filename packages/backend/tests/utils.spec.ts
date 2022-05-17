@@ -8,8 +8,8 @@ after(() => {
 })
 
 describe('Utils', () => {
-  describe('Security', function () {
-    it('should password is match passwordHash.', function () {
+  describe('Security', () => {
+    it('should password is match passwordHash.', () => {
       expect(
         Security.match('123', Security.encrypt('123'))
       ).to.be.eq(true)

@@ -26,10 +26,18 @@
     "regular": #afafaf,
     "secondary": #dfdfdf,
     "placeholder": #ffffff
+  ),
+  $fill-color: (
+    "blank": #202225,
   )
 );
 
 @use "element-plus/theme-chalk/src/index.scss" as *;
+@media screen and (max-width: 800px) {
+  .el-dialog {
+    width: 90%;
+  }
+}
 .el-icon {
   font-size: var(--font-size);
 }
@@ -47,4 +55,7 @@
   right: 5px;
   bottom: 5px;
   left: 5px;
+}
+.el-message-box {
+  width: 300px;
 }

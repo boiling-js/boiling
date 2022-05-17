@@ -54,7 +54,7 @@ export const router = new Router({
         if (u === null)
           throw new HttpError('NOT_FOUND', '用户不存在')
         if (!Security.match(password, u.passwordHash))
-          throw new HttpError('UNAUTHORIZED', '密码错误')
+          throw new HttpError('UNPROCESSABLE_ENTITY', '密码错误')
         const user = u.toJSON()
         if (ctx.session)
           ctx.session.curUser = <Users.Out><any>user
@@ -94,7 +94,7 @@ export const router = new Router({
       ctx.params.targetId
     )
   })
-  .get('/:id(uid)/friends', ctx => {
+  .get(Schema.array(Users.FriendOut), '/:id(uid)/friends?key&page(number)&num(number)', ctx => {
     return UsersService.Friends.get(useTarget(ctx.session, ctx.params.id))
   })
   .post('/:id(uid)/tag', ctx => {
@@ -112,15 +112,26 @@ export const router = new Router({
   .get('/avatars', async () => {
     return UsersService.getAvatars()
   })
+  /** 更新用户头像 */
   .patch('/:id(uid)/avatar', async ctx => {
     const { avatar } = ctx.request.body
     if (!avatar)
       throw new HttpError('BAD_REQUEST', '头像不能为空')
     return UsersService.update(useTarget(ctx.session, ctx.params.id), { avatar })
   })
-  /**
-   * 获取用户讨论组
-   */
-  .get('/:id(uid)/groups', async ctx => {
-    return ChatRoomsService.getGroupByUid(useTarget(ctx.session, ctx.params.id))
+  /** 更新用户信息 */
+  .patch('/:id(uid)', async ctx => {
+    const { username, sex, birthday, desc } = ctx.request.body
+    return UsersService.update(useTarget(ctx.session, ctx.params.id), {
+      username, sex, birthday, desc
+    })
+  })
+  /** 获取用户讨论组 */
+  .get('/:id(uid)/groups', ctx => {
+    return ChatRoomsService.getGroups(useTarget(ctx.session, ctx.params.id))
+  })
+  /** 更改密码 */
+  .patch('/:id(uid)/password', ctx => {
+    const { oldPwd, newPwd } = ctx.request.body
+    return UsersService.updatePassword(useTarget(ctx.session, ctx.params.id), oldPwd, newPwd)
   })

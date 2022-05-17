@@ -1,29 +1,71 @@
-import { Router } from '@boiling/core'
+import { Channels, Pagination, Router } from '@boiling/core'
+import { ChannelsService } from '../services/channels'
 import Schema from 'schemastery'
+import useCurUser from '../hooks/useCurUser'
+import usePagination from '../hooks/usePagination'
+import extendService from '../hooks/extendService'
 
 export const router = new Router({
   prefix: '/channels'
-}).post(Schema.string(), '/', async ctx => {
-    return 'you are creating channel.'
+})
+  /**
+   * 获取频道列表
+   */
+  .get(Pagination(Channels.Model), '?key&page(number)&num(number)', ctx => {
+    // @ts-ignore
+    ctx.query.key = ''
+    return usePagination(
+      extendService(ChannelsService, 'search', m => m), ctx.query
+    )(decodeURI(ctx.query.key))
   })
-  .del(Schema.string(), '/:id', async ctx => {
-    return 'you are deleting channel'
+  /**
+   * 创建讨论组
+   */
+  .post(Schema.Pick(Channels.Model, ['members', 'name', 'avatar']), Schema.any(), '', async ctx => {
+    const { name, avatar, description } = ctx.request.body
+    return ChannelsService.create(useCurUser(ctx.session).id,{
+      name,
+      avatar,
+      description
+    })
   })
-  .patch(Schema.string(), '/:id', async ctx => {
-    return 'you are patching channel'
+  /**
+   * 通过频道id获取频道信息
+   */
+  .get('/:channelId', async ctx => {
+    const { channelId } = ctx.params
+    return ChannelsService.get(channelId)
   })
-  .get(Schema.string(), '/', async ctx => {
-    return 'you are searching channels'
+  /**
+   * 更新频道信息
+   */
+  .patch('/:channelId', async ctx => {
+    const { channelId } = ctx.params
+    const { name, avatar, description, members } = ctx.request.body
+    return ChannelsService.update(channelId, {
+      name,
+      avatar,
+      description,
+      members
+    })
   })
-  .get(Schema.string(), '/:id', async ctx => {
-    return 'you are getting channel'
+  /**
+   * 删除频道
+   */
+  .delete('/:channelId', async ctx => {
+    const { channelId } = ctx.params
+    const channel = await ChannelsService.getOrThrow(channelId)
+    if (
+      !channel.members
+        .every(m => m.id === useCurUser(ctx.session).id && m.rules?.includes('owner'))
+    ) throw new HttpError('UNAUTHORIZED', '无权限删除该频道')
+    return ChannelsService.del(channelId)
   })
-  .get(Schema.string(), '/:id/members', async ctx => {
-    return 'you are getting channel members.'
-  })
-  .post(Schema.string(), '/:id/members', async ctx => {
-    return 'you join to channel.'
-  })
-  .post(Schema.string(), '/:id/messages', async ctx => {
-    return 'you are posting message.'
+  /**
+   * 添加子频道
+   */
+  .post(Schema.Pick(Channels.SubChannelMeta, ['subTitle']), Schema.any(), '/:channelId/subChannel', async ctx => {
+    const { channelId } = ctx.params
+    const { subTitle } = ctx.request.body
+    return ChannelsService.addSubChannel(channelId, subTitle)
   })

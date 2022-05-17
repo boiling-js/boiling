@@ -15,9 +15,6 @@
     "paths": {
       "@boiling/*": [
         "packages/*/src"
-      ],
-      "@boiling/frontend/vite.config": [
-        "packages/frontend/vite.config.ts"
       ]
     },
     "esModuleInterop": true,

@@ -11,7 +11,7 @@ after(() => {
   process.exit(0)
 })
 describe('ChatRooms Service', () => {
-  let u0: Users.Base, u1: Users.Base, u2: Users.Base, u3: Users.Base
+  let u0: Users.Base, u1: Users.Base, u2: Users.Base, u3: Users.Base, u4: Users.Base
   after(async () => {
     await UsersService.Model.deleteMany({})
   })
@@ -20,6 +20,7 @@ describe('ChatRooms Service', () => {
     u1 = await UsersService.add({ username: '002', passwordHash: '002', avatar: '002' })
     u2 = await UsersService.add({ username: '003', passwordHash: '003', avatar: '003' })
     u3 = await UsersService.add({ username: '004', passwordHash: '004', avatar: '004' })
+    u4 = await UsersService.add({ username: '005', passwordHash: '005', avatar: '005' })
   })
 
   afterEach(async () => {
@@ -76,16 +77,51 @@ describe('ChatRooms Service', () => {
     await expect(ChatRoomsService.del('623f1b13e11111f3c2debd48'))
       .to.be.eventually.be.rejectedWith('[404] id 为 \'623f1b13e11111f3c2debd48\' 的聊天室不存在')
   })
+  it('should search chat room by name or members.', async function () {
+    await ChatRoomsService.create([ u0.id, u1.id ], { name: 'foo' })
+    await ChatRoomsService.create([ u0.id, u2.id ], { name: 'fuu' })
+    await ChatRoomsService.create([ u0.id, u3.id ], { name: 'bar' })
+    await ChatRoomsService.create([ u1.id, u3.id ], { name: 'ber' })
+    expect(
+      await ChatRoomsService.search('f').count()
+    ).to.be.eq(2)
+    expect(
+      await ChatRoomsService.search('f b').count()
+    ).to.be.eq(4)
+    expect(
+      await ChatRoomsService.search('foo b').count()
+    ).to.be.eq(3)
+    expect(
+      await ChatRoomsService.search(`f b members:${ u0.id }`).count()
+    ).to.be.eq(3)
+    expect(
+      await ChatRoomsService.search(`members:${ u0.id }`).count()
+    ).to.be.eq(3)
+  })
   it('should get groups by uid', async () => {
     await Promise.all([
       ChatRoomsService.create([u0.id, u1.id]),
       ChatRoomsService.create([u0.id, u2.id, u3.id]),
       ChatRoomsService.create([u0.id, u1.id, u3.id])
     ])
-    const groups = await ChatRoomsService.getGroupByUid(u0.id)
-    expect(groups).to.have.lengthOf(2)
+    const groups = await ChatRoomsService.getGroups(u0.id)
+    expect(groups).to.be.have.lengthOf(2)
     expect(groups[0].members).to.be.deep.equal([u0.id, u2.id, u3.id])
     expect(groups[1].members).to.be.deep.equal([u0.id, u1.id, u3.id])
+    expect(
+      await ChatRoomsService.getGroups(u4.id)
+    ).to.be.have.lengthOf(0)
+  })
+  it('should update chatRoom' ,async () => {
+    const members = [u0.id, u1.id]
+    const { id } = await ChatRoomsService.create(members)
+    await ChatRoomsService.update(id, {
+      name: 'test',
+      avatar: 'test'
+    })
+    const chatRoom = await ChatRoomsService.get(id)
+    expect(chatRoom?.name).to.equal('test')
+    expect(chatRoom?.avatar).to.equal('test')
   })
   describe('Message', function () {
     it('should push message to target chat room.', async () => {
@@ -179,6 +215,17 @@ describe('ChatRooms Service', () => {
       ).to.be.eventually.rejectedWith('[404] id 为 \'623f1b13e11111f3c2debd48\' 的聊天室不存在')
       await ChatRoomsService.Message.delByChatRoomId(id)
       expect(ChatRoomsService.Message.search(id)).to.be.eventually.have.lengthOf(0)
+    })
+  })
+  describe('User', function () {
+    it('should get all users by chatRoomId', async () => {
+      const { id } = await ChatRoomsService.create([u0.id, u1.id])
+      const users = await ChatRoomsService.User.get(id)
+      expect(users.map(u => u.toJSON()))
+        .to.be.deep.equal(
+          // @ts-ignore
+          [u0, u1].map(u => u.toJSON())
+      )
     })
   })
 })

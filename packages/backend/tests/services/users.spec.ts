@@ -6,6 +6,7 @@ use(cap)
 
 import { UsersService } from '../../src/services/users'
 import { ChatRoomsService } from '../../src/services/chat-rooms'
+import {Security} from "../../src/utils";
 
 after(() => {
   process.exit(0)
@@ -201,5 +202,16 @@ describe('Users Service', function () {
     expect(newUser?.username).to.be.eq('test')
     expect(newUser?.avatar).to.be.eq('/img/avatar/3.jpg')
     expect(newUser?.status).to.be.eq('offline')
+  })
+  it('should update user password.', async function () {
+    const user = await UsersService.add({ username: 'test', passwordHash: Security.encrypt('test'), avatar: 'test' })
+    expect(Security.match('test', user!.passwordHash)).to.be.eq(true)
+    await UsersService.updatePassword(user.id, 'test', 'test1')
+    const newUser = await UsersService.get(user.id)
+    expect(Security.match('test1', newUser!.passwordHash)).to.be.eq(true)
+  })
+  it('should update user password and throw error when password is not correct.', async function () {
+    const user = await UsersService.add({ username: 'test', passwordHash: Security.encrypt('test'), avatar: 'test' })
+    await expect(UsersService.updatePassword(user.id, 'test1', 'test1')).to.be.rejectedWith(Error)
   })
 })

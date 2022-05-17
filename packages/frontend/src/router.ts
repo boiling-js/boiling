@@ -7,9 +7,8 @@ const router = createRouter({
   }, {
     path: '/home',
     name: 'home',
+    redirect: '/home/friends',
     component: () => import('./views/home/Index.vue'),
-    // TODO 好友、讨论组、频道 管理页面
-    // TODO 好友聊天页面
     children: [{
       path: '/home/friends',
       component: () => import('./views/home/Friends.vue')
@@ -22,6 +21,13 @@ const router = createRouter({
     }, {
       path: '/home/chat-rooms/:id',
       component: () => import('./views/ChatRoom.vue'),
+      props: route => ({
+        id: route.params.id,
+        title: route.query.title
+      })
+    }, {
+      path: '/home/channel/:id',
+      component: () => import('./views/Channel.vue'),
       props: route => ({
         id: route.params.id,
         title: route.query.title
@@ -45,6 +51,9 @@ const router = createRouter({
   }, {
     path: '/edit-personnel',
     component: () => import('./components/EditPersonnel.vue')
+  }, {
+    path: '/create-channel',
+    component: () => import('./components/CreateChannel.vue')
   }]
 })
 

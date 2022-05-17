@@ -6,40 +6,25 @@
       <span>{{ props.title }}</span>
     </div>
     <div class="room">
-      <div class="content">
-        <el-scrollbar class="scrollbar">
-          <div
-            v-for="msg in messages" :key="msg.id"
-            class="item">
-            <img
-              class="avatar"
-              :src="`/api/${msg.sender.avatar}`">
-            <div class="message">
-              <div>{{ msg.sender.username }}</div>
-              <div class="time">{{ dayjs(msg.createdAt).format('YYYY-MM-DD') }}</div>
-              <div class="text">{{ msg.content }}</div>
-            </div>
-          </div>
-        </el-scrollbar>
+      <div ref="content" class="content">
+        <template v-for="(msg, index) in messages" :key="msg.id">
+          <message v-model="messages[index]"/>
+        </template>
       </div>
-      <div class="message-input">
-        <el-input
-          v-model="editingMessage"
-          type="textarea"
-          @keyup.ctrl.enter="sendMessage"/>
-      </div>
+      <message-sender v-model:chat-room-id="$props.id"
+                      @content-change="keepBottom"
+                      @sended="m => messages.push(m)"/>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ElInput, ElScrollbar } from 'element-plus'
+<script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import dayjs from 'dayjs'
 import { Messages } from '@boiling/core'
 import { onDispatch } from '../hooks/useWsClient'
 import { api } from '../api'
-import store from '../store'
+import MessageSender from '../components/MessageSender.vue'
+import Message from '../components/Message.vue'
 
 /**
  * 用户加好友的时候接口中默认创建一个聊天室
@@ -55,23 +40,21 @@ const
     id: string
     title: string
   }>(),
-  editingMessage = ref(''),
-  messages = ref<Messages.Model[] | undefined>([]),
+  content = ref<HTMLDivElement | null>(null),
+  messages = ref<Messages.Model[]>([]),
   getMessages = async () => {
     messages.value = messages.value || []
     const { items } =
       await api['chat-room'](props.id).messages.query({ key: '' })
     messages.value.push(...items.reverse())
   },
-  sendMessage = async () => {
-    if (editingMessage.value) {
-      messages.value = messages.value || []
-      const m =
-        await api['chat-room'](props.id).message(store.state.user.id).add({
-          content: editingMessage.value
-        })
-      messages.value.push(m)
-      editingMessage.value = ''
+  keepBottom = () => {
+    const element = content.value
+    const isBottom = !!element && Math.abs(element.scrollHeight - element.clientHeight - element.scrollTop) < 10
+    if (element && isBottom) {
+      setTimeout(() => {
+        element.scrollTop = element.scrollHeight
+      }, 0)
     }
   }
 
@@ -82,7 +65,16 @@ const
  * 用户接收消息后，把接收到消息添加到消息列表中
  */
 
-onMounted(() => getMessages())
+onMounted(() => {
+  getMessages()
+
+  const element = content.value
+  if (element) {
+    setTimeout(() => {
+      element.scrollTop = element.scrollHeight
+    }, 10)
+  }
+})
 onDispatch(async m => {
   switch (m.t) {
     case 'MESSAGE':
@@ -93,8 +85,9 @@ onDispatch(async m => {
 })
 </script>
 
-<style scoped lang="scss">
-.chat {
+<style lang="scss" scoped>
+@import "../assets/scroll-bar";
+div.chat {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -103,7 +96,6 @@ onDispatch(async m => {
     display: flex;
     align-items: center;
     padding: 0 20px;
-    width: calc(100% - 40px);
     height: 68px;
     border-bottom: 2px solid #202225;
     > span.icon {
@@ -113,45 +105,26 @@ onDispatch(async m => {
   }
   > div.room {
     display: flex;
+    flex: 1 1;
     flex-direction: column;
     flex-grow: 1;
-    row-gap: 10px;
-    padding: 20px;
-    width: calc(100% - 40px);
     height: calc(100% - 110px);
     > div.content {
+      @include scroll-bar;
+
+      display: flex;
       flex-grow: 1;
-      height: calc(100% - 60px);
-      .el-scrollbar__view {
-        > .item {
-          display: flex;
-          margin-bottom: 10px;
-          > .avatar {
-            margin-right: 15px;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-          }
-          > .message {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            > .time {
-              color: #ccc;
-              font-size: 12px;
-            }
-            > .text {
-              margin-top: 5px;
-              color: #fff;
-              font-size: 14px;
-              word-break: break-all;
-            }
-          }
+      flex-direction: column;
+      > div.message {
+        padding: 10px 10px 0;
+        transition: 0.3s;
+        &:hover {
+          background-color: var(--color-auxi-regular);
         }
       }
     }
-    > div.message-input {
-      height: 60px;
+    > div.message-sender {
+      margin: 5px 10px;
     }
   }
 }

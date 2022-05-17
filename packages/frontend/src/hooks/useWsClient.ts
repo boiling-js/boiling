@@ -24,7 +24,7 @@ export const identifyWS = async (wsClient: WsClient, id: string, pwd: Users.Logi
       token: `Basic ${ btoa(id + ':' + pwd) }`
     }
   })
-  const identifyPkg = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.DISPATCH])
+  await wsClient.waitOnceMessage().resolve([Messages.Opcodes.DISPATCH])
 
   setInterval(() => {
     wsClient.send({

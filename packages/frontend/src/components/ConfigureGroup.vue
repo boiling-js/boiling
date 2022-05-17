@@ -10,10 +10,25 @@
       <el-form-item label="群名：">
         <el-input v-model="form.name" />
       </el-form-item>
-      <el-form-item label="好友：">
+      <el-form-item label="成员：">
+        <div
+          v-for="member in members"
+          :key="member.id"
+          class="friend">
+          <el-avatar
+            :src="`/api${member.avatar}`"
+          />
+          <div class="name">{{ member.remark || member.username }}</div>
+        </div>
         <div class="friend">
-          <div class="avatar">头像</div>
-          <div class="name">名字</div>
+          <el-avatar>
+            <span
+              class="material-icons md-light add"
+              @click="$refs.selMembers.open(members.map(member => member.id))">
+              add
+            </span>
+          </el-avatar>
+          <div class="name">添加</div>
         </div>
       </el-form-item>
     </el-form>
@@ -34,30 +49,43 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="show = false">取消</el-button>
-        <el-button type="primary" @click="show = false">确认</el-button>
+        <el-button type="primary" @click="confirm">确认</el-button>
       </span>
     </template>
+    <sel-members
+      ref="selMembers"
+      @confirm="(fIds, fSel) => addMembers(fIds, fSel)"
+    />
   </el-dialog>
 </template>
 
-<script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { ElDialog, ElForm, ElInput, ElFormItem, ElButton, ElDivider } from 'element-plus'
+<script lang="ts" setup>
+import { ref } from 'vue'
+import { ElDialog, ElForm, ElInput, ElFormItem, ElButton, ElDivider, ElAvatar } from 'element-plus'
+import { ChatRooms, Users } from '@boiling/core'
+import { api } from '../api'
+import SelMembers from './SelMembers.vue'
+
 const
   show = ref<Boolean>(false),
-  open = () => {
+  members = ref<Users.FriendOut[]>([]),
+  open = async (data: ChatRooms.Model) => {
+    form.value = JSON.parse(JSON.stringify(data))
+    members.value = await api['chat-room'](form.value?.id ?? '').members
     show.value = true
   },
-  form = reactive({
-    name: '',
-    region: '',
-    date1: '',
-    date2: '',
-    delivery: false,
-    type: [],
-    resource: '',
-    desc: ''
-  })
+  form = ref<ChatRooms.Model>(),
+  addMembers = (fIds: number[], fSel: Users.FriendOut[]) => {
+    members.value = members.value.concat(fSel.filter(f => !members.value.some(m => m.id === f.id)))
+  },
+  confirm = () => {
+    api['chat-room'](form.value?.id ?? '').upd({
+      name: form.value?.name,
+      members: members.value.map(m => m.id.toString())
+    })
+    show.value = false
+  }
+
 defineExpose({ open })
 </script>
 
@@ -71,10 +99,8 @@ defineExpose({ open })
       flex-direction: column;
       align-items: center;
       margin: 0 10px;
-      > div.avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
+      &:last-child {
+        cursor: pointer;
       }
     }
   }
