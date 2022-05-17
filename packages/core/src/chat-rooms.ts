@@ -10,6 +10,10 @@ export namespace ChatRooms {
      */
     id: Schema.string(),
     /**
+     * 频道id 不存在则不属于频道聊天室
+     * */
+    channelId: Schema.string().optional(),
+    /**
      * 名称
      *
      * 当聊天室为私聊时，名称为空
