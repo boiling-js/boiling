@@ -25,13 +25,6 @@ const router = createRouter({
         id: route.params.id,
         title: route.query.title
       })
-    }, {
-      path: '/home/channel/:id',
-      component: () => import('./views/Channel.vue'),
-      props: route => ({
-        id: route.params.id,
-        title: route.query.title
-      })
     }]
   }, {
     path: '/login',
@@ -44,6 +37,13 @@ const router = createRouter({
   }, {
     path: '/theme',
     component: () => import('./views/Theme.vue')
+  }, {
+    path: '/channel/:id',
+    component: () => import('./views/Channel.vue'),
+    props: route => ({
+      id: route.params.id,
+      title: route.query.title
+    })
   }, {
     path: '/:pathMatch(.*)*',
     component: () => import('element-plus').then(({ ElEmpty }) => ElEmpty),

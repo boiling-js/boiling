@@ -18,7 +18,7 @@
       class="operates">
       <span class="material-icons"
             @click="$router.push(
-              `/home/channel/${ channel.id }?title=${ channel.name }`
+              `/channel/${ channel.id }?title=${ channel.name }`
             )">
         chat_bubble_outline
       </span>

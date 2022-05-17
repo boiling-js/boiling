@@ -21,7 +21,7 @@
            :key="channel.id"
            class="select"
            @click="() => $router.push(
-             `/home/channel/${ channel.id }?title=${ channel.name }`
+             `/channel/${ channel.id }?title=${ channel.name }`
            )">
         <img width="36" :src="channel.avatar" alt="主页">
       </div>
