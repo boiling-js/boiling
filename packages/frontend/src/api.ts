@@ -75,6 +75,13 @@ interface OfficialApi {
   channels:  QueryPromise<Pagination<Channels.Model>, SearchQuery> & {
     add(d: Pick<Channels.Model, 'name' | 'avatar' | 'description'>): Promise<Channels.Model>
   }
+  channel(channelId: string): Promise<Channels.Model> & {
+    upd(d: {
+      name?: string
+      avatar?: string
+      members?: string[]
+    }): Promise<void>
+  }
 }
 
 class OfficialApi extends Api {
