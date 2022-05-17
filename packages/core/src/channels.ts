@@ -3,7 +3,7 @@ import Schema from 'schemastery'
 export namespace Channels {
   export const MemberMeta = Schema.interface({
     /** id */
-    id: Schema.string(),
+    id: Schema.number(),
     /** name */
     name: Schema.string().optional(),
     /** rules */
