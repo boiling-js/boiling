@@ -76,6 +76,7 @@ const
   color: var(--color-text-regular);
   border-radius: 6px;
   transition: 0.3s;
+  border-bottom: 1px solid var(--color-auxi-secondary);
   &:hover {
     background-color: var(--bg-color);
     opacity: 1;
