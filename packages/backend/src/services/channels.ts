@@ -51,12 +51,13 @@ export namespace ChannelsService {
   }
   /**
    * 通过频道名称或者简介搜索频道
+   * 为空时返回全部频道
    */
-  export function search(key: string) {
+  export function search(key = '') {
     return Model.find({
       $or: [
-        { name: { $regex: key, $options: 'i' } },
-        { description: { $regex: key, $options: 'i' } }
+        { name: { $regex: new RegExp(`.*${key}.*`) } },
+        { description: { $regex: new RegExp(`.*${key}.*`) } }
       ]
     })
   }
