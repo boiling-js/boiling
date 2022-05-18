@@ -23,7 +23,18 @@
         chat_bubble_outline
       </span>
       <span class="material-icons"
-            @click="() => {}">settings</span>
+            @click="() => $router.push({
+              path: '/create-channel',
+              query: {
+                type: 'setting',
+                info: JSON.stringify({
+                  id: channel.id,
+                  name: channel.name,
+                  avatar: channel.avatar,
+                  description: channel.description,
+                })
+              }
+            })">settings</span>
     </div>
   </div>
 </template>
