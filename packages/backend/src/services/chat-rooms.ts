@@ -129,6 +129,7 @@ export namespace ChatRoomsService {
     await existsOrThrow(id)
     await Model.updateOne({ _id: id }, options)
   }
+
   export namespace Message {
     export const Model = MessageModel
     export type M = Pick<Messages.Model, 'content'>
@@ -138,8 +139,7 @@ export namespace ChatRoomsService {
      * 如果为聊天室的第一条消息，则在用户的聊天室列表中添加该聊天室
      */
     export async function create(chatRoomId: string, senderId: number, msg: string | M) {
-      if (!await ChatRoomsService.exists(chatRoomId))
-        throw new HttpError('NOT_FOUND', `id 为 '${ chatRoomId }' 的聊天室不存在`)
+      await ChatRoomsService.existsOrThrow(chatRoomId)
       const sender = await UsersService.getOrThrow(senderId)
       if (typeof msg === 'string') {
         msg = { content: msg }
