@@ -3,6 +3,7 @@ import cap from 'chai-as-promised'
 import { ChannelsService } from '../../src/services/channels'
 import { Users } from '@boiling/core'
 import { UsersService } from '../../src/services/users'
+import { ChatRoomsService } from '../../src/services/chat-rooms'
 
 use(cap)
 
@@ -24,6 +25,7 @@ describe('Channels Service', () => {
 
   afterEach(async () => {
     await ChannelsService.Model.deleteMany({})
+    await ChatRoomsService.Model.deleteMany({})
   })
   it('should create a channel', async () => {
     const channel = await ChannelsService.create(u0.id, { name: 'test', avatar: 'test', description: 'test' })
@@ -71,5 +73,13 @@ describe('Channels Service', () => {
     }])
     expect((await ChannelsService.get(channel.id))?.members[1].id).to.equal(u1.id)
     expect((await ChannelsService.get(channel.id))?.members[2].id).to.equal(u2.id)
+  })
+  it('should add chatRoom for channel', async () => {
+    const channel = await ChannelsService.create(u0.id, { name: 'test', avatar: 'test', description: 'test' })
+    await ChannelsService.addSubChannel(channel.id, 'test subChannel')
+    console.log('before', await ChannelsService.get(channel.id))
+    const chatRoom = await ChatRoomsService.create([u0.id, u1.id, u2.id], { name: 'test subChannel chatRoom' }, channel.id)
+    await ChannelsService.addChatRoom(channel.id, 'test chatRoom', chatRoom.id)
+    console.log('after', await ChannelsService.get(channel.id))
   })
 })

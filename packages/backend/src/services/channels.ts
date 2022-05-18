@@ -86,8 +86,18 @@ export namespace ChannelsService {
    * 为子频道添加聊天室
    * */
   export async function addChatRoom(id: string, subTitle: string, chatRoomId: string) {
-    await existsOrThrow(id)
-    await Model.updateOne({ _id: id }, { $push: { chatRoom: chatRoomId } })
+    await getOrThrow(id)
+   /*const channel =  channel.subChannel.forEach(sub => {
+      if (sub.subTitle === subTitle) {
+        sub.chatRooms?.push({ id: chatRoomId })
+      }
+    })*/
+    await Model.updateOne({ _id: id }, {
+      subChannel: {
+        subTitle: { $eq: subTitle },
+        chatRooms: { $push: { id: chatRoomId } }
+      }
+    })
   }
   /**
    * 添加成员
