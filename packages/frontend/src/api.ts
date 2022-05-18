@@ -90,6 +90,10 @@ interface OfficialApi {
       /** 创建子频道 */
       add(d: {subTitle: string}): Promise<void>
     }
+    members: {
+      /** 添加成员 */
+      add(d: { members: Channels.MemberMeta[] }): Promise<void>
+    }
   }
 }
 

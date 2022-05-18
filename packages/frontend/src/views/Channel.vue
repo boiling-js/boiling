@@ -9,7 +9,7 @@
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item>邀请好友</el-dropdown-item>
+              <el-dropdown-item @click="$refs.selMembers.open([])">邀请好友</el-dropdown-item>
               <el-dropdown-item @click="subChannelForm.show = true">创建类别</el-dropdown-item>
               <el-dropdown-item>频道设置</el-dropdown-item>
             </el-dropdown-menu>
@@ -43,6 +43,7 @@
         </span>
       </template>
     </el-dialog>
+    <selMembers ref="selMembers" @confirm="members => addMember(members)"/>
   </div>
 </template>
 
@@ -62,6 +63,7 @@ import {
 } from 'element-plus'
 import { Channels } from '@boiling/core'
 import { api } from '../api'
+import SelMembers from '../components/SelMembers.vue'
 
 const
   props = defineProps<{
@@ -93,6 +95,14 @@ const
     await getChannel()
     subChannelForm.value.show = false
     ElMessage.success('创建成功')
+  },
+  addMember = async (members: number[]) => {
+    await api.channel(props.id).members.add({
+      members: members.map(m => ({
+         id: m
+       }))
+    })
+    await getChannel()
   }
 
 onMounted(() => {
