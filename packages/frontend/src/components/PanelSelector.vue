@@ -2,28 +2,29 @@
   <div class="wrapper">
     <div class="panel-selector">
       <el-tooltip placement="bottom" content="主页">
-        <div class="select" @click="$router.push('/home')">
+        <div class="option" @click="$router.push('/home')">
           <img width="36" src="../assets/img/favicon.svg" alt="主页">
         </div>
       </el-tooltip>
       <el-tooltip placement="bottom" content="探索">
-        <div class="select" @click="$router.push('/share')">
+        <div class="option" @click="$router.push('/share')">
           <el-icon :size="24" color="#fff"><compass/></el-icon>
         </div>
       </el-tooltip>
       <el-tooltip placement="bottom" content="创建">
-        <div class="select" @click="$router.push('/create-channel')">
+        <div class="option" @click="$router.push('/create-channel')">
           <el-icon :size="24" color="#fff"><plus/></el-icon>
         </div>
       </el-tooltip>
       <el-divider/>
       <div v-for="channel in channels?.items"
            :key="channel.id"
-           class="select"
-           @click="() => $router.push(
-             `/channel/${ channel.id }?title=${ channel.name }`
-           )">
-        <img width="36" :src="channel.avatar" alt="主页">
+           class="option channel"
+           :class="{
+             selected: $route.name === 'channel' && $route.params.id === channel.id,
+           }"
+           @click="() => $router.push(`/channel/${ channel.id }`)">
+        <img width="36" :src="channel.avatar" :alt="channel.id">
       </div>
     </div>
     <div v-show="$store.state.sidebarCrtlVisiable"
@@ -81,19 +82,27 @@ div.wrapper {
     justify-content: start;
     row-gap: 10px;
     padding: 10px;
-    > div.select {
+    > div.option {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 5px;
+      padding: 6px;
       width: 36px;
       height: 36px;
       cursor: pointer;
-      background-color: #36393f;
+      background-color: var(--color-auxi-regular);
       border-radius: 4px;
       transition: 0.3s;
       &:hover {
-        border-radius: 16px;
+        border-radius: 8px;
+      }
+      &.channel {
+        border: 1px solid var(--color-auxi-placeholder);
+      }
+      &.selected {
+        background-color: var(--color-auxi-primary);
+        border: 1px solid var(--color-primary);
       }
     }
     > div.el-divider--horizontal {

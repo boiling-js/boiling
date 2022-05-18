@@ -38,12 +38,10 @@ const router = createRouter({
     path: '/theme',
     component: () => import('./views/Theme.vue')
   }, {
+    name: 'channel',
     path: '/channel/:id',
     component: () => import('./views/Channel.vue'),
-    props: route => ({
-      id: route.params.id,
-      title: route.query.title
-    })
+    props: route => ({ id: route.params.id })
   }, {
     path: '/edit-personnel',
     component: () => import('./views/EditPersonnel.vue')
