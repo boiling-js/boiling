@@ -58,7 +58,7 @@ describe('Channels Service', () => {
   it('should add subChannel', async () => {
     const channel = await ChannelsService.create(u0.id, { name: 'test', avatar: 'test', description: 'test' })
     await ChannelsService.addSubChannel(channel.id, 'test subChannel')
-    expect((await ChannelsService.get(channel.id))?.subChannel[0].subTitle).to.equal('test subChannel')
+    expect((await ChannelsService.get(channel.id))?.subChannels[0].subTitle).to.equal('test subChannel')
   })
   it('should add member for channel', async () => {
     const channel = await ChannelsService.create(u0.id, { name: 'test', avatar: 'test', description: 'test' })
@@ -80,7 +80,7 @@ describe('Channels Service', () => {
     const chatRoom = await ChatRoomsService.create([u0.id, u1.id, u2.id], { name: 'test subChannel chatRoom' }, channel.id)
     await ChannelsService.addChatRoom(channel.id, 'foo', chatRoom.id)
     expect(await ChannelsService.get(channel.id))
-      .property('subChannel')
+      .property('subChannels')
       .property('0')
       .property('chatRooms')
       .property('0')

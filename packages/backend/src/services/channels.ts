@@ -80,14 +80,14 @@ export namespace ChannelsService {
    */
   export async function addSubChannel(id: string, title: string) {
     await existsOrThrow(id)
-    await Model.updateOne({ _id: id }, { $push: { subChannel: { subTitle: title } } })
+    await Model.updateOne({ _id: id }, { $push: { subChannels: { subTitle: title } } })
   }
   /**
    * 为子频道添加聊天室
    * */
   export async function addChatRoom(id: string, title: string, chatRoomId: string, desc?: string) {
     const channel = await getOrThrow(id)
-    const subChannel = channel.subChannel.find(item => item.subTitle === title)
+    const subChannel = channel.subChannels.find(item => item.subTitle === title)
     if (!subChannel)
       throw new HttpError('NOT_FOUND', `频道不存在标题为 ${ title } 的子频道`)
     // @ts-ignore

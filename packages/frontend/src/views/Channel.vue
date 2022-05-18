@@ -100,10 +100,10 @@ const
 const
   getChannel = async () => {
     channel.value = await api.channel(props.id)
-    subChannels.value = channel.value.subChannel
+    subChannels.value = channel.value.subChannels
   },
   createSubChannel = async () => {
-    await api.channel(props.id).subChannel.add({
+    await api.channel(props.id).subChannels.add({
       subTitle: subChannelForm.value.subTitle
     })
     await getChannel()

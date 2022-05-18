@@ -34,7 +34,7 @@ export namespace Channels {
     /** 成员列表 */
     members: Schema.array(MemberMeta),
     /** 子频道 */
-    subChannel: Schema.array(SubChannelMeta),
+    subChannels: Schema.array(SubChannelMeta),
     /** 介绍信息 */
     description: Schema.string().optional(),
     /** 创建时间 */

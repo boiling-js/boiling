@@ -86,7 +86,7 @@ interface OfficialApi {
     /** 删除频道 */
     del(): Promise<void>
     /** 子频道 */
-    subChannel: {
+    subChannels: {
       /** 创建子频道 */
       add(d: {subTitle: string}): Promise<void>
     }
