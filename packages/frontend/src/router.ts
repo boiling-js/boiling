@@ -45,12 +45,8 @@ const router = createRouter({
       title: route.query.title
     })
   }, {
-    path: '/:pathMatch(.*)*',
-    component: () => import('element-plus').then(({ ElEmpty }) => ElEmpty),
-    props: { description: '访问到了不存在的页面' }
-  }, {
     path: '/edit-personnel',
-    component: () => import('./components/EditPersonnel.vue')
+    component: () => import('./views/EditPersonnel.vue')
   }, {
     path: '/create-channel',
     component: () => import('./views/CreateChannel.vue'),
@@ -58,6 +54,10 @@ const router = createRouter({
       type: route.query.type,
       info: route.query.info
     })
+  }, {
+    path: '/:pathMatch(.*)*',
+    component: () => import('element-plus').then(({ ElEmpty }) => ElEmpty),
+    props: { description: '访问到了不存在的页面' }
   }]
 })
 

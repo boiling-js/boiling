@@ -81,7 +81,7 @@ import { ArrowLeft } from '@element-plus/icons-vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import store from '../store'
 import { Users } from '@boiling/core'
-import Avatar from './Avatar.vue'
+import Avatar from '../components/Avatar.vue'
 import { ElMessageBox } from 'element-plus'
 import { api } from '../api'
 
