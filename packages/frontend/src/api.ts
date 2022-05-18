@@ -88,7 +88,7 @@ interface OfficialApi {
     /** 子频道 */
     subChannels: {
       /** 创建子频道 */
-      add(d: {subTitle: string}): Promise<void>
+      add(d: {title: string}): Promise<void>
     }
     members: {
       /** 添加成员 */

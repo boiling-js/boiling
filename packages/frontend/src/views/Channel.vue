@@ -47,7 +47,7 @@
         label-width="100px"
         :model="subChannelForm">
         <el-form-item label="标题">
-          <el-input v-model="subChannelForm.subTitle" />
+          <el-input v-model="subChannelForm.title" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -86,16 +86,16 @@ const
   }>(),
   defaultProps = {
     children: 'chatRooms',
-    label: 'subTitle'
+    label: 'title'
   },
   channel = ref<Channels.Model>(),
   subChannels = ref<Channels.SubChannelMeta[]>([]),
   subChannelForm = ref<{
     show: boolean,
-    subTitle: string,
+    title: string,
   }>({
     show: false,
-    subTitle: ''
+    title: ''
   })
 const
   getChannel = async () => {
@@ -104,7 +104,7 @@ const
   },
   createSubChannel = async () => {
     await api.channel(props.id).subChannels.add({
-      subTitle: subChannelForm.value.subTitle
+      title: subChannelForm.value.title
     })
     await getChannel()
     subChannelForm.value.show = false

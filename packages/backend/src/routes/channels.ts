@@ -64,10 +64,10 @@ export const router = new Router({
   /**
    * 添加子频道
    */
-  .post(Schema.Pick(Channels.SubChannelMeta, ['subTitle']), Schema.any(), '/:channelId/subChannels', async ctx => {
+  .post(Schema.Pick(Channels.SubChannelMeta, ['title']), Schema.any(), '/:channelId/subChannels', async ctx => {
     const { channelId } = ctx.params
-    const { subTitle } = ctx.request.body
-    return ChannelsService.addSubChannel(channelId, subTitle)
+    const { title } = ctx.request.body
+    return ChannelsService.addSubChannel(channelId, title)
   })
   /**
    * 添加成员

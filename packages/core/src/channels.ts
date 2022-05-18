@@ -19,7 +19,7 @@ export namespace Channels {
   export type ChatRoomMeta = Schema.InferS<typeof ChatRoomMeta>
   export const SubChannelMeta = Schema.interface({
     /** 标题 */
-    subTitle: Schema.string(),
+    title: Schema.string(),
     /** 聊天室列表 */
     chatRooms: Schema.array(ChatRoomMeta).default([]).optional()
   })

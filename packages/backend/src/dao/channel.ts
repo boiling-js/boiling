@@ -13,7 +13,7 @@ export const channelSchema = new Schema<Channels.Model>({
     name: { type: String }
   }],
   subChannels: [{
-    subTitle: { type: String },
+    title: { type: String },
     chatRooms: [{
       id: { type: String, required: true },
       desc: { type: String }

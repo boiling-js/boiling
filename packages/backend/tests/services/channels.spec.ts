@@ -58,7 +58,7 @@ describe('Channels Service', () => {
   it('should add subChannel', async () => {
     const channel = await ChannelsService.create(u0.id, { name: 'test', avatar: 'test', description: 'test' })
     await ChannelsService.addSubChannel(channel.id, 'test subChannel')
-    expect((await ChannelsService.get(channel.id))?.subChannels[0].subTitle).to.equal('test subChannel')
+    expect((await ChannelsService.get(channel.id))?.subChannels[0].title).to.equal('test subChannel')
   })
   it('should add member for channel', async () => {
     const channel = await ChannelsService.create(u0.id, { name: 'test', avatar: 'test', description: 'test' })
