@@ -3,9 +3,12 @@
   <div v-if="isLoading" class="container">
     <panel-selector v-if="isHiddenLeftSelector" class="l"/>
     <router-view v-slot="{ Component }">
+      <component :is="Component" class="r"/>
+      <!--
       <transition name="el-fade-in-linear">
         <component :is="Component" class="r"/>
       </transition>
+      -->
     </router-view>
   </div>
   <div v-else class="container loading">
