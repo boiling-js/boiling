@@ -32,7 +32,7 @@
 import {  onMounted, ref } from 'vue'
 import {  ElIcon, ElForm, ElFormItem, ElInput, ElButton, ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
-import Avatar from './Avatar.vue'
+import Avatar from '../components/Avatar.vue'
 import { api } from '../api'
 import { Channels } from '@boiling/core'
 
