@@ -3,14 +3,18 @@
     <div class="classify">
       <div class="title">
         {{ props.title }}
-        <el-dropdown trigger="click">
+        <el-dropdown trigger="click" placement="bottom-end">
           <span class="el-dropdown-link">
             <span class="menu material-icons">menu</span>
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="$refs.selMembers.open([])">邀请好友</el-dropdown-item>
-              <el-dropdown-item @click="subChannelForm.show = true">创建类别</el-dropdown-item>
+              <el-dropdown-item @click="$refs.selMembers.open([])">
+                <el-icon><Avatar/></el-icon> 邀请好友
+              </el-dropdown-item>
+              <el-dropdown-item @click="subChannelForm.show = true">
+                <el-icon><Plus/></el-icon> 创建类别
+              </el-dropdown-item>
               <el-dropdown-item
                 @click="() => $router.push({
                   path: '/create-channel',
@@ -24,7 +28,7 @@
                     })
                   }
                 })">
-                频道设置
+                <el-icon><Setting/></el-icon> 频道设置
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -34,8 +38,14 @@
       <el-tree :data="subChannels" :props="defaultProps" @node-click="handleNodeClick">
         <template #default="{ node }">
           {{ node.label }}
-          <span class="add material-icons"
-                @click="() => {}">add</span>
+          <div class="operations">
+            <el-icon class="add" @click="() => {}">
+              <Plus/>
+            </el-icon>
+            <el-icon class="set" @click="() => {}">
+              <Setting/>
+            </el-icon>
+          </div>
         </template>
       </el-tree>
     </div>
@@ -66,6 +76,7 @@ import { nextTick, onMounted, ref } from 'vue'
 import {
   ElTree,
   ElDialog,
+  ElIcon,
   ElButton,
   ElForm,
   ElFormItem,
@@ -75,6 +86,7 @@ import {
   ElDropdownMenu,
   ElDropdownItem
 } from 'element-plus'
+import { Avatar, Plus, Setting } from '@element-plus/icons-vue'
 import { Channels } from '@boiling/core'
 import { api } from '../api'
 import SelMembers from '../components/SelMembers.vue'
@@ -131,14 +143,15 @@ const handleNodeClick = (data: Channels.SubChannelMeta) => {
 </script>
 
 <style lang="scss" scoped>
-.channel {
+div.channel {
   display: flex;
   width: 100%;
   height: 100%;
   > div.classify {
-    width: 300px;
     height: 100%;
-    background: var(--color-auxi-secondary);
+    max-width: 240px;
+    min-width: 240px;
+    background: var(--color-auxi-regular);
     > div.title {
       z-index: 10;
       display: flex;
@@ -156,17 +169,36 @@ const handleNodeClick = (data: Channels.SubChannelMeta) => {
       }
     }
     > img.avatar {
-      width: 300px;
-      height: 200px;
-      opacity: 0.8;
+      width: 100%;
     }
-    .el-tree {
+    div.el-tree {
       margin-top: 20px;
       background: none;
-      :deep(.el-tree-node__content) {
-        .add {
-          margin-right: 10px;
-          margin-left: auto;
+      :deep(div.el-tree-node) {
+        > div.el-tree-node__content {
+          padding: 5px 40px 5px 5px;
+          margin: 5px;
+          border-radius: 4px;
+          transition: 0.3s;
+          &:hover {
+            background-color: var(--color-auxi-secondary);
+          }
+          > div.operations {
+            position: absolute;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            column-gap: 5px;
+            > i.el-icon {
+              transition: 0.3s;
+              &:hover {
+                color: var(--color-primary);
+              }
+            }
+          }
+        }
+        &.is-current > div.el-tree-node__content {
+          background-color: var(--color-auxi-placeholder);
         }
       }
     }
