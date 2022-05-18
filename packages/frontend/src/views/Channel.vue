@@ -1,17 +1,26 @@
 <template>
   <div class="channel">
     <div class="classify">
-      <div class="title">{{ props.title }}</div>
-      <img class="avatar" :src="channel?.avatar" alt="">
-      <div class="subTitle">
-        频道
-        <span class="add material-icons md-light"
-              @click="subChannelForm.show = true">add</span>
+      <div class="title">
+        {{ props.title }}
+        <el-dropdown trigger="click">
+          <span class="el-dropdown-link">
+            <span class="menu material-icons">menu</span>
+          </span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item>邀请好友</el-dropdown-item>
+              <el-dropdown-item @click="subChannelForm.show = true">创建类别</el-dropdown-item>
+              <el-dropdown-item>频道设置</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </div>
+      <img class="avatar" :src="channel?.avatar" alt="">
       <el-tree :data="subChannels" :props="defaultProps" @node-click="handleNodeClick">
         <template #default="{ node }">
           {{ node.label }}
-          <span class="add material-icons md-light"
+          <span class="add material-icons"
                 @click="() => {}">add</span>
         </template>
       </el-tree>
@@ -39,7 +48,18 @@
 
 <script lang="ts" setup>
 import { nextTick, onMounted, ref } from 'vue'
-import { ElTree, ElDialog, ElButton, ElForm, ElFormItem, ElInput, ElMessage } from 'element-plus'
+import {
+  ElTree,
+  ElDialog,
+  ElButton,
+  ElForm,
+  ElFormItem,
+  ElInput,
+  ElMessage,
+  ElDropdown,
+  ElDropdownMenu,
+  ElDropdownItem
+} from 'element-plus'
 import { Channels } from '@boiling/core'
 import { api } from '../api'
 
@@ -96,6 +116,8 @@ const handleNodeClick = (data: Channels.SubChannelMeta) => {
     height: 100%;
     background: var(--color-auxi-secondary);
     > div.title {
+      display: flex;
+      align-items: center;
       padding: 0 16px;
       height: 68px;
       font-size: 16px;
@@ -104,27 +126,18 @@ const handleNodeClick = (data: Channels.SubChannelMeta) => {
       color: var(--color-text-primary);
       z-index: 10;
       border-bottom: 2px solid #202225;
+      .el-dropdown {
+        margin-left: auto;
+        cursor: pointer;
+      }
     }
     > img.avatar {
       width: 300px;
       height: 200px;
       opacity: .8;
     }
-    > div.subTitle {
-      margin-top: 10px;
-      padding: 0 10px;
-      height: 30px;
-      line-height: 30px;
-      font-size: 13px;
-      font-weight: bold;
-      color: var(--color-text-primary);
-       .add {
-         margin-top: 3px;
-         float: right;
-         cursor: pointer;
-       }
-    }
     .el-tree {
+      margin-top: 20px;
       background: none;
       :deep(.el-tree-node__content) {
         .add {
