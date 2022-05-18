@@ -57,7 +57,6 @@ const
   store = useStore()
 
 watch(() => route.path, () => {
-  console.log(route.path.startsWith('/home'), store.state.sidebarCrtlVisiable)
   if (route.path.startsWith('/home')) {
     store.commit('setSidebarCrtlVisiable', true)
   } else {
