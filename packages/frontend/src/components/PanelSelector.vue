@@ -1,31 +1,33 @@
 <template>
   <div class="wrapper">
     <div class="panel-selector">
-      <el-tooltip placement="bottom" content="主页">
+      <el-tooltip placement="right" content="主页">
         <div class="option" @click="$router.push('/home')">
           <img width="36" src="../assets/img/favicon.svg" alt="主页">
         </div>
       </el-tooltip>
-      <el-tooltip placement="bottom" content="探索">
+      <el-tooltip placement="right" content="探索">
         <div class="option" @click="$router.push('/share')">
           <el-icon :size="24" color="#fff"><compass/></el-icon>
         </div>
       </el-tooltip>
-      <el-tooltip placement="bottom" content="创建">
+      <el-tooltip placement="right" content="创建">
         <div class="option" @click="$router.push('/create-channel')">
           <el-icon :size="24" color="#fff"><plus/></el-icon>
         </div>
       </el-tooltip>
       <el-divider/>
-      <div v-for="channel in channels?.items"
-           :key="channel.id"
-           class="option channel"
-           :class="{
-             selected: $route.name === 'channel' && $route.params.id === channel.id,
-           }"
-           @click="() => $router.push(`/channel/${ channel.id }`)">
-        <img width="36" :src="channel.avatar" :alt="channel.id">
-      </div>
+      <el-tooltip v-for="channel in channels?.items"
+                  :key="channel.id"
+                  placement="right" :content="channel.name">
+        <div class="option channel"
+             :class="{
+               selected: $route.name === 'channel' && $route.params.id === channel.id,
+             }"
+             @click="() => $router.push(`/channel/${ channel.id }`)">
+          <img width="36" :src="channel.avatar" :alt="channel.id">
+        </div>
+      </el-tooltip>
     </div>
     <div v-show="$store.state.sidebarCrtlVisiable"
          :class="{
