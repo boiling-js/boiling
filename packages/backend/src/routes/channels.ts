@@ -69,3 +69,11 @@ export const router = new Router({
     const { subTitle } = ctx.request.body
     return ChannelsService.addSubChannel(channelId, subTitle)
   })
+  /**
+   * 添加成员
+   */
+  .post('/:channelId/members', async ctx => {
+    const { channelId } = ctx.params
+    const { members } = ctx.request.body
+    return ChannelsService.addMember(channelId, members)
+  })

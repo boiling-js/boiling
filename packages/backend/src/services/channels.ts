@@ -82,4 +82,18 @@ export namespace ChannelsService {
     await existsOrThrow(id)
     await Model.updateOne({ _id: id }, { $push: { subChannel: { subTitle } } })
   }
+  /**
+   * 为子频道添加聊天室
+   * */
+  export async function addChatRoom(id: string, subTitle: string, chatRoomId: string) {
+    await existsOrThrow(id)
+    await Model.updateOne({ _id: id }, { $push: { chatRoom: chatRoomId } })
+  }
+  /**
+   * 添加成员
+   */
+  export async function addMember(id: string, members: Channels.MemberMeta[]) {
+    await existsOrThrow(id)
+    await Model.updateOne({ _id: id }, { $push: { members: { $each: members } } })
+  }
 }

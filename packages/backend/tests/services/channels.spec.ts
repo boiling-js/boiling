@@ -11,13 +11,15 @@ after(() => {
 })
 
 describe('Channels Service', () => {
-  let u0: Users.Base
+  let u0: Users.Base, u1: Users.Base, u2: Users.Base
   after(async () => {
     await UsersService.Model.deleteMany({})
   })
 
   before(async () => {
     u0 = await UsersService.add({ username: '001', passwordHash: '001', avatar: '001' })
+    u1 = await UsersService.add({ username: '002', passwordHash: '002', avatar: '002' })
+    u2 = await UsersService.add({ username: '003', passwordHash: '003', avatar: '003' })
   })
 
   afterEach(async () => {
@@ -55,5 +57,19 @@ describe('Channels Service', () => {
     const channel = await ChannelsService.create(u0.id, { name: 'test', avatar: 'test', description: 'test' })
     await ChannelsService.addSubChannel(channel.id, 'test subChannel')
     expect((await ChannelsService.get(channel.id))?.subChannel[0].subTitle).to.equal('test subChannel')
+  })
+  it('should add member for channel', async () => {
+    const channel = await ChannelsService.create(u0.id, { name: 'test', avatar: 'test', description: 'test' })
+    await ChannelsService.addMember(channel.id, [{
+      id: u1.id,
+      name: u1.username,
+      rules: ['admin']
+    },{
+      id: u2.id,
+      name: u2.username,
+      rules: ['admin']
+    }])
+    expect((await ChannelsService.get(channel.id))?.members[1].id).to.equal(u1.id)
+    expect((await ChannelsService.get(channel.id))?.members[2].id).to.equal(u2.id)
   })
 })
