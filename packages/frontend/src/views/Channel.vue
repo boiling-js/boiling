@@ -11,7 +11,21 @@
             <el-dropdown-menu>
               <el-dropdown-item @click="$refs.selMembers.open([])">邀请好友</el-dropdown-item>
               <el-dropdown-item @click="subChannelForm.show = true">创建类别</el-dropdown-item>
-              <el-dropdown-item>频道设置</el-dropdown-item>
+              <el-dropdown-item
+                @click="() => $router.push({
+                  path: '/create-channel',
+                  query: {
+                    type: 'setting',
+                    info: JSON.stringify({
+                      id: channel.id,
+                      name: channel.name,
+                      avatar: channel.avatar,
+                      description: channel.description,
+                    })
+                  }
+                })">
+                频道设置
+              </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>

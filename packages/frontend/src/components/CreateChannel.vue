@@ -1,7 +1,7 @@
 <template>
   <div class="create-channel">
     <div class="content">
-      <div class="title">新建频道</div>
+      <div class="title">{{ props.type === 'create' ? '新建频道' : '设置频道' }}</div>
       <div class="avatar-uploader" @click="upload">
         <img v-if="channel.avatar" :src="channel.avatar" class="avatar" >
         <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
@@ -20,8 +20,8 @@
         </el-form-item>
       </el-form>
       <div class="bottom">
-        <el-button @click="$router.push('/home')">取消</el-button>
-        <el-button type="primary" @click="create">确认</el-button>
+        <el-button @click="$router.back()">取消</el-button>
+        <el-button type="primary" @click="confirm">确认</el-button>
       </div>
     </div>
     <avatar/>
@@ -29,18 +29,26 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import {  onMounted, ref } from 'vue'
 import {  ElIcon, ElForm, ElFormItem, ElInput, ElButton, ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
-import { Channels } from '@boiling/core'
 import Avatar from './Avatar.vue'
 import { api } from '../api'
+import { Channels } from '@boiling/core'
 
 const
-  channel = ref<Pick<Channels.Model, 'name' | 'avatar' | 'description'>>({
+  props = withDefaults(defineProps<{
+    type?: 'create' | 'setting',
+    info?: string
+  }>(), {
+    type: 'create',
+    info: ''
+  }),
+  channel = ref<Pick<Channels.Model, 'id' | 'name' | 'avatar' | 'description'>>({
+    id: '',
     name: '',
-    avatar: '',
-    description: ''
+    description: '',
+    avatar: ''
   }),
   selFile = ref<HTMLInputElement | null>(null)
 const
@@ -64,10 +72,21 @@ const
     }
     selFile.value?.click()
   },
-  create = async () => {
-    await api.channels.add(channel.value)
-    ElMessage.success('创建成功')
+  confirm = async () => {
+    if (props.type === 'create') {
+      await api.channels.add(channel.value)
+      ElMessage.success('创建成功')
+    } else if (props.type === 'setting') {
+      await api.channel(channel.value.id).upd(channel.value)
+      ElMessage.success('更新成功')
+    }
   }
+
+onMounted(() => {
+  if (props.type === 'setting') {
+    channel.value = JSON.parse(props.info)
+  }
+})
 </script>
 
 <style lang="scss" scoped>

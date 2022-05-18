@@ -53,7 +53,11 @@ const router = createRouter({
     component: () => import('./components/EditPersonnel.vue')
   }, {
     path: '/create-channel',
-    component: () => import('./components/CreateChannel.vue')
+    component: () => import('./components/CreateChannel.vue'),
+    props: route => ({
+      type: route.query.type,
+      info: route.query.info
+    })
   }]
 })
 
