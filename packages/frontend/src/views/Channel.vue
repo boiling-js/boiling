@@ -140,16 +140,16 @@ const handleNodeClick = (data: Channels.SubChannelMeta) => {
     height: 100%;
     background: var(--color-auxi-secondary);
     > div.title {
+      z-index: 10;
       display: flex;
-      align-items: center;
       padding: 0 16px;
       height: 68px;
-      font-size: 16px;
-      font-weight: bold;
       line-height: 70px;
       color: var(--color-text-primary);
-      z-index: 10;
+      font-size: 16px;
+      font-weight: bold;
       border-bottom: 2px solid #202225;
+      align-items: center;
       .el-dropdown {
         margin-left: auto;
         cursor: pointer;
@@ -158,15 +158,15 @@ const handleNodeClick = (data: Channels.SubChannelMeta) => {
     > img.avatar {
       width: 300px;
       height: 200px;
-      opacity: .8;
+      opacity: 0.8;
     }
     .el-tree {
       margin-top: 20px;
       background: none;
       :deep(.el-tree-node__content) {
         .add {
-          margin-left: auto;
           margin-right: 10px;
+          margin-left: auto;
         }
       }
     }
