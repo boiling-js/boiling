@@ -26,7 +26,8 @@
         <img width="36" :src="channel.avatar" alt="主页">
       </div>
     </div>
-    <div :class="{
+    <div v-show="$store.state.sidebarCrtlVisiable"
+         :class="{
            'control-sidebar': true,
            'is-show': $store.state.sidebarVisiable,
          }"
@@ -39,13 +40,27 @@
 </template>
 
 <script lang="ts" setup>
+import { onMounted, ref, watch } from 'vue'
+import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
 import { ElDivider, ElTooltip, ElIcon } from 'element-plus'
 import { Compass, Plus, ArrowRight } from '@element-plus/icons-vue'
 import { Channels, Pagination } from '@boiling/core'
-import { onMounted, ref } from 'vue'
 import { api } from '../api'
 
-const channels = ref<Pagination<Channels.Model>>()
+const
+  channels = ref<Pagination<Channels.Model>>(),
+  route = useRoute(),
+  store = useStore()
+
+watch(() => route.path, () => {
+  console.log(route.path.startsWith('/home'), store.state.sidebarCrtlVisiable)
+  if (route.path.startsWith('/home')) {
+    store.commit('setSidebarCrtlVisiable', true)
+  } else {
+    store.commit('setSidebarCrtlVisiable', false)
+  }
+})
 
 onMounted(async () => {
   channels.value = await api.channels.query({ key: '' })

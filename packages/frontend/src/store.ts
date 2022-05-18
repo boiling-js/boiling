@@ -5,6 +5,7 @@ import { api } from './api'
 
 export interface State {
   sidebarVisiable: boolean
+  sidebarCrtlVisiable: boolean
   isHiddenLeftSelector: boolean
   user: Users.Out
 }
@@ -12,6 +13,7 @@ export interface State {
 export default createStore<State>({
   state: {
     sidebarVisiable: false,
+    sidebarCrtlVisiable: false,
     isHiddenLeftSelector: false,
     user: {
       id: 0,
@@ -25,6 +27,9 @@ export default createStore<State>({
   mutations: {
     toggleSidebarVisiable(state) {
       state.sidebarVisiable = !state.sidebarVisiable
+    },
+    setSidebarCrtlVisiable(state, isHidden) {
+      state.sidebarCrtlVisiable = isHidden
     },
     setLeftSelectorHidden(state, isHidden) {
       state.isHiddenLeftSelector = isHidden
