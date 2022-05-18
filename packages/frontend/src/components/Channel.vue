@@ -4,12 +4,6 @@
       class="avatar" :style="{
         backgroundImage: `url(${channel.avatar})`
       }">
-      <div
-        class="avatar-shadow"
-        @click="() => {}"
-      >
-        更换头像
-      </div>
     </div>
     <div class="info">
       {{ props.channel.name }}
@@ -76,18 +70,8 @@ const
     height: var(--size);
     line-height: var(--size);
     text-align: center;
-    cursor: pointer;
     background-size: cover;
     border-radius: 50%;
-    > div.avatar-shadow {
-      position: absolute;
-      width: var(--size);
-      height: var(--size);
-      font-size: 11px;
-      background-color: #151414;
-      border-radius: 50%;
-      opacity: 0;
-    }
     &:hover {
       > div.avatar-shadow {
         opacity: 0.8;
