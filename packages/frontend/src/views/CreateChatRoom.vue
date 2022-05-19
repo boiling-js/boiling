@@ -11,7 +11,7 @@
         <el-form-item label="聊天室名称">
           <el-input v-model="chatRoom.name" />
         </el-form-item>
-        <el-form-item label="频道介绍">
+        <el-form-item label="聊天室介绍">
           <el-input
             v-model="chatRoom.description"
             type="textarea"
