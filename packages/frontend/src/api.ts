@@ -91,7 +91,7 @@ interface OfficialApi {
       add(d: {title: string}): Promise<void>
     }
     /** 聊天室 */
-    chatRooms(chatRoomId: string): {
+    chatRoom(chatRoomId: string): {
       /** 创建聊天室 */
       add(d: {title: string, chatRoomTitle?: string, description?: string}): Promise<void>
     }

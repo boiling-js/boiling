@@ -119,7 +119,7 @@ const
       })
       // 存在channelId 则为频道聊天室，需要加入到频道中
       if (props.channelId) {
-        await api.channel(props.channelId).chatRooms(chat.id).add({
+        await api.channel(props.channelId).chatRoom(chat.id).add({
           title: props.channelTitle,
           chatRoomTitle: chat.name,
           description: chatRoom.value.description
