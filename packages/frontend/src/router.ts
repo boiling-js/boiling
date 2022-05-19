@@ -59,7 +59,7 @@ const router = createRouter({
       type: route.query.type,
       info: route.query.info,
       channelId: route.query.channelId,
-      subTitle: route.query.subTitle
+      channelTitle: route.query.channelTitle
     })
   }, {
     path: '/:pathMatch(.*)*',

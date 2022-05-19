@@ -63,7 +63,14 @@
         </template>
       </el-tree>
     </div>
-    <div class="content"/>
+    <div class="content">
+      <chat-room
+        v-if="chattingRoom.id"
+        :id="chattingRoom.id"
+        :title="chattingRoom.title"
+      />
+      <el-empty v-else description="快来聊天吧~" />
+    </div>>
     <el-dialog
       v-model="subChannelForm.show"
       title="创建子频道">
@@ -98,20 +105,20 @@ import {
   ElMessage,
   ElDropdown,
   ElDropdownMenu,
-  ElDropdownItem
+  ElDropdownItem,
+  ElEmpty
 } from 'element-plus'
-import { useRouter } from 'vue-router'
 import { Avatar, Plus, Setting } from '@element-plus/icons-vue'
 import { Channels } from '@boiling/core'
 import { api } from '../api'
 import SelMembers from '../components/SelMembers.vue'
+import ChatRoom from './ChatRoom.vue'
 
 const
   props = defineProps<{
     id: string
     title: string
   }>(),
-  router = useRouter(),
   channel = ref<Channels.Model | undefined>(),
   subChannels = computed(() => channel.value?.subChannels),
   subChannelForm = ref<{
@@ -119,6 +126,10 @@ const
     title: string,
   }>({
     show: false,
+    title: ''
+  }),
+  chattingRoom = ref<Channels.ChatRoomMeta>({
+    id: '',
     title: ''
   })
 const
@@ -149,7 +160,8 @@ onMounted(() => {
 })
 const handleNodeClick = (data: Channels.ChatRoomMeta) => {
   if (data.id) {
-    router.push(`/home/chat-rooms/${ data.id }?title=${ data.title }`)
+    chattingRoom.value.id = data.id
+    chattingRoom.value.title = data.title
   }
 }
 
