@@ -20,7 +20,7 @@ interface OfficialApi {
     avatars: Promise<string[]>
   }
   /** 获取指定用户 */
-  user(id: number | '@me'): {
+  user(id: number | '@me'): Promise<Users.BaseOut> & {
     upd(d: Users.UpdateOut): Promise<void>
     password: {
       upd(d: { oldPwd: string, newPwd: string }): Promise<void>
