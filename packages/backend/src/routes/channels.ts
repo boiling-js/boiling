@@ -77,3 +77,11 @@ export const router = new Router({
     const { members } = ctx.request.body
     return ChannelsService.addMember(channelId, members)
   })
+  /**
+   * 添加聊天室
+   */
+  .post('/:channelId/chatRooms/:chatRoomId', async ctx => {
+    const { channelId, chatRoomId } = ctx.params
+    const { title, description } = ctx.request.body
+    return ChannelsService.addChatRoom(channelId, title, chatRoomId, description)
+  })
