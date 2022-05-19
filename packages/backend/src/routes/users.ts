@@ -41,7 +41,7 @@ export const router = new Router({
       extendService(UsersService, 'search', m => m.find({
         id: { $ne: useCurUser(ctx.session).id }
       })), ctx.query
-    )(ctx.query.key)
+    )(decodeURI(ctx.query.key))
   })
   .get(Users.BaseOut, '/:id(number)', async ctx => {
     return UsersService.getOrThrow(ctx.params.id)
