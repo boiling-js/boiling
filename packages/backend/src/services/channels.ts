@@ -85,13 +85,13 @@ export namespace ChannelsService {
   /**
    * 为子频道添加聊天室
    * */
-  export async function addChatRoom(id: string, title: string, chatRoomId: string, desc?: string) {
+  export async function addChatRoom(id: string, title: string, chatRoomId: string, description?: string) {
     const channel = await getOrThrow(id)
     const subChannel = channel.subChannels.find(item => item.title === title)
     if (!subChannel)
       throw new HttpError('NOT_FOUND', `频道不存在标题为 ${ title } 的子频道`)
     // @ts-ignore
-    subChannel.chatRooms?.push?.({ id: chatRoomId, desc })
+    subChannel.chatRooms?.push?.({ id: chatRoomId, description })
     await channel.save()
   }
   /**

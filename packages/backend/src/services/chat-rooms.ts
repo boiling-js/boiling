@@ -13,9 +13,8 @@ export namespace ChatRoomsService {
    *
    * @param members
    * @param options
-   * @param channelId
    */
-  export async function create(members: M['members'], options?: Partial<Pick<M, 'name' | 'avatar'>>, channelId?: string) {
+  export async function create(members: M['members'], options?: Partial<Pick<M, 'name' | 'avatar'>>) {
     if (members.length === 2 && await exists(members))
       throw new HttpError('CONFLICT', `members 为 [${ members.join(', ') }] 的聊天室已存在`)
     if (
@@ -24,7 +23,6 @@ export namespace ChatRoomsService {
     ) throw new HttpError('NOT_FOUND', 'members 中存在不存在的用户')
 
     return new Model({
-      channelId,
       members, ...options,
       createdAt: new Date()
     }).save()
