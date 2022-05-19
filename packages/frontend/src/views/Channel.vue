@@ -2,7 +2,7 @@
   <div class="channel">
     <div class="classify">
       <div class="title">
-        {{ props.title }}
+        {{ channel?.name }}
         <el-dropdown trigger="click" placement="bottom-end">
           <span class="el-dropdown-link">
             <span class="menu material-icons">menu</span>
@@ -35,7 +35,12 @@
         </el-dropdown>
       </div>
       <img class="avatar" :src="channel?.avatar" alt="">
-      <el-tree :data="subChannels" :props="defaultProps" @node-click="handleNodeClick">
+      <el-tree :data="subChannels"
+               :props="{
+                 children: 'chatRooms',
+                 label: 'title'
+               }"
+               @node-click="handleNodeClick">
         <template #default="{ node }">
           {{ node.label }}
           <div class="operations">
@@ -81,7 +86,7 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import {
   ElTree,
   ElDialog,
@@ -105,12 +110,8 @@ const
     id: string
     title: string
   }>(),
-  defaultProps = {
-    children: 'chatRooms',
-    label: 'title'
-  },
-  channel = ref<Channels.Model>(),
-  subChannels = ref<Channels.SubChannelMeta[]>([]),
+  channel = ref<Channels.Model | undefined>(),
+  subChannels = computed(() => channel.value?.subChannels),
   subChannelForm = ref<{
     show: boolean,
     title: string,
@@ -121,7 +122,6 @@ const
 const
   getChannel = async () => {
     channel.value = await api.channel(props.id)
-    subChannels.value = channel.value.subChannels
   },
   createSubChannel = async () => {
     await api.channel(props.id).subChannels.add({
