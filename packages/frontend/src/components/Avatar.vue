@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { ElDialog, ElScrollbar } from 'element-plus'
 import { api } from '../api'
 
@@ -24,17 +24,15 @@ const
   }>(),
   showDialog = ref<Boolean>(false),
   avatars = ref<string[]>([]),
-  show = () => {
+  show = async () => {
     showDialog.value = true
+    avatars.value = await api.users.avatars
   },
   selAvatar = async (avatar: string) => {
     emits('selAvatar', avatar)
     showDialog.value = false
   }
 
-  onMounted(async () => {
-    avatars.value = await api.users.avatars
-  })
 defineExpose({ show })
 </script>
 
