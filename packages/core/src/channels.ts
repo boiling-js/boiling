@@ -13,6 +13,8 @@ export namespace Channels {
   export const ChatRoomMeta = Schema.interface({
     /** id */
     id: Schema.string(),
+    /** 群名 */
+    title: Schema.string().optional(),
     /** desc */
     desc: Schema.string().optional()
   })
