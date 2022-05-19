@@ -37,13 +37,16 @@ describe('Users Service', function () {
       })
   })
   it('should search user by username.', async function () {
-    await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
-    const [ u ] = await UsersService.search('t').limit(1)
-    expect(u).not.to.be.undefined
-    expect(u.username).to.be.eq('test')
+    const u = await UsersService.add({ username: 'test', passwordHash: 'test', avatar: 'test' })
+    const [ uResult ] = await UsersService.search('t').limit(1)
+    expect(uResult).not.to.be.undefined
+    expect(uResult.username).to.be.eq('test')
     expect(
       await UsersService.search('m').count()
     ).to.be.eq(0)
+    expect(
+      await UsersService.search(`${ u.id }`).count()
+    ).to.be.eq(1)
   })
   it('should get user by id or username.', async function () {
     const {

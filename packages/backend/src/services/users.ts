@@ -67,7 +67,12 @@ export namespace UsersService {
     return m
   }
   export function search(key: string) {
-    return Model.find({ username: new RegExp(`${key}.*`) })
+    const id = Number(key)
+    return Model.find({
+      $or: [
+        { username: new RegExp(`${key}.*`) }
+      ].concat(isNaN(id) ? [] : [{ id } as any])
+    })
   }
   export async function getAvatars() {
     return (await fs.readdir('./static/img/avatar'))
