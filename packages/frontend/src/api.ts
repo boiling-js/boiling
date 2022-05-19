@@ -55,7 +55,7 @@ interface OfficialApi {
     disableToast?: boolean
   }> & {
     /** 创建聊天室 */
-    add(d: Pick<ChatRooms.Model, 'members' | 'name' | 'avatar'>): Promise<ChatRooms.Model>
+    add(d: Pick<ChatRooms.Model, 'members' | 'name' | 'avatar' | 'channelId'>): Promise<ChatRooms.Model>
   }
   /** 聊天室 */
   'chat-room'(chatRoomId: string): {
@@ -89,6 +89,11 @@ interface OfficialApi {
     subChannels: {
       /** 创建子频道 */
       add(d: {title: string}): Promise<void>
+    }
+    /** 聊天室 */
+    chatRooms(chatRoomId: string): {
+      /** 创建聊天室 */
+      add(d: {title: string, description?: string}): Promise<void>
     }
     members: {
       /** 添加成员 */

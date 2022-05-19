@@ -3,8 +3,7 @@
     <div
       class="avatar" :style="{
         backgroundImage: `url(${channel.avatar})`
-      }">
-    </div>
+      }"/>
     <div class="info">
       {{ props.channel.name }}
     </div>

@@ -39,7 +39,16 @@
         <template #default="{ node }">
           {{ node.label }}
           <div class="operations">
-            <el-icon class="add" @click="() => {}">
+            <el-icon
+              class="add"
+              @click="() => $router.push({
+                path: '/create-chatRoom',
+                query: {
+                  type: 'create',
+                  channelId: channel.id,
+                  channelTitle: node.label
+                }
+              })">
               <Plus/>
             </el-icon>
             <el-icon class="set" @click="() => {}">

@@ -54,6 +54,15 @@ const router = createRouter({
       type: route.query.type,
       info: route.query.info
     })
+  },{
+    path: '/create-chatRoom',
+    component: () => import('./views/CreateChatRoom.vue'),
+    props: route => ({
+      type: route.query.type,
+      info: route.query.info,
+      channelId: route.query.channelId,
+      subTitle: route.query.subTitle
+    })
   }, {
     path: '/:pathMatch(.*)*',
     component: () => import('element-plus').then(({ ElEmpty }) => ElEmpty),
