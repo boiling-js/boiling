@@ -100,6 +100,7 @@ import {
   ElDropdownMenu,
   ElDropdownItem
 } from 'element-plus'
+import { useRouter } from 'vue-router'
 import { Avatar, Plus, Setting } from '@element-plus/icons-vue'
 import { Channels } from '@boiling/core'
 import { api } from '../api'
@@ -110,6 +111,7 @@ const
     id: string
     title: string
   }>(),
+  router = useRouter(),
   channel = ref<Channels.Model | undefined>(),
   subChannels = computed(() => channel.value?.subChannels),
   subChannelForm = ref<{
@@ -145,8 +147,10 @@ onMounted(() => {
     await getChannel()
   })
 })
-const handleNodeClick = (data: Channels.SubChannelMeta) => {
-  console.log(data)
+const handleNodeClick = (data: Channels.ChatRoomMeta) => {
+  if (data.id) {
+    router.push(`/home/chat-rooms/${ data.id }?title=${ data.title }`)
+  }
 }
 
 </script>
