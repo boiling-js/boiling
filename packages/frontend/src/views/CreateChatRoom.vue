@@ -121,6 +121,7 @@ const
       if (props.channelId) {
         await api.channel(props.channelId).chatRooms(chat.id).add({
           title: props.channelTitle,
+          chatRoomTitle: chat.name,
           description: chatRoom.value.description
         })
       }

@@ -93,7 +93,7 @@ interface OfficialApi {
     /** 聊天室 */
     chatRooms(chatRoomId: string): {
       /** 创建聊天室 */
-      add(d: {title: string, description?: string}): Promise<void>
+      add(d: {title: string, chatRoomTitle?: string, description?: string}): Promise<void>
     }
     members: {
       /** 添加成员 */
