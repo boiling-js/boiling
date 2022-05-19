@@ -85,7 +85,7 @@ export namespace ChannelsService {
   /**
    * 为子频道添加聊天室
    * */
-  export async function addChatRoom(id: string, title: string, chatRoomId: string, description?: string) {
+  export async function addChatRoom(id: string, title: string, chatRoomId: string, chatRoomTitle?: string, description?: string) {
     const channel = await getOrThrow(id)
     const subChannel = channel.subChannels.find(item => item.title === title)
     if (!subChannel)
