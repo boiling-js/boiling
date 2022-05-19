@@ -91,7 +91,7 @@ export namespace ChannelsService {
     if (!subChannel)
       throw new HttpError('NOT_FOUND', `频道不存在标题为 ${ title } 的子频道`)
     // @ts-ignore
-    subChannel.chatRooms?.push?.({ id: chatRoomId, description })
+    subChannel.chatRooms?.push?.({ id: chatRoomId, title: chatRoomTitle, description })
     await channel.save()
   }
   /**
