@@ -43,8 +43,8 @@ export const router = new Router({
       })), ctx.query
     )(ctx.query.key)
   })
-  .get('/:id(number)', async ctx => {
-    return UsersService.get(ctx.params.id)
+  .get(Users.BaseOut, '/:id(number)', async ctx => {
+    return UsersService.getOrThrow(ctx.params.id)
   })
   .post(Users.Login, Users.Out.or(Schema.any()), '/:id(number)/status', async ctx => {
     const { status, password } = ctx.request.body
