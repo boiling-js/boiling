@@ -6,7 +6,7 @@ use(cap)
 
 import { UsersService } from '../../src/services/users'
 import { ChatRoomsService } from '../../src/services/chat-rooms'
-import {Security} from "../../src/utils";
+import { Security } from '../../src/utils'
 
 after(() => {
   process.exit(0)
