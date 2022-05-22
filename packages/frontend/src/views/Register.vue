@@ -45,6 +45,17 @@ const
     confirmPassword: ''
   }),
   router = useRouter(),
+  checkPWD = (rule: any, value: string, callback: any) => {
+    console.log('checkPWD', value)
+    const pwdRegex = new RegExp('(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).{8,30}')
+    if (value === '') {
+      callback(new Error('请输入密码'))
+    } else if (!pwdRegex.test(value)) {
+      callback(new Error('密码中必须包含字母、数字、特殊字符且长度为8-30位'))
+    } else {
+      callback()
+    }
+  },
   rules = {
     username: {
       required: true,
@@ -53,7 +64,7 @@ const
     },
     password: {
       required: true,
-      message: '请输入密码',
+      validator: checkPWD,
       trigger: 'blur'
     },
     confirmPassword: {
