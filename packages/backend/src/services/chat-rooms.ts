@@ -92,8 +92,9 @@ export namespace ChatRoomsService {
         names.push(keyword)
       }
     })
-    const filter: Parameters<typeof Model.find>[0] = {
-      name: { $regex: new RegExp(names.map(n => `(.*${ n }.*)`).join('|')) }
+    const filter: Parameters<typeof Model.find>[0] = {}
+    if (names.length > 0) {
+      filter.name = { $regex: new RegExp(names.map(n => `(.*${ n }.*)`).join('|')) }
     }
     if (members.length > 0) {
       if (members.length === 2) {
