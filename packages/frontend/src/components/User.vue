@@ -67,18 +67,14 @@ const
   isMe = computed(() => store.state.user.id === props.info.id),
   getChatRoom = async () => {
     const members = [store.state.user.id, +props.info.id]
-    try {
-      const { items: [ cr ] } = await api['chat-rooms'].query({
-        disableToast: true,
-        key: `members:${ members.join(',') }`
-      })
-      return cr
-    } catch (e) {
-      if (e instanceof Error && e.message.match(/^\[404-/)) {
-        return await api['chat-rooms'].add({ members })
-      } else
-        throw e
+    const { items: [ cr ] } = await api['chat-rooms'].query({
+      disableToast: true,
+      key: `members:${ members.join(',') }`
+    })
+    if (!cr) {
+      return await api['chat-rooms'].add({ members })
     }
+    return cr
   },
   changeAvatar = async (avatar: string) => {
     await ElMessageBox.confirm(
