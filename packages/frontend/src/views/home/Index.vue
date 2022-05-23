@@ -83,11 +83,7 @@ const
   }
 
 onMounted(async () => {
-  const { items: tempList } = await api['chat-rooms'].query({
-    key: `members:${ user.value.id }`,
-    num: 999,
-    page: 0
-  })
+  const tempList = await api.user('@me')['chat-rooms']
   for (const chatRoom of tempList) {
     const { members } = chatRoom
     const fId = members.find(member => member !== user.value.id)
@@ -101,7 +97,6 @@ onMounted(async () => {
     chatRoom.avatar = u.avatar
   }
   chatRooms.value = tempList
-  console.log(chatRooms.value)
 })
 </script>
 

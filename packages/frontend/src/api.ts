@@ -34,6 +34,8 @@ interface OfficialApi {
     }
     /** 获取讨论组 */
     groups: Promise<ChatRooms.Model[]>
+    /** 获取聊天室 */
+    'chat-rooms': Promise<ChatRooms.Model[]>
     /** 获取好友列表 */
     friends: Promise<Users.FriendOut[]> & {
       /** 添加好友 */
