@@ -130,6 +130,13 @@ export const router = new Router({
   .get('/:id(uid)/groups', ctx => {
     return ChatRoomsService.getGroups(useTarget(ctx.session, ctx.params.id))
   })
+  /**
+   * 获取用户最近聊天室
+   * 不去获取频道内的聊天室
+   */
+  .get('/:id(uid)/chat-rooms', ctx => {
+    return ChatRoomsService.search(`members:${ useTarget(ctx.session, ctx.params.id) }`)
+  })
   /** 更改密码 */
   .patch('/:id(uid)/password', ctx => {
     const { oldPwd, newPwd } = ctx.request.body
