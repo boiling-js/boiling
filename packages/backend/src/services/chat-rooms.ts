@@ -36,7 +36,7 @@ export namespace ChatRoomsService {
   export function exists(arg0: string | number[]): Promise<boolean>
   export function exists(arg0: string | number[]): Promise<boolean> {
     if (Array.isArray(arg0)) {
-      return Model.exists({ members: { $all: arg0 } })
+      return Model.exists({ members: arg0 })
     } else {
       return Model.exists({ _id: arg0 })
     }
@@ -96,7 +96,11 @@ export namespace ChatRoomsService {
       name: { $regex: new RegExp(names.map(n => `(.*${ n }.*)`).join('|')) }
     }
     if (members.length > 0) {
-      filter['members'] = { $in: members }
+      if (members.length === 2) {
+        filter.members = members
+      } else {
+        filter.members = { $in: members }
+      }
     }
     return Model.find(filter)
   }

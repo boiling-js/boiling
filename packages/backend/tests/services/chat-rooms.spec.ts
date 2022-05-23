@@ -44,13 +44,13 @@ describe('ChatRooms Service', () => {
   })
   it('should get chat room by members or id.', async () => {
     const members = [u0.id, u1.id]
-    const { id } = await ChatRoomsService.create(members)
-    await expect(ChatRoomsService.get(id))
-      .to.be.eventually.have.property('id', id)
+    const { id: chatRoomId0 } = await ChatRoomsService.create(members)
+    await expect(ChatRoomsService.get(chatRoomId0))
+      .to.be.eventually.have.property('id', chatRoomId0)
     await expect(ChatRoomsService.get(members))
-      .to.be.eventually.have.property('id', id)
+      .to.be.eventually.have.property('id', chatRoomId0)
     await expect(ChatRoomsService.get(members.reverse()))
-      .to.be.eventually.have.property('id', id)
+      .to.be.eventually.have.property('id', chatRoomId0)
     await expect(ChatRoomsService.getOrThrow(members.concat(123)))
       .to.be.eventually.rejectedWith(`[404] members 为 [${ members.concat(123).join(', ') }] 的聊天室不存在`)
     await expect(ChatRoomsService.getOrThrow('623f1b13e11111f3c2debd48'))
@@ -79,6 +79,7 @@ describe('ChatRooms Service', () => {
   })
   it('should search chat room by name or members.', async () => {
     await ChatRoomsService.create([ u0.id, u1.id ], { name: 'foo' })
+    await ChatRoomsService.create([ u0.id, u1.id, u2.id ], { name: 'vuo' })
     await ChatRoomsService.create([ u0.id, u2.id ], { name: 'fuu' })
     await ChatRoomsService.create([ u0.id, u3.id ], { name: 'bar' })
     await ChatRoomsService.create([ u1.id, u3.id ], { name: 'ber' })
@@ -96,7 +97,10 @@ describe('ChatRooms Service', () => {
     ).to.be.eq(3)
     expect(
       await ChatRoomsService.search(`members:${ u0.id }`).count()
-    ).to.be.eq(3)
+    ).to.be.eq(4)
+    expect(
+      await ChatRoomsService.search(`members:${ [ u0.id, u1.id ].join(',') }`).count()
+    ).to.be.eq(1)
   })
   it('should get groups by uid', async () => {
     await Promise.all([
