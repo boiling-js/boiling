@@ -2,10 +2,23 @@
   "name": "@boiling/electron",
   "version": "0.1.0",
   "license": "MIT",
+  "author": "Yijie",
+  "description": "Boiling Desktop Application",
   "scripts": {
-    "start": "electron -r ts-node/register src/runner.ts"
+    "start": "electron -r ts-node/register src/runner.ts",
+    "build": "electron-builder --win --x64"
   },
-  "dependencies": {
-    "electron": "^16.0.5"
+  "devDependencies": {
+    "electron": "^16.0.5",
+    "electron-builder": "^23.0.3"
+  },
+  "build": {
+    "appId": "com.boiling.app",
+    "mac": {
+      "target": [ "dmg", "zip" ]
+    },
+    "win": {
+      "target": [ "nsis", "zip" ]
+    }
   }
 }
