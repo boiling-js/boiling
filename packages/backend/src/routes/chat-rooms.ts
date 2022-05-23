@@ -22,7 +22,9 @@ export const router = new Router({
    */
   .post(Schema.Pick(ChatRooms.Model, ['members', 'name', 'avatar']), Schema.any(), '', async ctx => {
     const { members, ...opts } = ctx.request.body
-    return ChatRoomsService.create(members.concat(useCurUser(ctx.session).id), opts)
+    return ChatRoomsService.create([
+      ...new Set<number>(members.concat(useCurUser(ctx.session).id))
+    ], opts)
   })
   /**
    * 添加消息
