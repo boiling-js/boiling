@@ -1,31 +1,29 @@
 <template>
-  <div class="create-group">
-    <el-dialog
-      v-model="show"
-      title="选择成员"
-      width="62%"
-      @close="close">
-      <el-checkbox-group
-        v-model="fIds"
-        @change="handleChange">
-        <el-checkbox
-          v-for="friend in friends"
-          :key="friend.id"
-          :label="friend.id">
-          <el-avatar
-            :src="`/api${friend.avatar}`"
-          />
-          {{ friend.remark ||friend.username }}
-        </el-checkbox>
-      </el-checkbox-group>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="show = false">取消</el-button>
-          <el-button type="primary" @click="confirm">确认</el-button>
-        </span>
-      </template>
-    </el-dialog>
-  </div>
+  <el-dialog
+    v-model="show"
+    title="选择成员"
+    width="62%"
+    @close="close">
+    <el-checkbox-group
+      v-model="fIds"
+      @change="handleChange">
+      <el-checkbox
+        v-for="friend in friends"
+        :key="friend.id"
+        :label="friend.id">
+        <el-avatar
+          :src="`/api${friend.avatar}`"
+        />
+        {{ friend.remark ||friend.username }}
+      </el-checkbox>
+    </el-checkbox-group>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="show = false">取消</el-button>
+        <el-button type="primary" @click="confirm">确认</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -66,23 +64,20 @@ onMounted(() => getFriends())
 </script>
 
 <style lang="scss" scoped>
-.create-group {
-  padding: 20px;
-  .el-dialog__body {
-    .el-checkbox-group {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
-      align-items: center;
-      .el-checkbox {
-        margin: 10px;
-        width: 130px;
-        :deep(.el-checkbox__label) {
-          display: flex;
-          align-items: center;
-          .el-avatar {
-            margin-right: 10px;
-          }
+.el-dialog__body {
+  .el-checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    .el-checkbox {
+      margin: 10px;
+      width: 130px;
+      :deep(.el-checkbox__label) {
+        display: flex;
+        align-items: center;
+        .el-avatar {
+          margin-right: 10px;
         }
       }
     }
