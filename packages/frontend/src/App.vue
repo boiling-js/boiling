@@ -37,30 +37,24 @@ onMounted(() => {
 
 <style lang="scss">
 html, body { margin: 0; }
-#app {
+body {
   /* stylelint-disable length-zero-no-unit */
   --title-bar-height: 0px;
   /* stylelint-enable length-zero-no-unit */
-
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
-  font-family: "Avenir", "Helvetica", "Arial", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  flex-direction: column;
-  justify-content: space-between;
-  div.title-bar {
-    display: none;
-  }
   &.is-desktop {
     --title-bar-height: 26px;
-
-    margin: 5px;
-    height: calc(100vh - 10px);
-    border-radius: 6px;
-    box-shadow: 0 0 5px rgb(0 0 0 / 80%);
-    &.Darwin {
+    #app {
+      margin: 5px;
+      height: calc(100vh - 10px);
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgb(0 0 0 / 80%);
+      div.title-bar {
+        display: flex;
+      }
+    }
+    &.Darwin #app {
       margin: 0;
+      height: 100vh;
       > div.title-bar {
         > div.name {
           justify-content: center;
@@ -70,9 +64,18 @@ html, body { margin: 0; }
         }
       }
     }
-    div.title-bar {
-      display: flex;
-    }
+  }
+}
+#app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  font-family: "Avenir", "Helvetica", "Arial", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  flex-direction: column;
+  justify-content: space-between;
+  div.title-bar {
+    display: none;
   }
 }
 </style>

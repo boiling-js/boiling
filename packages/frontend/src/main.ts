@@ -8,16 +8,15 @@ import router from './router'
 import store from './store'
 
 const app = createApp(App)
-const appElement = document.querySelector<HTMLDivElement>('#app')
 
 window.osMeta = {
   isDesktop: !!window?.desktop
 }
 if (window.osMeta.isDesktop) {
   window.osMeta.type = desktop?.type
-  appElement?.classList.add('is-desktop')
+  document.body.classList.add('is-desktop')
   window.osMeta.type
-    && appElement?.classList.add(window.osMeta.type)
+    && document.body.classList.add(window.osMeta.type)
 }
 
 app.config.globalProperties = {
