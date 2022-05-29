@@ -101,6 +101,9 @@ describe('ChatRooms Service', () => {
     expect(
       await ChatRoomsService.search(`members:${ [ u0.id, u1.id ].join(',') }`).count()
     ).to.be.eq(1)
+    expect(
+      await ChatRoomsService.search(`members:${ [ u1.id, u0.id ].join(',') }`).count()
+    ).to.be.eq(1)
   })
   it('should get groups by uid', async () => {
     await Promise.all([

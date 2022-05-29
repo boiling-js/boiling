@@ -98,7 +98,10 @@ export namespace ChatRoomsService {
     }
     if (members.length > 0) {
       if (members.length === 2) {
-        filter.members = members
+        filter.members = {
+          $all: members,
+          $size: 2
+        }
       } else {
         filter.members = { $in: members }
       }
