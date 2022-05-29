@@ -40,8 +40,8 @@ const router = createRouter({
   }, {
     name: 'channel',
     path: '/channel/:id',
-    component: () => import('./views/Channel.vue'),
-    props: route => ({ id: route.params.id })
+    props: true,
+    component: () => import('./views/Channel.vue')
   }, {
     path: '/edit-personnel',
     component: () => import('./views/EditPersonnel.vue')
