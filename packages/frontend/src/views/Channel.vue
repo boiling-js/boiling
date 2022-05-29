@@ -88,12 +88,12 @@
         </span>
       </template>
     </el-dialog>
-    <selMembers ref="selMembers" @confirm="members => addMember(members)"/>
+    <sel-members ref="selMembers" @confirm="members => addMember(members)"/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import {
   ElTree,
   ElDialog,
@@ -117,7 +117,6 @@ import ChatRoom from './ChatRoom.vue'
 const
   props = defineProps<{
     id: string
-    title: string
   }>(),
   channel = ref<Channels.Model | undefined>(),
   subChannels = computed(() => channel.value?.subChannels),
@@ -153,10 +152,8 @@ const
     await getChannel()
   }
 
-onMounted(() => {
-  nextTick(async () => {
-    await getChannel()
-  })
+onMounted(async () => {
+  await getChannel()
 })
 const handleNodeClick = (data: Channels.ChatRoomMeta) => {
   if (data.id) {
