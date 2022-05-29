@@ -91,9 +91,9 @@ onMounted(async () => {
       ElMessage.error('聊天室数据异常')
       continue
     }
-    const f: Users.Friend = store.state.user.friends.find((friend: Users.Friend) => friend.id === fId)
+    const f = store.state.user.friends.find((friend: Users.Friend) => friend.id === fId)
     const u = await api.user(fId)
-    chatRoom.name = f.remark || u.username
+    chatRoom.name = f?.remark || u.username
     chatRoom.avatar = u.avatar
   }
   chatRooms.value = tempList
