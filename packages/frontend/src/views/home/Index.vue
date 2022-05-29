@@ -195,6 +195,7 @@ div.contain {
           column-gap: 5px;
           padding: 5px;
           font-size: 12px;
+          color: var(--color-text-regular);
           cursor: pointer;
           border-radius: 4px;
           transition: 0.3s;
