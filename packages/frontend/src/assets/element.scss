@@ -29,7 +29,12 @@
   ),
   $fill-color: (
     "blank": #202225,
-  )
+  ),
+  $bg-color: (
+    '': #202225,
+    'page': #282c34,
+    'overlay': #2c313a,
+  ),
 );
 
 @use "element-plus/theme-chalk/src/index.scss" as *;
