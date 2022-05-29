@@ -1,6 +1,6 @@
 <template>
   <div class="channel">
-    <div class="classify">
+    <div v-show="$store.state.sidebarVisiable" class="classify">
       <div class="title">
         {{ channel?.name }}
         <el-dropdown trigger="click" placement="bottom-end">
@@ -70,7 +70,7 @@
         :title="chattingRoom.title"
       />
       <el-empty v-else description="快来聊天吧~" />
-    </div>>
+    </div>
     <el-dialog
       v-model="subChannelForm.show"
       title="创建子频道">
@@ -230,6 +230,7 @@ div.channel {
   }
   > div.content {
     flex-grow: 1;
+    background-color: var(--color-auxi-placeholder);
   }
 }
 </style>
