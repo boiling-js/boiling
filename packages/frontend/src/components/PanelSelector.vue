@@ -1,34 +1,36 @@
 <template>
   <div class="wrapper">
-    <div class="panel-selector">
-      <el-tooltip placement="right" content="主页">
-        <div class="option" @click="$router.push('/home')">
-          <img width="36" src="../assets/img/favicon.svg" alt="主页">
-        </div>
-      </el-tooltip>
-      <el-tooltip placement="right" content="探索">
-        <div class="option" @click="$router.push('/share')">
-          <el-icon :size="24" color="#fff"><compass/></el-icon>
-        </div>
-      </el-tooltip>
-      <el-tooltip placement="right" content="创建">
-        <div class="option" @click="$router.push('/create-channel')">
-          <el-icon :size="24" color="#fff"><plus/></el-icon>
-        </div>
-      </el-tooltip>
-      <el-divider/>
-      <el-tooltip v-for="channel in channels?.items"
-                  :key="channel.id"
-                  placement="right" :content="channel.name">
-        <div class="option channel"
-             :class="{
-               selected: $route.name === 'channel' && $route.params.id === channel.id,
-             }"
-             @click="() => $router.push(`/channel/${ channel.id }`)">
-          <img width="36" :src="channel.avatar" :alt="channel.id">
-        </div>
-      </el-tooltip>
-    </div>
+    <el-scrollbar>
+      <div class="panel-selector">
+        <el-tooltip placement="right" content="主页">
+          <div class="option" @click="$router.push('/home')">
+            <img width="36" src="../assets/img/favicon.svg" alt="主页">
+          </div>
+        </el-tooltip>
+        <el-tooltip placement="right" content="探索">
+          <div class="option" @click="$router.push('/share')">
+            <el-icon :size="24" color="#fff"><compass/></el-icon>
+          </div>
+        </el-tooltip>
+        <el-tooltip placement="right" content="创建">
+          <div class="option" @click="$router.push('/create-channel')">
+            <el-icon :size="24" color="#fff"><plus/></el-icon>
+          </div>
+        </el-tooltip>
+        <el-divider/>
+        <el-tooltip v-for="channel in channels?.items"
+                    :key="channel.id"
+                    placement="right" :content="channel.name">
+          <div class="option channel"
+               :class="{
+                 selected: $route.name === 'channel' && $route.params.id === channel.id,
+               }"
+               @click="() => $router.push(`/channel/${ channel.id }`)">
+            <img width="36" :src="channel.avatar" :alt="channel.id">
+          </div>
+        </el-tooltip>
+      </div>
+    </el-scrollbar>
     <div v-show="$store.state.sidebarCrtlVisiable"
          :class="{
            'control-sidebar': true,
@@ -46,7 +48,7 @@
 import { onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
-import { ElDivider, ElTooltip, ElIcon } from 'element-plus'
+import { ElDivider, ElTooltip, ElIcon, ElScrollbar } from 'element-plus'
 import { Compass, Plus, ArrowRight } from '@element-plus/icons-vue'
 import { Channels, Pagination } from '@boiling/core'
 import { api } from '../api'
@@ -56,27 +58,35 @@ const
   route = useRoute(),
   store = useStore()
 
-watch(() => route.path, () => {
-  if (route.path.startsWith('/home')) {
+const initSidebarCrtlVisiable = () => {
+  if (
+    route.path.startsWith('/home')
+    || route.path.startsWith('/channel')
+  ) {
     store.commit('setSidebarCrtlVisiable', true)
   } else {
     store.commit('setSidebarCrtlVisiable', false)
   }
+}
+
+watch(() => route.path, () => {
+  initSidebarCrtlVisiable()
 })
 
 onMounted(async () => {
   channels.value = await api.channels.query({ key: '' })
+  initSidebarCrtlVisiable()
 })
 </script>
 
 <style lang="scss" scoped>
 div.wrapper {
+  position: relative;
   height: 100%;
-  overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
   }
-  > div.panel-selector {
+  div.panel-selector {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -118,9 +128,9 @@ div.wrapper {
     --font-size: 20px;
 
     z-index: 10;
-    position: fixed;
+    position: absolute;
     top: calc(50% - 16px);
-    left: 75px;
+    left: 70px;
     display: flex;
     align-items: center;
     height: 32px;
@@ -134,7 +144,7 @@ div.wrapper {
       }
     }
     &.is-show {
-      left: calc(75px + 240px);
+      left: calc(70px + 240px);
       > i.el-icon {
         transform: rotate(180deg);
       }
