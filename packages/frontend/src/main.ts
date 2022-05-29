@@ -14,8 +14,10 @@ window.osMeta = {
   isDesktop: !!window?.desktop
 }
 if (window.osMeta.isDesktop) {
-  appElement?.classList.add('is-desktop')
   window.osMeta.type = desktop?.type
+  appElement?.classList.add('is-desktop')
+  window.osMeta.type
+    && appElement?.classList.add(window.osMeta.type)
 }
 
 app.config.globalProperties = {

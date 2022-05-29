@@ -59,6 +59,17 @@ html, body { margin: 0; }
     height: calc(100vh - 10px);
     border-radius: 6px;
     box-shadow: 0 0 5px rgb(0 0 0 / 80%);
+    &.Darwin {
+      margin: 0;
+      > div.title-bar {
+        > div.name {
+          justify-content: center;
+        }
+        > div.opts {
+          display: none;
+        }
+      }
+    }
     div.title-bar {
       display: flex;
     }
