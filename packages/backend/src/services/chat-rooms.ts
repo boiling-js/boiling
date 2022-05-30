@@ -114,7 +114,8 @@ export namespace ChatRoomsService {
    */
   export async function getGroups(uid: number) {
     return Model.find({
-      members: { $in: [ uid ], $not: { $size: 2 } }
+      members: { $in: [ uid ], $not: { $size: 2 } },
+      channelId: { $exists: false }
     })
   }
   /**
