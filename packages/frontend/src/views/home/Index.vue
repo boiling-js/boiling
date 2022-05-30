@@ -4,7 +4,7 @@
       <div class="self-bar">
         <div class="avatar">
           <el-dropdown trigger="click">
-            <img width="48" :src="`/api/${ user.avatar }`" alt="">
+            <img width="48" height="48" :src="`${ user.avatar }`" alt="">
             <div :class="`dot ${status}`"/>
             <template #dropdown>
               <el-dropdown-menu>
