@@ -12,7 +12,7 @@
     <div
       v-else
       class="avatar" :style="{
-        backgroundImage: `url(/api${info.avatar})`
+        backgroundImage: `url(${info.avatar})`
       }"/>
     <div
       v-if="type === 'inline'"

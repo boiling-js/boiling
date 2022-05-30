@@ -35,7 +35,7 @@
           </div>
           <template v-for="chatRoom in chatRooms" :key="chatRoom.id">
             <div class="chat-room" @click="$router.push(`/home/chat-rooms/${ chatRoom.id }?title=${ chatRoom.name }`)">
-              <img class="avatar" :src="`/api/${chatRoom.avatar}`" :alt="chatRoom.id">
+              <img class="avatar" :src="`${chatRoom.avatar}`" :alt="chatRoom.id">
               {{ chatRoom.name }}
             </div>
           </template>
