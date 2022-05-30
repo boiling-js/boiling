@@ -116,7 +116,11 @@ export namespace UsersService {
         tags: [],
         remark: ''
       }, opts) })
-      await Promise.all([user.save(), ChatRoomsService.create([user.id, fUid])])
+      friend.friends.push({ id: uid, ...Object.assign(<Required<Opts>>{
+          tags: [],
+          remark: ''
+        }) })
+      await Promise.all([user.save(), friend.save(), ChatRoomsService.create([user.id, fUid])])
     }
     export async function del(uid: number, fUid: number) {
       const [ user, friend ] = await Promise.all([UsersService.getOrThrow(uid), UsersService.getOrThrow(fUid)])
