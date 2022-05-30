@@ -13,6 +13,7 @@ process.env.HEARTBEAT_INTERVAL = '5000'
 after(() => process.exit(0))
 
 describe('WS', function () {
+  this.timeout((process.env?.HEARTBEAT_INTERVAL ?? '20000') + 500)
   const users = <Record<string, [InstanceType<typeof UserModel>, string]>>{
     default: [new UserModel({
       id: 1001,
@@ -32,13 +33,14 @@ describe('WS', function () {
   after(async () => {
     await UserModel.deleteMany()
   })
-  before(() => new Promise<void>((resolve, reject) => {
-    app.listen(+PORT, HOST, () =>
-      DAOMain().then(resolve).catch(reject)
-    )
-  }).then(async () => {
+  before(async () => {
+    await new Promise<void>((resolve, reject) => {
+      app.listen(+PORT, HOST, () =>
+        DAOMain().then(resolve).catch(reject)
+      )
+    })
     await users.default[0].save()
-  }))
+  })
 
   const identifyAndHeartbeat = async (wsClient: WsClient) => {
     const m1 = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.HELLO])
@@ -69,7 +71,6 @@ describe('WS', function () {
   }
 
   it('should connect ws server.', async function () {
-    this.timeout((process.env?.HEARTBEAT_INTERVAL ?? '20000') + 500)
     const wsClient = new WsClient(new WebSocket(`ws://${ HOST }:${ PORT }/ws`))
     await identifyAndHeartbeat(wsClient)
 
@@ -83,13 +84,9 @@ describe('WS', function () {
     }
   })
   it('should connect ws server and receive messages.', async function () {
-    this.timeout((process.env?.HEARTBEAT_INTERVAL ?? '20000') + 500)
     const wsClient = new WsClient(new WebSocket(`ws://${ HOST }:${ PORT }/ws`))
     await identifyAndHeartbeat(wsClient)
 
-    // 模拟前端请求了发消息接口后，后端找到对应用户并将消息推送给这个连接上的用户
-    // post http://server:port/chat-rooms/[时间戳]:1001:1002/messages { content: 'hello', ... }
-    // 后端把这个消息储存到数据库中，再在在线用户列表中找到这个用户把消息发送给他
     clients.get(1001)?.dispatch('MESSAGE', {
       content: 'hello'
     })
