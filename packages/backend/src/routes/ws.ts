@@ -74,10 +74,10 @@ export const router: Middleware = async (context, next) => {
   if (!context.url.startsWith('/ws'))
     return await next()
   const { websocket: ws } = context
+  let uid: number | undefined
   const sender = new Sender(ws)
   sender.hello()
   new Promise(async (resolve, reject) => {
-    let uid: number | undefined
     let isIdentified = false
     // 五秒内发送鉴权
     setTimeout(() => {
@@ -146,7 +146,7 @@ export const router: Middleware = async (context, next) => {
           isDelete = false
         }
       }
-      isDelete
+      isDelete && uid
         && clients.delete(uid!)
     }
     uid && clients.set(uid, sender)
@@ -157,5 +157,6 @@ export const router: Middleware = async (context, next) => {
       ws.close(4500, '未知错误')
       console.error(e)
     }
+    uid && clients.delete(uid!)
   })
 }

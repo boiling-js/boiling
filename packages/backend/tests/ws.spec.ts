@@ -184,6 +184,8 @@ describe('WS', function () {
           expect(code).to.be.eq(4408)
           expect(msg.toString())
             .to.be.eq('超时未发送心跳包')
+          expect(clients.get(1001), 'client should be removed')
+            .to.be.undefined
           resolve()
         } catch (e) {
           reject(e)
