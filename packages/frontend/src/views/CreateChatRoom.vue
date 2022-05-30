@@ -183,6 +183,14 @@ onMounted(async () => {
       height: 178px;
       text-align: center;
     }
+    > .el-form {
+      :deep(.el-form-item__content) {
+        > div.friend {
+          margin-right: 20px;
+          text-align: center;
+        }
+      }
+    }
     > div.bottom {
       position: absolute;
       width: 152px;
