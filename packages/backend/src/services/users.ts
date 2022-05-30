@@ -76,7 +76,7 @@ export namespace UsersService {
   }
   export async function getAvatars() {
     return (await fs.readdir('./static/img/avatar'))
-      .map(f => `/img/avatar/${f}`)
+      .map(f => `/api/img/avatar/${f}`)
   }
   export async function update(id: number, base: Partial<Users.UpdateOut>) {
     const user = await UsersService.getOrThrow(id)
