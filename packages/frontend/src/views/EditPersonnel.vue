@@ -4,8 +4,8 @@
     <el-avatar
       class="avatar"
       :size="120"
-      :src="`/api/${store.state.user.avatar}`"
-      @click="$refs.avatar.show()"
+      :src="`${store.state.user.avatar}`"
+      @click="$refs.uploader.open()"
     />
     <el-divider content-position="left">基本信息</el-divider>
     <el-form ref="editPersonnelForm" :model="form" label-width="75px">
@@ -56,10 +56,10 @@
       </span>
     </template>
   </el-dialog>
-  <avatar
-    ref="avatar"
-    @selAvatar="(selAvatar) => changeAvatar(selAvatar)"
-  />
+  <uploader-avatar
+    ref="uploader"
+    :avatar="user.avatar"
+    @selAvatar="(selAvatar) => changeAvatar(selAvatar)"/>
 </template>
 
 <script lang="ts" setup>
@@ -81,7 +81,7 @@ import { ArrowLeft } from '@element-plus/icons-vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import store from '../store'
 import { Users } from '@boiling/core'
-import Avatar from '../components/Avatar.vue'
+import UploaderAvatar from '../components/UploaderAvatar.vue'
 import { ElMessageBox } from 'element-plus'
 import { api } from '../api'
 
