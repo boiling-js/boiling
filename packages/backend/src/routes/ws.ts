@@ -139,6 +139,16 @@ export const router: Middleware = async (context, next) => {
         reject(e)
       }
     })
+    ws.onclose = e => {
+      let isDelete = true
+      if (e.code === 3000 && e.reason.startsWith('Debug')) {
+        if (e.reason === 'Debug:resume') {
+          isDelete = false
+        }
+      }
+      isDelete
+        && clients.delete(uid!)
+    }
     uid && clients.set(uid, sender)
   }).catch(e => {
     if (e instanceof HttpError)

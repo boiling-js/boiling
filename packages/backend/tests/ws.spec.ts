@@ -56,7 +56,7 @@ describe('WS', function () {
     const m2 = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.DISPATCH])
     expect(m2.op).to.equal(Messages.Opcodes.DISPATCH)
     expect(m2.t).to.equal('READY')
-    expect(m2.d).property('user').to.deep.equal({
+    expect(m2.d).property('user').to.deep.include({
       id: 1001,
       username: 'default',
       avatar: 'default',
@@ -71,7 +71,7 @@ describe('WS', function () {
   }
 
   it('should connect ws server.', async function () {
-    const wsClient = new WsClient(new WebSocket(`ws://${ HOST }:${ PORT }/ws`))
+    const wsClient = new WsClient(new Websocket(`ws://${ HOST }:${ PORT }/ws`) as any)
     await identifyAndHeartbeat(wsClient)
 
     let c = 0
@@ -84,7 +84,7 @@ describe('WS', function () {
     }
   })
   it('should connect ws server and receive messages.', async function () {
-    const wsClient = new WsClient(new WebSocket(`ws://${ HOST }:${ PORT }/ws`))
+    const wsClient = new WsClient(new Websocket(`ws://${ HOST }:${ PORT }/ws`) as any)
     await identifyAndHeartbeat(wsClient)
 
     clients.get(1001)?.dispatch('MESSAGE', {
@@ -109,6 +109,24 @@ describe('WS', function () {
           break
       }
     }
+  })
+  it('should remove client from clients when it close.', async () => {
+    const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
+    const wsClient = new WsClient(ws as any)
+    await identifyAndHeartbeat(wsClient)
+    expect(clients.get(1001)).to.be.ok
+    ws.close(3001)
+    await new Promise(resolve => setTimeout(resolve, 100))
+    expect(clients.get(1001)).to.be.undefined
+  })
+  it('should not remove client from clients.', async () => {
+    const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
+    const wsClient = new WsClient(ws as any)
+    await identifyAndHeartbeat(wsClient)
+    expect(clients.get(1001)).to.be.ok
+    ws.close(3000, 'Debug:resume')
+    await new Promise(resolve => setTimeout(resolve, 100))
+    expect(clients.get(1001)).to.be.ok
   })
   it('should connect ws server and throw `BAD_REQUEST` error.', function (done) {
     const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
@@ -207,7 +225,7 @@ describe('WS', function () {
             >>JSON.parse(d.toString())
           expect(m.op).to.equal(Messages.Opcodes.DISPATCH)
           expect(m.t).to.equal('READY')
-          expect(m.d).property('user').to.deep.equal({
+          expect(m.d).property('user').to.deep.include({
             id: 1001,
             username: 'default',
             avatar: 'default',
