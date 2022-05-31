@@ -9,19 +9,27 @@ class Sender {
     this.ws = ws
   }
   do(m: Messages.Server) {
-    this.ws.send(JSON.stringify(m))
+    return new Promise<void>((resolve, reject) => {
+      this.ws.send(JSON.stringify(m), (err) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve()
+        }
+      })
+    })
   }
   hello() {
-    this.do({
+    return this.do({
       op: Messages.Opcodes.HELLO,
       d: { heartbeatInterval: Number(process.env.HEARTBEAT_INTERVAL || 600000) }
     })
   }
   ping() {
-    this.do({ op: Messages.Opcodes.HEARTBEAT_ACK })
+    return this.do({ op: Messages.Opcodes.HEARTBEAT_ACK })
   }
   dispatch<M extends Messages.PickTarget<Messages.Opcodes.DISPATCH>>(t: M['t'], d: M['d']) {
-    this.do({
+    return this.do({
       op: Messages.Opcodes.DISPATCH,
       // @ts-ignore
       t, d
@@ -76,7 +84,7 @@ export const router: Middleware = async (context, next) => {
   const { websocket: ws } = context
   let uid: number | undefined
   const sender = new Sender(ws)
-  sender.hello()
+  await sender.hello()
   new Promise(async (resolve, reject) => {
     let isIdentified = false
     // 五秒内发送鉴权
@@ -95,9 +103,8 @@ export const router: Middleware = async (context, next) => {
           if (!Utils.Security.match(pwd, user!.passwordHash)) {
             throw new HttpError('UNAUTHORIZED', '密码错误')
           }
-          sender.do({
+          await sender.do({
             op: Messages.Opcodes.DISPATCH,
-            // @ts-ignore
             t: 'READY',
             d: {
               sessionId: '1551321315',
@@ -124,13 +131,13 @@ export const router: Middleware = async (context, next) => {
       }
     }, Number(process.env.HEARTBEAT_INTERVAL || 600000) + 1000)
 
-    ws.on('message', data => {
+    ws.on('message', async data => {
       try {
         const m = resolveData<Messages.Client>(data)
         switch (m.op) {
           case Messages.Opcodes.HEARTBEAT:
             isPinged = true
-            sender.ping()
+            await sender.ping()
             break
           default:
             throw new HttpError('UNPROCESSABLE_ENTITY', '不支持的op类型')
