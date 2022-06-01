@@ -20,7 +20,6 @@ import { initApp } from './utils'
 configDotenv()
 
 const app = websockify(new Koa())
-app.keys = ['hker92hjkugfkerbl.e[gewkg68']
 
 export const staticPath = resolve(__dirname, '../static')
 
@@ -42,6 +41,13 @@ app
   .use(ChatRoomsRouter.middleware())
   .use(CommonRouter.middleware())
 
-initApp(app)
-
 export type AppContext = typeof app.context
+
+async function main() {
+  await initApp(app)
+}
+
+main().catch(e => {
+  console.error(e)
+  process.exit(1)
+})

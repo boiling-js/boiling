@@ -4,9 +4,8 @@ import websockify from 'koa-websocket'
 import { expect } from 'chai'
 import { Messages, WsClient, resolveMessage } from '@boiling/core'
 import { router as WSRouter, clientManager } from '../src/routes/ws'
-import DAOMain from '../src/dao'
 import { UserModel } from '../src/dao/user'
-import { Security } from '../src/utils'
+import { initApp, Security } from '../src/utils'
 
 process.env.HEARTBEAT_INTERVAL = '5000'
 
@@ -22,23 +21,17 @@ describe('WS', function () {
       passwordHash: Security.encrypt('default')
     }), `Basic ${ Buffer.from('1001:default').toString('base64')}`]
   }
-  const {
-    PORT = '19849',
-    HOST = '127.0.0.1'
-  } = {}
+  let PORT = '', HOST = ''
   const app = websockify(new Koa())
-  app.keys = ['any']
   app.ws.use(WSRouter)
 
   after(async () => {
     await UserModel.deleteMany()
   })
   before(async () => {
-    await new Promise<void>((resolve, reject) => {
-      app.listen(+PORT, HOST, () =>
-        DAOMain().then(resolve).catch(reject)
-      )
-    })
+    const { PORT: p, HOST: h } = await initApp(app)
+    PORT = p
+    HOST = h
     await users.default[0].save()
   })
   afterEach(() => {

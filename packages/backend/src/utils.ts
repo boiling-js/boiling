@@ -5,25 +5,6 @@ import { App } from 'koa-websocket'
 import DAOMain from './dao'
 
 namespace Utils {
-  export function initApp(app: App) {
-    const {
-      BACKEND_PORT: PORT = '8080',
-      BACKEND_HOST: HOST = 'localhost'
-    } = process.env
-    return {
-      HOST, PORT,
-      server: app.listen(+PORT, HOST, async () => {
-        // connect mongodb database
-        try {
-          await DAOMain()
-        } catch (e) {
-          console.error(e)
-          process.exit(1)
-        }
-        console.log(`server is running on http://${ HOST }:${ PORT }`)
-      })
-    }
-  }
   export namespace Security {
     export function encrypt(plaintext: string) {
       return createHash('md5')
@@ -43,6 +24,29 @@ namespace Utils {
       await client.connect()
       client.removeListener('error', onError)
     }
+  }
+  export function initApp(app: App) {
+    app.keys = ['hker92hjkugfkerbl.e[gewkg68']
+    const {
+      BACKEND_PORT: PORT = '8080',
+      BACKEND_HOST: HOST = 'localhost'
+    } = process.env
+    return new Promise<{
+      HOST: string
+      PORT: string
+      server: ReturnType<typeof app.listen>
+    }>((resolve, reject) => {
+      const server = app.listen(+PORT, HOST, async () => {
+        // connect mongodb database
+        try {
+          await DAOMain()
+        } catch (e) {
+          reject(e)
+        }
+        console.log(`server is running on http://${ HOST }:${ PORT }`)
+        resolve({ HOST, PORT, server })
+      })
+    })
   }
   export namespace Seq {
     export async function auto(n: string, initIndent = 0, step = 1) {
