@@ -7,7 +7,6 @@ import logger from 'koa-logger'
 import { resolve } from 'path'
 
 import './global'
-import DAOMain from './dao'
 import { configDotenv } from '@boiling/utils'
 
 import { router as WSRouter } from './routes/ws'
@@ -16,6 +15,7 @@ import { router as ChannelsRouter } from './routes/channels'
 import { router as ChatRoomsRouter } from './routes/chat-rooms'
 import { router as CommonRouter } from './routes/common'
 import { Middlewares } from './middlewares'
+import { initApp } from './utils'
 
 configDotenv()
 
@@ -42,19 +42,6 @@ app
   .use(ChatRoomsRouter.middleware())
   .use(CommonRouter.middleware())
 
-const {
-  BACKEND_PORT: PORT = '8080',
-  BACKEND_HOST: HOST = 'localhost'
-} = process.env
-app.listen(+PORT, HOST, async () => {
-  // connect mongodb database
-  try {
-    await DAOMain()
-  } catch (e) {
-    console.error(e)
-    process.exit(1)
-  }
-  console.log(`server is running on http://${ HOST }:${ PORT }`)
-})
+initApp(app)
 
 export type AppContext = typeof app.context

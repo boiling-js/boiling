@@ -1,8 +1,29 @@
-import { Server } from 'ws'
+import { createClient } from 'redis'
 import { createHash } from 'crypto'
 import { SeqModel } from './dao/seq'
+import { App } from 'koa-websocket'
+import DAOMain from './dao'
 
 namespace Utils {
+  export function initApp(app: App) {
+    const {
+      BACKEND_PORT: PORT = '8080',
+      BACKEND_HOST: HOST = 'localhost'
+    } = process.env
+    return {
+      HOST, PORT,
+      server: app.listen(+PORT, HOST, async () => {
+        // connect mongodb database
+        try {
+          await DAOMain()
+        } catch (e) {
+          console.error(e)
+          process.exit(1)
+        }
+        console.log(`server is running on http://${ HOST }:${ PORT }`)
+      })
+    }
+  }
   export namespace Security {
     export function encrypt(plaintext: string) {
       return createHash('md5')
@@ -12,10 +33,15 @@ namespace Utils {
       return encrypt(waitMatch) === origin
     }
   }
-  export namespace WS {
-    export let s: Server | null = null
-    export function register(ns: Server) {
-      s = ns
+  export namespace Redis {
+    export async function init() {
+      const client = createClient()
+      const onError = (err: any) => {
+        console.log('Redis Client Error', err)
+      }
+      client.once('error', onError)
+      await client.connect()
+      client.removeListener('error', onError)
     }
   }
   export namespace Seq {
