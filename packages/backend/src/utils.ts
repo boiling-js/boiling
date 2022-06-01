@@ -15,14 +15,11 @@ namespace Utils {
     }
   }
   export namespace Redis {
+    export const client = createClient()
     export async function init() {
-      const client = createClient()
-      const onError = (err: any) => {
-        console.log('Redis Client Error', err)
-      }
-      client.once('error', onError)
+      client.once('error', console.error)
       await client.connect()
-      client.removeListener('error', onError)
+      client.removeListener('error', console.error)
     }
   }
   export function initApp(app: App) {
@@ -40,6 +37,7 @@ namespace Utils {
         // connect mongodb database
         try {
           await DAOMain()
+          await Redis.init()
         } catch (e) {
           reject(e)
         }
