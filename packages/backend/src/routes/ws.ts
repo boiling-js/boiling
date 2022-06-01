@@ -1,10 +1,12 @@
 import Websocket from 'ws'
+import { v4 as uuid } from 'uuid'
 import { Middleware } from 'koa-websocket'
 import { Messages, Users } from '@boiling/core'
 import { UsersService } from '../services/users'
 import Utils from '../utils'
 
 class Sender {
+  sessionId?: string
   constructor(public ws: Websocket) {
     this.ws = ws
   }
@@ -28,12 +30,18 @@ class Sender {
   ping() {
     return this.do({ op: Messages.Opcodes.HEARTBEAT_ACK })
   }
-  dispatch<M extends Messages.PickTarget<Messages.Opcodes.DISPATCH>>(t: M['t'], d: M['d']) {
-    return this.do({
+  async dispatch<M extends Messages.PickTarget<Messages.Opcodes.DISPATCH>>(t: M['t'], d: M['d']) {
+    // TODO 给对应的 redis 中的 session 储存对应的消息 id
+    if (this.sessionId) {
+    }
+    await this.do({
       op: Messages.Opcodes.DISPATCH,
       // @ts-ignore
       t, d
     })
+    // TODO 在发送给了前端并且没有报错后，把对应的消息 id 从 redis 中删除
+    if (this.sessionId) {
+    }
   }
 }
 
@@ -62,7 +70,16 @@ const waitIdentify = <T extends Messages.PickTarget<Messages.Opcodes.IDENTIFY, M
   })
 })
 
+/**
+ * TODO
+ * uid -> sessionId
+ * sessionId -> client
+ *
+ * send message to uid -> sessionId -> client
+ */
 export const clients = new Map<number, Sender>()
+
+export const sessions = new Map<string, number>()
 
 /**
  * 基础流程：
@@ -83,6 +100,7 @@ export const router: Middleware = async (context, next) => {
     return await next()
   const { websocket: ws } = context
   let uid: number | undefined
+  const sessionId = uuid()
   const sender = new Sender(ws)
   await sender.hello()
   new Promise(async (resolve, reject) => {
@@ -93,28 +111,30 @@ export const router: Middleware = async (context, next) => {
         reject(new HttpError('REQUEST_TIMEOUT', '超时未发送鉴权'))
     }, 5000)
     try {
+      // TODO 处理 Resume 包，并返回对应的 token
       const { token } = await waitIdentify(ws) || {}
       const [ type, content ] = token?.split(' ') ?? []
+      let user: Awaited<ReturnType<typeof UsersService.getOrThrow>> | null = null
       switch (type) {
         case 'Basic':
           const [id, pwd] = Buffer.from(content, 'base64').toString().split(':')
-          const user = await UsersService.getOrThrow(+id)
+          user = await UsersService.getOrThrow(+id)
           uid = user.id
           if (!Utils.Security.match(pwd, user!.passwordHash)) {
             throw new HttpError('UNAUTHORIZED', '密码错误')
           }
-          await sender.do({
-            op: Messages.Opcodes.DISPATCH,
-            t: 'READY',
-            d: {
-              sessionId: '1551321315',
-              user: Users.BaseOut(user)
-            }
-          })
           break
         default:
           throw new HttpError('UNAUTHORIZED', '不支持的协议')
       }
+      await sender.do({
+        op: Messages.Opcodes.DISPATCH,
+        t: 'READY',
+        d: {
+          sessionId,
+          user: Users.BaseOut(user)
+        }
+      })
     } catch (e) {
       reject(e)
     }

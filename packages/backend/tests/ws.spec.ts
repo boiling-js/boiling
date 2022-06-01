@@ -87,7 +87,7 @@ describe('WS', function () {
     const wsClient = new WsClient(new Websocket(`ws://${ HOST }:${ PORT }/ws`) as any)
     await identifyAndHeartbeat(wsClient)
 
-    clients.get(1001)?.dispatch('MESSAGE', {
+    await clients.get(1001)?.dispatch('MESSAGE', {
       content: 'hello'
     })
     for await (const _ of wsClient.waitMessage()) {
@@ -127,6 +127,18 @@ describe('WS', function () {
     ws.close(3000, 'Debug:resume')
     await new Promise(resolve => setTimeout(resolve, 100))
     expect(clients.get(1001)).to.be.ok
+  })
+  it('should resume client.', async () => {
+    const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
+    const wsClient = new WsClient(ws as any)
+    await identifyAndHeartbeat(wsClient)
+    ws.close(3000, 'Debug:resume')
+    await new Promise(resolve => setTimeout(resolve, 100))
+    const c = clients.get(1001)
+    if (!c)
+      throw new Error('client not found')
+
+    await c.dispatch('MESSAGE', {})
   })
   it('should connect ws server and throw `BAD_REQUEST` error.', function (done) {
     const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
