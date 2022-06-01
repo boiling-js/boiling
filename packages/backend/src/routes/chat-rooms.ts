@@ -2,7 +2,7 @@ import Schema from 'schemastery'
 import { ChatRooms, Messages, Pagination, Router } from '@boiling/core'
 import { ChatRoomsService } from '../services/chat-rooms'
 import usePagination from '../hooks/usePagination'
-import { clients } from './ws'
+import { clientManager } from './ws'
 import useCurUser from '../hooks/useCurUser'
 import extendService from '../hooks/extendService'
 
@@ -34,9 +34,13 @@ export const router = new Router({
     const senderId = useCurUser(ctx.session).id
     const m = await ChatRoomsService.Message.create(ctx.params.chatRoomId, senderId, content)
     const { members } = await ChatRoomsService.get(ctx.params.chatRoomId) || {}
-    members?.filter(id => id !== senderId)?.forEach(memberId =>
-      clients.get(memberId)?.dispatch('MESSAGE', m)
-    )
+    members
+      ?.filter(id => id !== senderId)
+      ?.forEach(
+        memberId => clientManager
+          .proxyTo(memberId)
+          ?.map(client => client?.dispatch('MESSAGE', m))
+      )
     return m
   })
   /**

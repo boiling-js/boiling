@@ -3,7 +3,7 @@ import Koa from 'koa'
 import websockify from 'koa-websocket'
 import { expect } from 'chai'
 import { Messages, WsClient, resolveMessage } from '@boiling/core'
-import { router as WSRouter, clients } from '../src/routes/ws'
+import { router as WSRouter, clientManager } from '../src/routes/ws'
 import DAOMain from '../src/dao'
 import { UserModel } from '../src/dao/user'
 import { Security } from '../src/utils'
@@ -40,6 +40,9 @@ describe('WS', function () {
       )
     })
     await users.default[0].save()
+  })
+  afterEach(() => {
+    clientManager.clear()
   })
 
   const identifyAndHeartbeat = async (wsClient: WsClient) => {
@@ -87,9 +90,9 @@ describe('WS', function () {
     const wsClient = new WsClient(new Websocket(`ws://${ HOST }:${ PORT }/ws`) as any)
     await identifyAndHeartbeat(wsClient)
 
-    await clients.get(1001)?.dispatch('MESSAGE', {
-      content: 'hello'
-    })
+    await Promise.all(clientManager.proxyTo(1001)?.map(c => {
+      return c?.dispatch('MESSAGE', { content: 'hello' })
+    }) ?? [])
     for await (const _ of wsClient.waitMessage()) {
       const m = resolveMessage(_, [
         Messages.Opcodes.HEARTBEAT_ACK,
@@ -114,19 +117,19 @@ describe('WS', function () {
     const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
     const wsClient = new WsClient(ws as any)
     await identifyAndHeartbeat(wsClient)
-    expect(clients.get(1001)).to.be.ok
+    expect(clientManager.proxyTo(1001)).to.have.lengthOf(1)
     ws.close(3001)
     await new Promise(resolve => setTimeout(resolve, 100))
-    expect(clients.get(1001)).to.be.undefined
+    expect(clientManager.proxyTo(1001)).to.have.lengthOf(0)
   })
   it('should not remove client from clients.', async () => {
     const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
     const wsClient = new WsClient(ws as any)
     await identifyAndHeartbeat(wsClient)
-    expect(clients.get(1001)).to.be.ok
+    expect(clientManager.proxyTo(1001)).to.have.lengthOf(1)
     ws.close(3000, 'Debug:resume')
     await new Promise(resolve => setTimeout(resolve, 100))
-    expect(clients.get(1001)).to.be.ok
+    expect(clientManager.proxyTo(1001)).to.have.lengthOf(1)
   })
   it('should resume client.', async () => {
     const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
@@ -134,11 +137,13 @@ describe('WS', function () {
     await identifyAndHeartbeat(wsClient)
     ws.close(3000, 'Debug:resume')
     await new Promise(resolve => setTimeout(resolve, 100))
-    const c = clients.get(1001)
-    if (!c)
+    const sessions = clientManager.proxyTo(1001)
+    if (!sessions)
       throw new Error('client not found')
 
-    await c.dispatch('MESSAGE', {})
+    // await Promise.all(sessions.map(
+    //   c => c?.dispatch('MESSAGE', {})
+    // ))
   })
   it('should connect ws server and throw `BAD_REQUEST` error.', function (done) {
     const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
@@ -196,8 +201,9 @@ describe('WS', function () {
           expect(code).to.be.eq(4408)
           expect(msg.toString())
             .to.be.eq('超时未发送心跳包')
-          expect(clients.get(1001), 'client should be removed')
-            .to.be.undefined
+
+          expect(clientManager.proxyTo(1001), 'client should be removed')
+            .to.have.lengthOf(0)
           resolve()
         } catch (e) {
           reject(e)

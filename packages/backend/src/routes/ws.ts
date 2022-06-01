@@ -70,16 +70,42 @@ const waitIdentify = <T extends Messages.PickTarget<Messages.Opcodes.IDENTIFY, M
   })
 })
 
-/**
- * TODO
- * uid -> sessionId
- * sessionId -> client
- *
- * send message to uid -> sessionId -> client
- */
-export const clients = new Map<number, Sender>()
-
-export const sessions = new Map<string, number>()
+export const clientManager = {
+  userSessions: new Map<number, string[]>(),
+  clients: new Map<string, Sender>(),
+  appendClient(
+    uid: number, sessionId: string, sender: Sender
+  ) {
+    sender.sessionId = sessionId
+    this.clients.set(sessionId, sender)
+    const sessions = this.userSessions.get(uid)
+    if (!sessions) {
+      this.userSessions.set(uid, [sessionId])
+    } else {
+      sessions.push(sessionId)
+    }
+  },
+  removeClient(sessionId: string) {
+    const client = this.clients.get(sessionId)
+    if (client) {
+      this.clients.delete(sessionId)
+    }
+    this.userSessions.forEach((sessions) => {
+      const index = sessions.indexOf(sessionId)
+      if (index > -1) {
+        sessions.splice(index, 1)
+      }
+    })
+  },
+  clear() {
+    this.clients.clear()
+    this.userSessions.clear()
+  },
+  proxyTo(uid: number) {
+    return this.userSessions.get(uid)
+      ?.map(sessionId => this.clients.get(sessionId))
+  }
+}
 
 /**
  * 基础流程：
@@ -174,9 +200,9 @@ export const router: Middleware = async (context, next) => {
         }
       }
       isDelete && uid
-        && clients.delete(uid!)
+        && clientManager.removeClient(sessionId)
     }
-    uid && clients.set(uid, sender)
+    uid && clientManager.appendClient(uid, sessionId, sender)
   }).catch(e => {
     if (e instanceof HttpError)
       ws.close(e.code + 4000, e.msg)
@@ -184,6 +210,6 @@ export const router: Middleware = async (context, next) => {
       ws.close(4500, '未知错误')
       console.error(e)
     }
-    uid && clients.delete(uid!)
+    uid && clientManager.removeClient(sessionId)
   })
 }
