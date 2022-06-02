@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { Messages } from '@boiling/core'
 import { onDispatch } from '../hooks/useWsClient'
 import { api } from '../api'
@@ -56,32 +56,32 @@ const
         element.scrollTop = element.scrollHeight
       }, 0)
     }
+  },
+  init = () => {
+    getMessages()
+
+    const element = content.value
+    if (element) {
+      setTimeout(() => {
+        element.scrollTop = element.scrollHeight
+      }, 10)
+    }
   }
 
-/**
- * 用户打开聊天室，拉取最近的几条消息
- *   用户向上滚动的时候，拉取更多的消息，加到消息列表的最前面
- * 用户发送消息后，拿到响应数据，再将响应数据添加到消息列表中
- * 用户接收消息后，把接收到消息添加到消息列表中
- */
-
-onMounted(() => {
-  getMessages()
-
-  const element = content.value
-  if (element) {
-    setTimeout(() => {
-      element.scrollTop = element.scrollHeight
-    }, 10)
-  }
-})
-onDispatch(async m => {
+watch(() => props.id, init)
+onMounted(init)
+const offDispatch = onDispatch(async m => {
   switch (m.t) {
     case 'MESSAGE':
-      messages.value = messages.value || []
-      messages.value.push(m.d)
+      if (m.d.chatRoomId === props.id) {
+        messages.value = messages.value || []
+        messages.value.push(m.d)
+      }
       break
   }
+})
+onUnmounted(() => {
+  offDispatch()
 })
 </script>
 
