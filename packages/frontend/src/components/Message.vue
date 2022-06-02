@@ -2,7 +2,7 @@
   <div class="message">
     <img class="avatar"
          :alt="`@${modelValue.sender.username}`"
-         :src="`/api/${modelValue.sender.avatar}`">
+         :src="`${modelValue.sender.avatar}`">
     <div class="content">
       <div class="title">
         <span class="uname">{{ modelValue.sender.username }}</span>
