@@ -46,9 +46,11 @@ const
     password: import.meta.env.VITE_LOGIN_PWD || ''
   }),
   login = async () => {
-    const { id, ...status } = account,
+    const
+      { id, ...status } = account,
       [wsClient] = useWsClient()
-    identifyWS(wsClient, id, account.password)
+
+    identifyWS(wsClient, `Basic ${ btoa(id + ':' + account.password) }`)
     store.commit('setUser', await api.user(+id).status.add(status))
   }
 

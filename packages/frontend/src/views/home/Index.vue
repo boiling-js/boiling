@@ -65,10 +65,12 @@ import { Tools } from '@element-plus/icons-vue'
 import { ChatRooms, Users } from '@boiling/core'
 import SearchUser from '../../components/SearchUser.vue'
 import { api } from '../../api'
+import { useWsClient } from '../../hooks/useWsClient'
 
 const
   store = useStore(),
   router = useRouter(),
+  [_, setWsClient] = useWsClient(),
   user = computed(() => store.state.user),
   status = computed(() => store.state.user.status),
   chatRooms = ref<ChatRooms.Model[]>([]),
@@ -80,6 +82,7 @@ const
         type: 'warning'
       }).then(() => {
         router.push('/login')
+        setWsClient(null)
         store.commit('clear')
       }).catch()
     }

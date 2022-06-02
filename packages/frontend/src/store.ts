@@ -2,6 +2,7 @@ import { createStore } from 'vuex'
 import { Users } from '@boiling/core'
 import CreatePersistedState from 'vuex-persistedstate'
 import { api } from './api'
+import { S_ID_KEY, S_NUM_KEY, S_TK_KEY } from './hooks/useWsClient'
 
 export interface State {
   sidebarVisiable: boolean
@@ -64,6 +65,9 @@ export default createStore<State>({
     },
     clear(state) {
       state.user = uDefault
+      localStorage.removeItem(S_ID_KEY)
+      localStorage.removeItem(S_TK_KEY)
+      localStorage.removeItem(S_NUM_KEY)
     }
   },
   actions: {

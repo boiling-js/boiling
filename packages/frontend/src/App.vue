@@ -22,6 +22,7 @@ import { useStore } from 'vuex'
 import PanelSelector from './components/PanelSelector.vue'
 import TitleBar from './components/TitleBar.vue'
 import Boiling from './components/Boiling.vue'
+import { identifyWS, S_ID_KEY, S_TK_KEY, useWsClient } from './hooks/useWsClient'
 
 const
   store = useStore(),
@@ -32,6 +33,11 @@ onMounted(() => {
   setTimeout(() => {
     isLoading.value = true
   }, process.env.NODE_ENV === 'development' ? 1000 : 4000)
+  const tk = localStorage.getItem(S_TK_KEY)
+  if (tk && localStorage.getItem(S_ID_KEY)) {
+    const [ws] = useWsClient()
+    identifyWS(ws, tk, { resume: true })
+  }
 })
 </script>
 
