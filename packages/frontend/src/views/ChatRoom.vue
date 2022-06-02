@@ -3,7 +3,7 @@
     <div class="top-bar">
       <span class="icon material-icons"
             @click="$router.back()">arrow_back_ios_new</span>
-      <span>{{ props.title }}</span>
+      <span class="title">{{ props.title }}</span>
     </div>
     <div class="room">
       <div ref="content" class="content">
@@ -101,6 +101,15 @@ div.chat {
     > span.icon {
       margin-right: 10px;
       cursor: pointer;
+      user-select: none;
+      color: var(--color-text-secondary);
+      transition: 0.3s;
+      &:hover {
+        color: var(--color-text-placeholder);
+      }
+    }
+    > span.title {
+      color: var(--color-text-placeholder);
     }
   }
   > div.room {
