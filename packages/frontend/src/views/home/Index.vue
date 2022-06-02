@@ -74,16 +74,13 @@ const
   chatRooms = ref<ChatRooms.Model[]>([]),
   updateStatus = async (status: string) => {
     if (status === 'offline') {
-      await ElMessageBox.confirm(
-        '是否确认退出登录?',
-        '退出登录',
-        {
-          confirmButtonText: '确认',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      ).then(() => {
+      await ElMessageBox.confirm('是否确认退出登录?', '退出登录', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
         router.push('/login')
+        store.commit('clear')
       }).catch()
     }
     await store.dispatch('updStatus', status)

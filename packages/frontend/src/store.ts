@@ -10,19 +10,21 @@ export interface State {
   user: Users.Out
 }
 
+const uDefault: State['user'] = {
+  id: 0,
+  username: '',
+  avatar: '',
+  tags: [],
+  friends: [],
+  status: 'online'
+}
+
 export default createStore<State>({
   state: {
     sidebarVisiable: false,
     sidebarCrtlVisiable: false,
     isHiddenLeftSelector: false,
-    user: {
-      id: 0,
-      username: '',
-      avatar: '',
-      tags: [],
-      friends: [],
-      status: 'online'
-    }
+    user: uDefault
   },
   mutations: {
     toggleSidebarVisiable(state) {
@@ -59,6 +61,9 @@ export default createStore<State>({
     },
     update(state, user: Users.UpdateOut) {
       state.user = { ...state.user, ...user }
+    },
+    clear(state) {
+      state.user = uDefault
     }
   },
   actions: {
