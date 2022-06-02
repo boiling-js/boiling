@@ -7,7 +7,7 @@
       <img
         v-for="(item, index) in avatars"
         :key="index"
-        :src="`/api/${item}`"
+        :src="`${item}`"
         @click="selAvatar(item)">
     </el-scrollbar>
   </el-dialog>

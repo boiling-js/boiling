@@ -32,7 +32,7 @@ export const router = new Router({
     const user = await UsersService.add({
       username,
       passwordHash: Security.encrypt(password),
-      avatar: `/img/avatar/${ Math.floor(Math.random() * 10) }.jpg`
+      avatar: `/api/img/avatar/${ Math.floor(Math.random() * 10) }.jpg`
     })
     return { id: user.id, username: user.username, avatar: user.avatar }
   })

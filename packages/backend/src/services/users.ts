@@ -76,7 +76,7 @@ export namespace UsersService {
   }
   export async function getAvatars() {
     return (await fs.readdir('./static/img/avatar'))
-      .map(f => `/img/avatar/${f}`)
+      .map(f => `/api/img/avatar/${f}`)
   }
   export async function update(id: number, base: Partial<Users.UpdateOut>) {
     const user = await UsersService.getOrThrow(id)
@@ -116,7 +116,11 @@ export namespace UsersService {
         tags: [],
         remark: ''
       }, opts) })
-      await Promise.all([user.save(), ChatRoomsService.create([user.id, fUid])])
+      friend.friends.push({ id: uid, ...Object.assign(<Required<Opts>>{
+          tags: [],
+          remark: ''
+        }) })
+      await Promise.all([user.save(), friend.save(), ChatRoomsService.create([user.id, fUid])])
     }
     export async function del(uid: number, fUid: number) {
       const [ user, friend ] = await Promise.all([UsersService.getOrThrow(uid), UsersService.getOrThrow(fUid)])
