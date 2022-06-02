@@ -185,9 +185,7 @@ export const router: Middleware = async (context, next) => {
         sessionId = oldSId
         sender.sessionId = sessionId
         const messages = await sender.messages(s)
-        await new Promise(re => process.nextTick(re))
         for (const m of messages) {
-          console.log(m)
           await sender.do(m)
         }
         await sender.dispatch('RESUMED', {}, { store: false })

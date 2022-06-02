@@ -188,8 +188,6 @@ describe('WS', function () {
           Messages.Opcodes.DISPATCH
         ])
         if (m.op === Messages.Opcodes.DISPATCH) {
-          console.log(m.t)
-          console.log(m.d)
           if (m.t === 'MESSAGE') {
             acturalContents += m.d.content
           }
