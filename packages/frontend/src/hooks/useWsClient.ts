@@ -9,6 +9,7 @@ const dispatchListeners = new Set<DispatchListener>()
 
 export const onDispatch = (listener: DispatchListener) => {
   dispatchListeners.add(listener)
+  return () => dispatchListeners.delete(listener)
 }
 
 export const identifyWS = async (wsClient: WsClient, id: string, pwd: Users.Login['password']) => {
