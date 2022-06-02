@@ -107,7 +107,16 @@ const waitIdentify = <T extends Messages.PickTarget<
 export const clientManager = {
   userSessions: new Map<number, string[]>(),
   clients: new Map<string, Sender>(),
-  initFromRedis() {
+  async initFromRedis() {
+    const keys = await Redis.client.keys('user:*:sessions')
+    keys
+      .map(k => k.split(':')[1])
+      .map(async uid => {
+        this.userSessions.set(
+          Number(uid),
+          await Redis.client.lRange(`user:${uid}:sessions`, 0, -1)
+        )
+      })
   },
   appendClient(
     uid: number, sessionId: string, sender: Sender

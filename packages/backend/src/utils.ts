@@ -3,6 +3,7 @@ import { createHash } from 'crypto'
 import { SeqModel } from './dao/seq'
 import { App } from 'koa-websocket'
 import DAOMain from './dao'
+import { clientManager } from './routes/ws'
 
 namespace Utils {
   export namespace Security {
@@ -40,6 +41,7 @@ namespace Utils {
         try {
           await DAOMain()
           await Redis.init()
+          await clientManager.initFromRedis()
         } catch (e) {
           reject(e)
         }
