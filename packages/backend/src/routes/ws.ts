@@ -3,10 +3,20 @@ import { v4 as uuid } from 'uuid'
 import { Middleware } from 'koa-websocket'
 import { Messages, Users } from '@boiling/core'
 import { UsersService } from '../services/users'
-import Utils from '../utils'
+import Utils, { Redis } from '../utils'
+
+const env = Object.defineProperty(<{ interval: number }>{}, 'interval', {
+  get() {
+    return Number(process.env.HEARTBEAT_INTERVAL ?? 600000)
+  }
+})
 
 class Sender {
+  s = 1
   sessionId?: string
+  get mKey() {
+    return `session:${this.sessionId}:messages`
+  }
   constructor(public ws: Websocket) {
     this.ws = ws
   }
@@ -21,27 +31,44 @@ class Sender {
       })
     })
   }
+  ready(sessionId: string, user: Users.BaseOut) {
+    return this.do({
+      op: Messages.Opcodes.DISPATCH,
+      s: this.s++,
+      t: 'READY',
+      d: {
+        sessionId,
+        user: Users.BaseOut(user)
+      }
+    })
+  }
   hello() {
     return this.do({
       op: Messages.Opcodes.HELLO,
-      d: { heartbeatInterval: Number(process.env.HEARTBEAT_INTERVAL || 600000) }
+      d: { heartbeatInterval: env.interval }
     })
   }
   ping() {
     return this.do({ op: Messages.Opcodes.HEARTBEAT_ACK })
   }
-  async dispatch<M extends Messages.PickTarget<Messages.Opcodes.DISPATCH>>(t: M['t'], d: M['d']) {
-    // TODO 给对应的 redis 中的 session 储存对应的消息 id
-    if (this.sessionId) {
-    }
-    await this.do({
+  async dispatch<M extends Messages.PickTarget<Messages.Opcodes.DISPATCH>>(
+    t: M['t'], d: M['d'], options = { store: true }
+  ) {
+    const m = {
       op: Messages.Opcodes.DISPATCH,
-      // @ts-ignore
+      s: this.s++,
       t, d
-    })
-    // TODO 在发送给了前端并且没有报错后，把对应的消息 id 从 redis 中删除
-    if (this.sessionId) {
+    } as M
+    const mStr = JSON.stringify(m)
+    if (this.sessionId && options.store) {
+      await Redis.client.rPush(this.mKey, mStr)
     }
+    await this.do(m)
+  }
+  async messages(sN: number) {
+    return (
+      await Redis.client.lRange(this.mKey, sN, -1)
+    ).map(m => JSON.parse(m))
   }
 }
 
@@ -53,17 +80,24 @@ const resolveData = <T>(data: Websocket.RawData) => {
   }
 }
 
-const waitIdentify = <T extends Messages.PickTarget<Messages.Opcodes.IDENTIFY, Messages.Client>>(
+const waitIdentify = <T extends Messages.PickTarget<
+  Messages.Opcodes.IDENTIFY | Messages.Opcodes.RESUME, Messages.Client
+>>(
   ws: Websocket
-) => new Promise<T['d']>((resolve, reject) => {
+) => new Promise<{
+  s?: number
+  token: T['d']['token']
+  sessionId?: string
+}>((resolve, reject) => {
   // 只接受一次
   ws.once('message', data => {
     try {
       const m = resolveData<T>(data)
-      if (m.op !== Messages.Opcodes.IDENTIFY) {
-        reject(new HttpError('BAD_REQUEST', '你必须先发送一个 IDENTIFY 消息'))
+      if ([Messages.Opcodes.IDENTIFY, Messages.Opcodes.RESUME].includes(m.op)) {
+        resolve(m.d)
+      } else {
+        reject(new HttpError('BAD_REQUEST', '你必须先发送一个 IDENTIFY/RESUME 消息'))
       }
-      resolve(m.d)
     } catch (e) {
       reject(e)
     }
@@ -73,29 +107,36 @@ const waitIdentify = <T extends Messages.PickTarget<Messages.Opcodes.IDENTIFY, M
 export const clientManager = {
   userSessions: new Map<number, string[]>(),
   clients: new Map<string, Sender>(),
+  initFromRedis() {
+  },
   appendClient(
     uid: number, sessionId: string, sender: Sender
   ) {
     sender.sessionId = sessionId
     this.clients.set(sessionId, sender)
-    const sessions = this.userSessions.get(uid)
+    let sessions = this.userSessions.get(uid)
     if (!sessions) {
-      this.userSessions.set(uid, [sessionId])
+      sessions = [sessionId]
+      this.userSessions.set(uid, sessions)
     } else {
       sessions.push(sessionId)
     }
+    Redis.client.lPush(`user:${uid}:sessions`, sessionId)
   },
   removeClient(sessionId: string) {
-    const client = this.clients.get(sessionId)
-    if (client) {
+    let uId: string | undefined
+    if (this.clients.has(sessionId)) {
       this.clients.delete(sessionId)
     }
-    this.userSessions.forEach((sessions) => {
+    this.userSessions.forEach((sessions, userId) => {
       const index = sessions.indexOf(sessionId)
       if (index > -1) {
         sessions.splice(index, 1)
+        uId = userId.toString()
       }
     })
+    Redis.client.lRem(`user:${uId}:sessions`, 0, sessionId)
+    Redis.client.lPop(`session:${sessionId}:messages`)
   },
   clear() {
     this.clients.clear()
@@ -107,26 +148,12 @@ export const clientManager = {
   }
 }
 
-/**
- * 基础流程：
- * 服务端发送 hello 数据包给客户端，其中包含了心跳包的间隔时间
- * 客户端接收到 hello 数据包后，发送鉴权数据包给服务端
- * 鉴权通过后，服务端再下发其他的数据包给客户端
- * 客户端按照 hello 包中的心跳包间隔时间，发送心跳包给服务端
- * 服务端收到心跳包后，发送心跳包响应给客户端
- *
- * 异常处理：
- * 1. 鉴权不通过，服务端会主动断开连接
- * 2. 多次未发送心跳包，服务端会主动断开连接
- * 3. 鉴权不通过不会下发其他数据包
- * 4. 错误的数据包，服务端会主动断开连接
- */
 export const router: Middleware = async (context, next) => {
   if (!context.url.startsWith('/ws'))
     return await next()
   const { websocket: ws } = context
   let uid: number | undefined
-  const sessionId = uuid()
+  let sessionId = uuid()
   const sender = new Sender(ws)
   await sender.hello()
   new Promise(async (resolve, reject) => {
@@ -137,8 +164,8 @@ export const router: Middleware = async (context, next) => {
         reject(new HttpError('REQUEST_TIMEOUT', '超时未发送鉴权'))
     }, 5000)
     try {
-      // TODO 处理 Resume 包，并返回对应的 token
-      const { token } = await waitIdentify(ws) || {}
+      const { s, token, sessionId: oldSId } = await waitIdentify(ws) || {}
+
       const [ type, content ] = token?.split(' ') ?? []
       let user: Awaited<ReturnType<typeof UsersService.getOrThrow>> | null = null
       switch (type) {
@@ -153,21 +180,25 @@ export const router: Middleware = async (context, next) => {
         default:
           throw new HttpError('UNAUTHORIZED', '不支持的协议')
       }
-      await sender.do({
-        op: Messages.Opcodes.DISPATCH,
-        t: 'READY',
-        d: {
-          sessionId,
-          user: Users.BaseOut(user)
+      if (oldSId !== undefined && s !== undefined) {
+        sender.s = s
+        sessionId = oldSId
+        sender.sessionId = sessionId
+        const messages = await sender.messages(s)
+        await new Promise(re => process.nextTick(re))
+        for (const m of messages) {
+          console.log(m)
+          await sender.do(m)
         }
-      })
+        await sender.dispatch('RESUMED', {}, { store: false })
+      } else {
+        await sender.ready(sessionId, user)
+      }
     } catch (e) {
       reject(e)
     }
     isIdentified = true
 
-    // 要求客户端按照 hello 包中的心跳包间隔时间，发送心跳包给服务端，服务端收到心跳包后，发送心跳包响应给客户端
-    // 如果多次未发送心跳包，服务端会主动断开连接
     let isPinged = false
     setInterval(() => {
       if (!isPinged) {
@@ -175,7 +206,7 @@ export const router: Middleware = async (context, next) => {
       } else {
         isPinged = false
       }
-    }, Number(process.env.HEARTBEAT_INTERVAL || 600000) + 1000)
+    }, env.interval + 1000)
 
     ws.on('message', async data => {
       try {
@@ -199,7 +230,7 @@ export const router: Middleware = async (context, next) => {
           isDelete = false
         }
       }
-      isDelete && uid
+      isDelete
         && clientManager.removeClient(sessionId)
     }
     uid && clientManager.appendClient(uid, sessionId, sender)
@@ -210,6 +241,6 @@ export const router: Middleware = async (context, next) => {
       ws.close(4500, '未知错误')
       console.error(e)
     }
-    uid && clientManager.removeClient(sessionId)
+    clientManager.removeClient(sessionId)
   })
 }

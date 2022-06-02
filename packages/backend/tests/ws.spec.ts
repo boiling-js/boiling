@@ -51,6 +51,7 @@ describe('WS', function () {
     })
     const m2 = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.DISPATCH])
     expect(m2.op).to.equal(Messages.Opcodes.DISPATCH)
+    expect(m2.s).to.equal(1)
     expect(m2.t).to.equal('READY')
     expect(m2.d).property('user').to.deep.include({
       id: 1001,
@@ -64,6 +65,10 @@ describe('WS', function () {
         op: Messages.Opcodes.HEARTBEAT
       })
     }, heartbeatInterval)
+    return {
+      hello: m1,
+      ready: m2
+    }
   }
 
   it('should connect ws server.', async function () {
@@ -127,16 +132,79 @@ describe('WS', function () {
   it('should resume client.', async () => {
     const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
     const wsClient = new WsClient(ws as any)
-    await identifyAndHeartbeat(wsClient)
+    const { ready } = await identifyAndHeartbeat(wsClient)
+    if (ready.t !== 'READY')
+      throw new Error('not ready')
+
     ws.close(3000, 'Debug:resume')
     await new Promise(resolve => setTimeout(resolve, 100))
     const sessions = clientManager.proxyTo(1001)
     if (!sessions)
       throw new Error('client not found')
 
-    // await Promise.all(sessions.map(
-    //   c => c?.dispatch('MESSAGE', {})
-    // ))
+    try {
+      await Promise.all(sessions.map(
+        c => c?.dispatch('MESSAGE', { content: 'hi hi hi0' })
+      ).concat(sessions.map(
+        c => c?.dispatch('MESSAGE', { content: 'hi hi hi1' })
+      )).concat(sessions.map(
+        c => c?.dispatch('MESSAGE', { content: 'hi hi hi2' })
+      )).concat(sessions.map(
+        c => c?.dispatch('MESSAGE', { content: 'hi hi hi3' })
+      )))
+    } catch (e) {
+      const c = clientManager.proxyTo(1001)?.[0]
+      expect(await c?.messages(0))
+        .to.have.lengthOf(4)
+      expect(await c?.messages(1))
+        .to.have.lengthOf(3)
+    }
+    const resumeConnect = async () => {
+      const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
+      const wsClient = new WsClient(ws as any)
+
+      const m1 = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.HELLO])
+      expect(m1.op).to.equal(Messages.Opcodes.HELLO)
+      const heartbeatInterval = m1.d.heartbeatInterval
+
+      wsClient.send({
+        op: Messages.Opcodes.RESUME,
+        d: {
+          token: users.default[1],
+          sessionId: ready.d.sessionId,
+          s: 0
+        }
+      })
+
+      setInterval(() => {
+        wsClient.send({
+          op: Messages.Opcodes.HEARTBEAT
+        })
+      }, heartbeatInterval)
+      let acturalContents = ''
+      for await (const _ of wsClient.waitMessage()) {
+        const m = resolveMessage(_, [
+          Messages.Opcodes.HEARTBEAT_ACK,
+          Messages.Opcodes.DISPATCH
+        ])
+        if (m.op === Messages.Opcodes.DISPATCH) {
+          console.log(m.t)
+          console.log(m.d)
+          if (m.t === 'MESSAGE') {
+            acturalContents += m.d.content
+          }
+          if (m.t === 'RESUMED') {
+            break
+          }
+        }
+      }
+      expect(acturalContents)
+        .to.deep.equal('hi hi hi0hi hi hi1hi hi hi2hi hi hi3')
+    }
+    await resumeConnect()
+    if (ready.t === 'READY') {
+      clientManager.removeClient(ready.d.sessionId)
+    }
   })
   it('should connect ws server and throw `BAD_REQUEST` error.', function (done) {
     const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
