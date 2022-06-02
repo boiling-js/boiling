@@ -15,7 +15,9 @@ namespace Utils {
     }
   }
   export namespace Redis {
-    export const client = createClient()
+    export const client = createClient({
+      database: 5
+    })
     export async function init() {
       client.once('error', console.error)
       await client.connect()
