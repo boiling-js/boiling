@@ -34,7 +34,14 @@
                   @click="$refs.searchUser.show">add</span>
           </div>
           <template v-for="chatRoom in chatRooms" :key="chatRoom.id">
-            <div class="chat-room" @click="$router.push(`/home/chat-rooms/${ chatRoom.id }?title=${ chatRoom.name }`)">
+            <div class="chat-room" @click="() => {
+              const to = `/home/chat-rooms/${ chatRoom.id }?title=${ chatRoom.name }`
+              if ($route.path.startsWith('/home/chat-rooms')) {
+                $router.replace(to)
+              } else {
+                $router.push(to)
+              }
+            }">
               <img class="avatar" :src="`${chatRoom.avatar}`" :alt="chatRoom.id">
               {{ chatRoom.name }}
             </div>
