@@ -28,7 +28,7 @@ const createMessageResolver = (p: Promise<string>) => new Proxy(p as Promise<str
 })
 
 export class WsClient {
-  constructor(private ws: WebSocket) {
+  constructor(public ws: WebSocket) {
     this.ws = ws
   }
   once<K extends keyof WebSocketEventMap>(type: K, listener: (this: WebSocket, ev: WebSocketEventMap[K]) => any, options?: boolean | AddEventListenerOptions) {
