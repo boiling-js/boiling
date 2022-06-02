@@ -46,9 +46,15 @@ export namespace Messages {
      * 客户端发送鉴权
      */
     IDENTIFY = 4,
+    /**
+     * Client
+     * 客户端断连恢复连接
+     */
+    RESUME = 5,
   }
   type DP<T extends string, D extends any> = {
     op: Opcodes.DISPATCH
+    s: number
     t: T
     d: D
   }
@@ -98,12 +104,23 @@ export namespace Messages {
     user: Users.BaseOut
   }>
     | Events['ChatRoom'] | Events['User'] | Events['Guilds']
+    | DP<'RESUMED', {}>
   export type Client = {
     op: Opcodes.HEARTBEAT
   } | {
     op: Opcodes.IDENTIFY
     d: {
       token: string
+    }
+  } | {
+    op: Opcodes.RESUME
+    d: {
+      /** 验证密钥 */
+      token: string
+      /** 客户端上次断开连接时的 sessionId */
+      sessionId: string
+      /** 客户端上次断开连接时的最后一条消息的序列号 */
+      s: number
     }
   }
   export type PickTarget<T extends Opcodes, E = Server> = E extends { op: T } ? E : never
