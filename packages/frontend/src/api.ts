@@ -66,7 +66,7 @@ interface OfficialApi {
     upd(d: {
       name?: string
       avatar?: string
-      members?: string[]
+      members?: number[]
     }): Promise<void>
     messages: QueryPromise<Pagination<Messages.Model>, SearchQuery> & {
       /** 发送消息 */
