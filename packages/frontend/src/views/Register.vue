@@ -46,7 +46,6 @@ const
   }),
   router = useRouter(),
   checkPWD = (rule: any, value: string, callback: any) => {
-    console.log('checkPWD', value)
     const pwdRegex = new RegExp('(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).{8,30}')
     if (value === '') {
       callback(new Error('请输入密码'))
