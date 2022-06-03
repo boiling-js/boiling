@@ -52,6 +52,8 @@ interface OfficialApi {
     avatar: {
       upd(d: { avatar: string }): Promise<void>
     }
+    /** 获取频道 */
+    channels: Promise<Channels.Model[]>
   }
   'chat-rooms': QueryPromise<Pagination<ChatRooms.Model>, SearchQuery & {
     disableToast?: boolean

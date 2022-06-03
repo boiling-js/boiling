@@ -18,7 +18,7 @@
           </div>
         </el-tooltip>
         <el-divider/>
-        <el-tooltip v-for="channel in channels?.items"
+        <el-tooltip v-for="channel in channels"
                     :key="channel.id"
                     placement="right" :content="channel.name">
           <div class="option channel"
@@ -50,11 +50,11 @@ import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 import { ElDivider, ElTooltip, ElIcon, ElScrollbar } from 'element-plus'
 import { Compass, Plus, ArrowRight } from '@element-plus/icons-vue'
-import { Channels, Pagination } from '@boiling/core'
+import { Channels } from '@boiling/core'
 import { api } from '../api'
 
 const
-  channels = ref<Pagination<Channels.Model>>(),
+  channels = ref<Channels.Model[]>(),
   route = useRoute(),
   store = useStore()
 
@@ -74,7 +74,7 @@ watch(() => route.path, () => {
 })
 
 onMounted(async () => {
-  channels.value = await api.channels.query({ key: '' })
+  channels.value = await api.user('@me').channels
   initSidebarCrtlVisiable()
 })
 </script>
