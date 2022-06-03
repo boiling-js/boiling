@@ -16,7 +16,7 @@
           :key="member.id"
           class="friend">
           <el-avatar
-            :src="`/api${member.avatar}`"
+            :src="`${member.avatar}`"
           />
           <div class="name">{{ member.remark || member.username }}</div>
         </div>
@@ -78,10 +78,10 @@ const
   addMembers = (fIds: number[], fSel: Users.FriendOut[]) => {
     members.value = members.value.concat(fSel.filter(f => !members.value.some(m => m.id === f.id)))
   },
-  confirm = () => {
-    api['chat-room'](form.value?.id ?? '').upd({
+  confirm = async () => {
+   await api['chat-room'](form.value?.id ?? '').upd({
       name: form.value?.name,
-      members: members.value.map(m => m.id.toString())
+      members: members.value.map(m => m.id)
     })
     show.value = false
   }
