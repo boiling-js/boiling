@@ -68,7 +68,7 @@ export namespace ChatRoomsService {
     if (Array.isArray(arg0)) {
       return Model.findOne({ members: { $all: arg0 } })
     } else {
-      return Model.findOne({ id: arg0 })
+      return Model.findOne({ _id: arg0 })
     }
   }
   /**
