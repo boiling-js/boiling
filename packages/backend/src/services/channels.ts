@@ -61,6 +61,19 @@ export namespace ChannelsService {
       ]
     })
   }
+
+  /**
+   * 通过用户id获取频道
+   */
+  export async function getByUserId(uid: number) {
+    return Model.find({
+      members: {
+        $elemMatch: {
+          id: uid
+        }
+      }
+    })
+  }
   /**
    * 删除解散频道
    */
