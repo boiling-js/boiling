@@ -4,20 +4,30 @@
   "license": "MIT",
   "author": "Yijie",
   "description": "Boiling Desktop Application",
+  "main": "dist/runner.js",
   "scripts": {
     "start": "electron -r ts-node/register src/runner.ts",
-    "build": "electron-builder --win --x64"
+    "build:src": "tsc -p ./tsconfig.pro.json",
+    "build:app": "yarn build:src && electron-builder -c.extraMetadata.name=boiling",
+    "build:app:mac": "yarn build:app -m",
+    "build:app:win": "yarn build:app -w",
+    "build:app:linux": "yarn build:app -l"
   },
   "devDependencies": {
-    "electron": "^16.0.5",
+    "electron": "16.0.9",
     "electron-builder": "^23.0.3"
   },
   "build": {
     "appId": "com.boiling.app",
+    "directories": {
+      "output": "releases"
+    },
     "mac": {
+      "icon": "static/favicon.icns",
       "target": [ "dmg", "zip" ]
     },
     "win": {
+      "icon": "static/favicon.png",
       "target": [ "nsis", "zip" ]
     }
   }
