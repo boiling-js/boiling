@@ -1,0 +1,32 @@
+name: 'Generate Pem'
+description: 'Generate pem file and set known_hosts.'
+author: 'YiJie'
+
+inputs:
+  user:
+    description: The remote server username
+    required: true
+  pem:
+    description: The remote server key
+    required: true
+  pem-type:
+    description: The remote server key type
+    required: true
+  host:
+    description: The remote server rsync host
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        DSN: ${{ inputs.user }}@${{ inputs.host }}
+      run: |
+        cat > k.pem <<EOF
+        ${{ inputs.pem }}
+        EOF
+        chmod 0600 k.pem
+        mkdir ~/.ssh
+        touch ~/.ssh/known_hosts
+        ssh-keyscan -H -t ${{ inputs.pem-type }} ${{ inputs.host }} >> ~/.ssh/known_hosts
