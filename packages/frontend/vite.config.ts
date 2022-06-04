@@ -8,6 +8,7 @@ export default defineConfig(env => ({
   define: {
     API_HOST: env.command === 'build' ? process.env.PRODUCT_URL : ''
   },
+  publicDir: 'public',
   server: {
     port: Number(process.env.VITE_PORT) || 3000,
     proxy: {
