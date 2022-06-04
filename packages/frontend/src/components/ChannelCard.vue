@@ -16,7 +16,7 @@
       <h3 class="title">{{ channel.name }}</h3>
       <div class="operates">
         <span
-          v-if="channel.members.map(m => m.id === me)"
+          v-if="channel.members.every(m => m.id === me)"
           class="material-icons icon"
           @click="$router.push(
             `/channel/${ channel.id }?title=${ channel.name }`
@@ -38,24 +38,18 @@ import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { api } from '../api'
 
-defineProps({
-  channel: {
-    type: Channels.Model,
-    required: true
-  }
-})
-
 const
+  props = defineProps<{
+    channel: Channels.Model
+  }>(),
   store = useStore(),
   me = computed(() => {  return store.state.user.id })
 const
-  addMember = async (members: number[]) => {
-    await api.channel(me.value).members.add({
-      members: members.map(m => ({
-        id: m
-      }))
+  addMember = async () => {
+    await api.channel(props.channel.id).members.add({
+      members: [{ id: me.value }]
     })
-    ElMessage.success('创建成功')
+    ElMessage.success('添加成功！')
   }
 </script>
 
