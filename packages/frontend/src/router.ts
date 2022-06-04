@@ -52,6 +52,9 @@ const router = createRouter({
       type: route.query.type,
       info: route.query.info
     })
+  }, {
+    path: '/search-channel',
+    component: () => import('./components/SearchChannel.vue')
   },{
     path: '/create-chatRoom',
     component: () => import('./views/CreateChatRoom.vue'),
