@@ -66,7 +66,8 @@
                    v-text="'确认'"/>
       </div>
       <el-divider/>
-      <div class="operate">
+      <!--TODO 拉入黑名单-->
+      <!--<div class="operate">
         <div class="desc">
           <div class="title">拉入黑名单</div>
           拉入黑名单后，你将无法接收到对方的消息。
@@ -74,7 +75,7 @@
         <el-button type="danger"
                    v-text="'确认'"/>
       </div>
-      <el-divider/>
+      <el-divider/>-->
     </div>
     <template #footer>
       <span class="dialog-footer">
