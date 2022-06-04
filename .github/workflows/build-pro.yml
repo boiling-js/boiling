@@ -99,7 +99,7 @@ jobs:
         uses: boiling-js/boiling/.github/actions/rsync@master
         with:
           path: ./packages/frontend/dist
-          remote-path: /www/dist/
+          remote-path: /www/
           host: ${{ secrets.PRO_HOST }}
           user: developer
           pem: ${{ secrets.PRO_PEM }}
