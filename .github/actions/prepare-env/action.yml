@@ -1,0 +1,23 @@
+name: 'Prepare Enviroment'
+description: 'Prepare and cache project Node.js enviroment.'
+author: 'YiJie'
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v2
+      with:
+        node-version: 16.15.0
+    - uses: actions/checkout@v2
+    - uses: actions/cache@v2
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: ./node_modules
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+    - shell: bash
+      run: yarn
