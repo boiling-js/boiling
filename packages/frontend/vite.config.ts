@@ -6,7 +6,7 @@ configDotenv()
 
 export default defineConfig(env => ({
   define: {
-    API_HOST: env.command === 'build' ? process.env.PRODUCT_URL : ''
+    API_HOST: JSON.stringify(env.command === 'build' ? process.env.PRODUCT_URL : '')
   },
   publicDir: 'public',
   server: {
