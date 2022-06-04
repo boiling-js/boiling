@@ -14,6 +14,7 @@ interface OSMeta {
 }
 
 export declare global {
+  declare const API_HOST: string
   export declare const desktop: Desktop | undefined
   export declare const osMeta: OSMeta | undefined
   interface Window {
