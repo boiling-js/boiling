@@ -5,7 +5,6 @@ import { configDotenv } from '@boiling/utils'
 configDotenv()
 
 export default defineConfig({
-  base: './',
   server: {
     port: Number(process.env.VITE_PORT) || 3000,
     proxy: {
