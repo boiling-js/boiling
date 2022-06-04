@@ -5,6 +5,7 @@ import { configDotenv } from '@boiling/utils'
 async function createWindow() {
   const mainWindow = new BrowserWindow({
     icon: nativeImage.createFromPath(path.join(__dirname, '../static/favicon.ico')),
+    title: 'Boiling',
     width: 1200,
     height: 800,
     minWidth: 940,
@@ -15,10 +16,10 @@ async function createWindow() {
       preload: path.join(__dirname, 'preload.js')
     }
   })
-  if (!process.env.VITE_PORT) {
-    throw new Error('Not configured VITE_PORT.')
-  }
   if (process.env.NODE_ENV === 'development') {
+    if (!process.env.VITE_PORT)
+      throw new Error('Not configured VITE_PORT.')
+
     await mainWindow.loadURL(`http://127.0.0.1:${process.env.VITE_PORT}`)
     mainWindow.webContents.openDevTools({
       mode: 'detach'
@@ -55,7 +56,8 @@ async function main() {
   })
 }
 
-main().catch(() => {
+main().catch(e => {
+  console.error(e)
   console.error('Failed to start the application.')
   process.exit(1)
 })

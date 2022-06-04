@@ -111,7 +111,7 @@ interface OfficialApi {
 
 class OfficialApi extends Api {
   constructor() {
-    super('/api')
+    super(`${ API_HOST ?? '' }/api`)
     return attachApi(this)
   }
 }

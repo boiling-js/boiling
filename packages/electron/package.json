@@ -4,11 +4,11 @@
   "license": "MIT",
   "author": "Yijie",
   "description": "Boiling Desktop Application",
-  "main": "dist/runner.js",
+  "main": "dist/index.js",
   "scripts": {
     "start": "electron -r ts-node/register src/runner.ts",
     "cp-frontend": "copyfiles ../frontend/dist/* -u 3 ../frontend/dist/**/* static",
-    "build:src": "tsc -p ./tsconfig.pro.json && yarn cp-frontend && copyfiles src/*.js dist --flat",
+    "build:src": "ts-node esbuild.ts && yarn cp-frontend && copyfiles src/*.js dist --flat",
     "build:app": "yarn build:src && electron-builder -c.extraMetadata.name=boiling",
     "build:app:mac": "yarn build:app -m",
     "build:app:win": "yarn build:app -w",
