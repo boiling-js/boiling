@@ -20,7 +20,6 @@ jobs:
         uses: boiling-js/boiling/.github/actions/prepare-env@master
 
   build-win-app:
-    needs: [prepare-env]
     name: Build Windows app
     runs-on: windows-latest
     steps:
@@ -40,7 +39,6 @@ jobs:
           path: ./packages/electron/releases/boiling-${{ github.ref_name }}.msi
 
   build-mac-app:
-    needs: [prepare-env]
     name: Build MacOS app
     runs-on: macos-latest
     steps:
@@ -93,7 +91,7 @@ jobs:
           path: ~/downloads
       - name: Untar frontend-pack-dist
         run: mkdir dist && tar -xvf frontend-pack-dist.tar dist
-        working-directory: $HOME/downloads
+        working-directory: /home/runner/downloads
       - name: rsync deployments
         uses: boiling-js/boiling/.github/actions/rsync@master
         with:
