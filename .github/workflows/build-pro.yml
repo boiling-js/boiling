@@ -11,6 +11,7 @@ on:
 jobs:
   prepare-env:
     runs-on: ubuntu-latest
+    name: Prepare enviroment
     steps:
       - uses: actions/checkout@v2
         with:
@@ -20,8 +21,12 @@ jobs:
 
   build-win-app:
     needs: [prepare-env]
+    name: Build Windows app
     runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
       - name: prepare enviroment
         uses: boiling-js/boiling/.github/actions/prepare-env@master
       - name: build win app
@@ -31,6 +36,24 @@ jobs:
         with:
           name: app-windows
           path: ./packages/electron/release/boiling-${{ github.ref }}.exe
+
+  build-mac-app:
+    needs: [prepare-env]
+    name: Build MacOS app
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+      - name: prepare enviroment
+        uses: boiling-js/boiling/.github/actions/prepare-env@master
+      - name: build win app
+        run: yarn build:app -m
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-windows
+          path: ./packages/electron/release/boiling-${{ github.ref }}.dmg
 
   package-frontend:
     needs: [prepare-env]
@@ -65,7 +88,7 @@ jobs:
         with:
           name: frontend-pack-dist
       - name: Untar frontend-pack-dist
-        run: tar -xvf frontend-pack-dist.tar ./dist
+        run: mkdir dist && tar -xvf frontend-pack-dist.tar dist
       - name: rsync deployments
         uses: boiling-js/boiling/.github/actions/rsync@master
         with:
