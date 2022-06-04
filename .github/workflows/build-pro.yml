@@ -25,6 +25,8 @@ jobs:
   build-win-app:
     name: Build Windows app
     runs-on: windows-latest
+    env:
+      PRODUCT_URL: http://${{ secrets.PRO_HOST }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -43,9 +45,12 @@ jobs:
             ./packages/electron/releases/boiling Setup ${{ github.ref_name }}.exe
             ./packages/electron/releases/boiling-${{ github.ref_name }}-win.zip
 
+
   build-mac-app:
     name: Build MacOS app
     runs-on: macos-latest
+    env:
+      PRODUCT_URL: http://${{ secrets.PRO_HOST }}
     steps:
       - uses: actions/checkout@v2
         with:
