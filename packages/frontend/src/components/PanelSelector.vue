@@ -8,7 +8,7 @@
           </div>
         </el-tooltip>
         <el-tooltip placement="right" content="探索">
-          <div class="option" @click="$router.push('/share')">
+          <div class="option" @click="$router.push('/search-channel')">
             <el-icon :size="24" color="#fff"><compass/></el-icon>
           </div>
         </el-tooltip>
