@@ -63,7 +63,6 @@ jobs:
     needs: [prepare-env]
     name: Package Frontend
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
         with:
@@ -91,8 +90,10 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: frontend-pack-dist
+          path: ~/downloads
       - name: Untar frontend-pack-dist
         run: mkdir dist && tar -xvf frontend-pack-dist.tar dist
+        working-directory: ~/downloads
       - name: rsync deployments
         uses: boiling-js/boiling/.github/actions/rsync@master
         with:
