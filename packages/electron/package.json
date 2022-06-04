@@ -20,7 +20,7 @@
     "electron-builder": "^23.0.3"
   },
   "dependencies": {
-    "@boiling/utils": "file:../utils"
+    "@boiling/utils": "*"
   },
   "build": {
     "appId": "com.boiling.app",
@@ -40,7 +40,7 @@
       ]
     },
     "win": {
-      "icon": "static/favicon.png",
+      "icon": "static/favicon.ico",
       "target": [
         "nsis",
         "zip"
