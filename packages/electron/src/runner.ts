@@ -1,10 +1,10 @@
-import { app, ipcMain, BrowserWindow } from 'electron'
+import { app, ipcMain, nativeImage, BrowserWindow } from 'electron'
 import * as path from 'path'
 import { configDotenv } from '@boiling/utils'
 
 async function createWindow() {
   const mainWindow = new BrowserWindow({
-    icon: path.join(__dirname, '../static/favicon.ico'),
+    icon: nativeImage.createFromPath(path.join(__dirname, '../static/favicon.ico')),
     width: 1200,
     height: 800,
     minWidth: 940,
@@ -24,9 +24,10 @@ async function createWindow() {
       mode: 'detach'
     })
   } else {
-    await mainWindow.loadFile(
-      path.join(__dirname, '../static/index.html')
-    )
+    if (!process.env.PRODUCT_URL)
+      throw new Error('Not configured PRODUCT_URL.')
+
+    await mainWindow.loadURL(process.env.PRODUCT_URL)
   }
   ipcMain.on('window', (e, ...args) => {
     const [ action ] = args
