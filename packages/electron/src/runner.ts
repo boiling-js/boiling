@@ -5,6 +5,7 @@ import { configDotenv } from '@boiling/utils'
 async function createWindow() {
   const mainWindow = new BrowserWindow({
     icon: nativeImage.createFromPath(path.join(__dirname, '../static/favicon.ico')),
+    title: 'Boiling',
     width: 1200,
     height: 800,
     minWidth: 940,
@@ -28,6 +29,9 @@ async function createWindow() {
       throw new Error('Not configured PRODUCT_URL.')
 
     await mainWindow.loadURL(process.env.PRODUCT_URL)
+    mainWindow.webContents.openDevTools({
+      mode: 'detach'
+    })
   }
   ipcMain.on('window', (e, ...args) => {
     const [ action ] = args
