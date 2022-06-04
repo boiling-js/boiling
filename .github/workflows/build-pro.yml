@@ -32,6 +32,7 @@ jobs:
         run: yarn workspace @boiling/utils build
       - name: build win app
         run: yarn build:app -w
+      - run: dir ./packages/electron/releases
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
@@ -88,10 +89,8 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: frontend-pack-dist
-          path: ~/downloads
       - name: Untar frontend-pack-dist
-        run: mkdir dist && tar -xvf frontend-pack-dist.tar dist
-        working-directory: /home/runner/downloads
+        run: tar -xvf frontend-pack-dist.tar ./dist
       - name: rsync deployments
         uses: boiling-js/boiling/.github/actions/rsync@master
         with:
