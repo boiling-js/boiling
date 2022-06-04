@@ -4,7 +4,10 @@ import { configDotenv } from '@boiling/utils'
 
 configDotenv()
 
-export default defineConfig({
+export default defineConfig(env => ({
+  define: {
+    API_HOST: env.command === 'build' ? process.env.PRODUCT_URL : ''
+  },
   server: {
     port: Number(process.env.VITE_PORT) || 3000,
     proxy: {
@@ -17,4 +20,4 @@ export default defineConfig({
     }
   },
   plugins: [ vue() ]
-})
+}))
