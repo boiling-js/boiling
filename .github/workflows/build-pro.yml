@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: app-windows
-          path: ./packages/electron/release/boiling-${{ github.ref_name }}.msi
+          path: ./packages/electron/releases/boiling-${{ github.ref_name }}.msi
 
   build-mac-app:
     needs: [prepare-env]
@@ -57,7 +57,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: app-macos
-          path: ./packages/electron/release/boiling-${{ github.ref_name }}.dmg
+          path: ./packages/electron/releases/boiling-${{ github.ref_name }}.dmg
 
   package-frontend:
     needs: [prepare-env]
@@ -93,7 +93,7 @@ jobs:
           path: ~/downloads
       - name: Untar frontend-pack-dist
         run: mkdir dist && tar -xvf frontend-pack-dist.tar dist
-        working-directory: ~/downloads
+        working-directory: $HOME/downloads
       - name: rsync deployments
         uses: boiling-js/boiling/.github/actions/rsync@master
         with:
