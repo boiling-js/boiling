@@ -16,7 +16,7 @@ jobs:
         with:
           ref: ${{ github.ref }}
       - name: prepare enviroment
-        uses: boiling-js/boiling/.github/actions/prepare-env@${{ github.ref }}
+        uses: boiling-js/boiling/.github/actions/prepare-env@master
 
   package-frontend:
     needs: [prepare-env]
@@ -28,7 +28,7 @@ jobs:
         with:
           ref: ${{ github.ref }}
       - name: prepare enviroment
-        uses: boiling-js/boiling/.github/actions/prepare-env@${{ github.ref }}
+        uses: boiling-js/boiling/.github/actions/prepare-env@master
       - name: Build utils
         run: yarn @boiling/utils build
       - name: Build frontend
@@ -53,7 +53,7 @@ jobs:
       - name: Untar frontend-pack-dist
         run: tar -xvf frontend-pack-dist.tar ./dist
       - name: rsync deployments
-        uses: boiling-js/boiling/.github/actions/rsync@${{ github.ref }}
+        uses: boiling-js/boiling/.github/actions/rsync@master
         with:
           path: dist/
           remote-path: /www/dist/
