@@ -49,6 +49,7 @@ const
     }
   },
   init = () => {
+    messages.value = []
     getMessages()
 
     const element = content.value
