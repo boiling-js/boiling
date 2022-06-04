@@ -14,8 +14,7 @@
     "core": "yarn workspace @boiling/core",
     "b": "yarn workspace @boiling/backend",
     "f": "yarn workspace @boiling/frontend",
-    "cp-dist": "copyfiles -f packages/frontend/dist/* packages/electron/static",
-    "build:app": "yarn f build && yarn cp-dist && yarn workspace @boiling/electron build:app"
+    "build:app": "yarn f build && yarn workspace @boiling/electron build:app"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^15.0.0",

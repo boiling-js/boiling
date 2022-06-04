@@ -1,0 +1,40 @@
+name: 'Rsync Action'
+description: 'Upload directory by rsync.'
+author: 'YiJie'
+
+inputs:
+  user:
+    description: The remote server username
+    required: true
+  pem:
+    description: The remote server key
+    required: true
+  pem-type:
+    description: The remote server key type
+    required: true
+  host:
+    description: The remote server rsync host
+    required: true
+  path:
+    description: The local path
+    required: false
+    default: ''
+  remote-path:
+    description: The remote server rsync path
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - uses: boiling-js/boiling/.github/actions/gen-pem@master
+      with:
+        user: ${{ inputs.user }}
+        host: ${{ inputs.host }}
+        pem: ${{ inputs.pem }}
+        pem-type: ${{ inputs.pem-type }}
+    - shell: bash
+      env:
+        DSN: ${{ inputs.user }}@${{ inputs.host }}
+        LOCAL_PATH: ${{ github.workspace }}/${{ inputs.path }}
+      run: rsync -e "ssh -i k.pem" -av $LOCAL_PATH $DSN:${{ inputs.remote-path }}

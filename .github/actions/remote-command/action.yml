@@ -1,0 +1,37 @@
+name: 'Remote Command'
+description: 'Run remote command by ssh.'
+author: 'YiJie'
+
+inputs:
+  user:
+    description: The remote server username
+    required: true
+  pem:
+    description: The remote server key
+    required: true
+  pem-type:
+    description: The remote server key type
+    required: true
+  host:
+    description: The remote server rsync host
+    required: true
+  cmds:
+    description: Cmds that need to be run
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: boiling-js/boiling/.github/actions/gen-pem@master
+      with:
+        user: ${{ inputs.user }}
+        host: ${{ inputs.host }}
+        pem: ${{ inputs.pem }}
+        pem-type: ${{ inputs.pem-type }}
+    - shell: bash
+      env:
+        DSN: ${{ inputs.user }}@${{ inputs.host }}
+      run: |
+        ssh -i k.pem $DSN <<EOF
+        ${{ inputs.cmds }}
+        EOF
