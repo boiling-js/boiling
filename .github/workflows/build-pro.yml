@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${GITHUB_REF##*/}
       - name: prepare enviroment
         uses: boiling-js/boiling/.github/actions/prepare-env@${GITHUB_REF##*/}
 
@@ -23,6 +25,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${GITHUB_REF##*/}
       - name: prepare enviroment
         uses: boiling-js/boiling/.github/actions/prepare-env@${GITHUB_REF##*/}
       - name: Build utils
