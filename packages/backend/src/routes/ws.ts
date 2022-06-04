@@ -114,7 +114,7 @@ export const clientManager = {
       .map(async uid => {
         this.userSessions.set(
           Number(uid),
-          await Redis.client.lRange(`user:${uid}:sessions`, 0, -1)
+          await Redis.client.sMembers(`user:${uid}:sessions`)
         )
       })
   },
@@ -126,11 +126,11 @@ export const clientManager = {
     let sessions = this.userSessions.get(uid)
     if (!sessions) {
       sessions = [sessionId]
-      this.userSessions.set(uid, sessions)
     } else {
       sessions.push(sessionId)
     }
-    Redis.client.lPush(`user:${uid}:sessions`, sessionId)
+    this.userSessions.set(uid, [...new Set(sessions)])
+    Redis.client.sAdd(`user:${uid}:sessions`, sessionId)
   },
   removeClient(sessionId: string) {
     let uId: string | undefined
@@ -144,7 +144,7 @@ export const clientManager = {
         uId = userId.toString()
       }
     })
-    Redis.client.lRem(`user:${uId}:sessions`, 0, sessionId)
+    Redis.client.sRem(`user:${uId}:sessions`, sessionId)
     Redis.client.lPop(`session:${sessionId}:messages`)
   },
   clear() {
