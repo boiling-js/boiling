@@ -9,7 +9,7 @@ const options = {
   target: 'node14',
   platform: 'node',
   sourcemap: false,
-  external: [ '@boiling/utils' ],
+  external: [ '@boiling/utils', 'electron' ],
   define: {
     'process.env.PRODUCT_URL': JSON.stringify(process.env.PRODUCT_URL)
   }
