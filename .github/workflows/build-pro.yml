@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: app-windows
-          path: ./packages/electron/release/boiling-${{ github.ref }}.exe
+          path: ./packages/electron/release/boiling-${{ github.ref_name }}.exe
 
   build-mac-app:
     needs: [prepare-env]
@@ -57,7 +57,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: app-macos
-          path: ./packages/electron/release/boiling-${{ github.ref }}.dmg
+          path: ./packages/electron/release/boiling-${{ github.ref_name }}.dmg
 
   package-frontend:
     needs: [prepare-env]
