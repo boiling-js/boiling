@@ -16,10 +16,10 @@ async function createWindow() {
       preload: path.join(__dirname, 'preload.js')
     }
   })
-  if (!process.env.VITE_PORT) {
-    throw new Error('Not configured VITE_PORT.')
-  }
   if (process.env.NODE_ENV === 'development') {
+    if (!process.env.VITE_PORT)
+      throw new Error('Not configured VITE_PORT.')
+
     await mainWindow.loadURL(`http://127.0.0.1:${process.env.VITE_PORT}`)
     mainWindow.webContents.openDevTools({
       mode: 'detach'
@@ -29,9 +29,6 @@ async function createWindow() {
       throw new Error('Not configured PRODUCT_URL.')
 
     await mainWindow.loadURL(process.env.PRODUCT_URL)
-    mainWindow.webContents.openDevTools({
-      mode: 'detach'
-    })
   }
   ipcMain.on('window', (e, ...args) => {
     const [ action ] = args
@@ -59,7 +56,8 @@ async function main() {
   })
 }
 
-main().catch(() => {
+main().catch(e => {
+  console.error(e)
   console.error('Failed to start the application.')
   process.exit(1)
 })
