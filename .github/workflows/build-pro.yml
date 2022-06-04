@@ -30,7 +30,7 @@ jobs:
       - name: prepare enviroment
         uses: boiling-js/boiling/.github/actions/prepare-env@master
       - name: Build utils
-        run: yarn @boiling/utils build
+        run: yarn workspace @boiling/utils build
       - name: Build frontend
         run: yarn f build
       - name: Tar dist
