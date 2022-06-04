@@ -18,6 +18,20 @@ jobs:
       - name: prepare enviroment
         uses: boiling-js/boiling/.github/actions/prepare-env@master
 
+  build-win-app:
+    needs: [prepare-env]
+    runs-on: windows-latest
+    steps:
+      - name: prepare enviroment
+        uses: boiling-js/boiling/.github/actions/prepare-env@master
+      - name: build win app
+        run: yarn build:app -w
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-windows
+          path: ./packages/electron/release/boiling-${{ github.ref }}.exe
+
   package-frontend:
     needs: [prepare-env]
     name: Package Frontend
