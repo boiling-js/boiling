@@ -29,6 +29,8 @@ jobs:
           ref: ${{ github.ref }}
       - name: prepare enviroment
         uses: boiling-js/boiling/.github/actions/prepare-env@master
+      - name: Build utils
+        run: yarn workspace @boiling/utils build
       - name: build win app
         run: yarn build:app -w
       - name: Upload artifact
@@ -47,6 +49,8 @@ jobs:
           ref: ${{ github.ref }}
       - name: prepare enviroment
         uses: boiling-js/boiling/.github/actions/prepare-env@master
+      - name: Build utils
+        run: yarn workspace @boiling/utils build
       - name: build mac app
         run: yarn build:app -m
       - name: Upload artifact
