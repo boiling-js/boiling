@@ -1,0 +1,67 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Build development enviroment
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+jobs:
+  package-frontend:
+    name: Package Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.15.0
+      - name: Checkout
+        uses: actions/checkout@master
+        with:
+          repository: boiling-js/boiling
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Install dependencies
+        run: yarn
+      - name: Build dist
+        run: yarn f build
+      - name: Tar dist
+        run: tar -cvf frontend-pack-dist.tar ./packages/frontend/dist
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: frontend-pack-dist
+          path: frontend-pack-dist.tar
+
+  upload-frontend:
+    needs: [package-frontend]
+    name: Upload Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download a single artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: frontend-pack-dist
+      - name: Untar frontend-pack-dist
+        run: tar -xvf frontend-pack-dist.tar ./dist
+      - name: rsync deployments
+        uses: boiling-js/boiling/.github/actions/rsync@master
+        with:
+          path: dist/
+          remote-path: /www/dist/
+          host: ${{ secrets.PRO_HOST }}
+          user: developer
+          pem: ${{ secrets.PRO_PEM }}
+          pem-type: ssh-ed25519

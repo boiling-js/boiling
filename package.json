@@ -1,7 +1,7 @@
 {
   "private": true,
-  "name": "boiling",
-  "version": "1.0.0",
+  "name": "boiling-workspace",
+  "version": "0.1.0",
   "license": "MIT",
   "workspaces": [
     "packages/*"
