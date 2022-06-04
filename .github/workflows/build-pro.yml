@@ -12,6 +12,7 @@ jobs:
   prepare-env:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: prepare enviroment
         uses: boiling-js/boiling/.github/actions/prepare-env@master
 
@@ -21,6 +22,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v2
       - name: prepare enviroment
         uses: boiling-js/boiling/.github/actions/prepare-env@master
       - name: Build utils
