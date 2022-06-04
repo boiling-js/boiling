@@ -93,6 +93,9 @@ onMounted(async () => {
   const tempList = await api.user('@me')['chat-rooms']
   for (const chatRoom of tempList) {
     const { members } = chatRoom
+    if (members.length > 2)
+      continue
+
     const fId = members.find(member => member !== user.value.id)
     if (!fId) {
       ElMessage.error('聊天室数据异常')
