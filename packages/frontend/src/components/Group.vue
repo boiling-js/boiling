@@ -2,11 +2,11 @@
   <div class="group">
     <div
       class="avatar" :style="{
-        backgroundImage: `url(/api${group.avatar})`
+        backgroundImage: `url(${group.avatar})`
       }">
       <div
         class="avatar-shadow"
-        @click="$refs.avatar.show"
+        @click="$refs.uploader.open"
       >
         更换头像
       </div>
@@ -27,8 +27,9 @@
     </div>
     <configure-group ref="configureGroup"/>
   </div>
-  <avatar
-    ref="avatar"
+  <uploader-avatar
+    ref="uploader"
+    :avatar="group.avatar"
     @selAvatar="(selAvatar) => changeAvatar(selAvatar)"/>
 </template>
 
@@ -36,9 +37,9 @@
 import { defineEmits, defineProps } from 'vue'
 import { ChatRooms } from '@boiling/core'
 import ConfigureGroup from './ConfigureGroup.vue'
-import Avatar from './Avatar.vue'
 import { ElMessageBox } from 'element-plus'
 import { api } from '../api'
+import UploaderAvatar from './UploaderAvatar.vue'
 
 const
   props = defineProps({

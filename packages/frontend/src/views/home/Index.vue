@@ -4,7 +4,7 @@
       <div class="self-bar">
         <div class="avatar">
           <el-dropdown trigger="click">
-            <img width="48" :src="`/api/${ user.avatar }`" alt="">
+            <img width="48" height="48" :src="`${ user.avatar }`" alt="">
             <div :class="`dot ${status}`"/>
             <template #dropdown>
               <el-dropdown-menu>
@@ -29,13 +29,20 @@
         <section @click="$router.push('/home/groups')">讨论组</section>
         <div class="chats">
           <div class="title">
-            私信
+            最近聊天室
             <span class="add material-icons md-light"
                   @click="$refs.searchUser.show">add</span>
           </div>
           <template v-for="chatRoom in chatRooms" :key="chatRoom.id">
-            <div class="chat-room" @click="$router.push(`/home/chat-rooms/${ chatRoom.id }?title=${ chatRoom.name }`)">
-              <img class="avatar" :src="chatRoom.avatar" :alt="chatRoom.id">
+            <div class="chat-room" @click="() => {
+              const to = `/home/chat-rooms/${ chatRoom.id }?title=${ chatRoom.name }`
+              if ($route.path.startsWith('/home/chat-rooms')) {
+                $router.replace(to)
+              } else {
+                $router.push(to)
+              }
+            }">
+              <img class="avatar" :src="`${chatRoom.avatar}`" :alt="chatRoom.id">
               {{ chatRoom.name }}
             </div>
           </template>
@@ -53,43 +60,53 @@
 import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { ElTooltip, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem, ElMessageBox } from 'element-plus'
+import { ElTooltip, ElIcon, ElDropdown, ElDropdownMenu, ElDropdownItem, ElMessage, ElMessageBox } from 'element-plus'
 import { Tools } from '@element-plus/icons-vue'
-import { ChatRooms } from '@boiling/core'
+import { ChatRooms, Users } from '@boiling/core'
 import SearchUser from '../../components/SearchUser.vue'
 import { api } from '../../api'
+import { useWsClient } from '../../hooks/useWsClient'
 
 const
   store = useStore(),
   router = useRouter(),
+  [_, setWsClient] = useWsClient(),
   user = computed(() => store.state.user),
   status = computed(() => store.state.user.status),
   chatRooms = ref<ChatRooms.Model[]>([]),
   updateStatus = async (status: string) => {
     if (status === 'offline') {
-      await ElMessageBox.confirm(
-        '是否确认退出登录?',
-        '退出登录',
-        {
-          confirmButtonText: '确认',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      ).then(() => {
+      await ElMessageBox.confirm('是否确认退出登录?', '退出登录', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
         router.push('/login')
+        setWsClient(null)
+        store.commit('clear')
       }).catch()
     }
     await store.dispatch('updStatus', status)
   }
 
 onMounted(async () => {
-  chatRooms.value = (
-    await api['chat-rooms'].query({
-      key: `members:${ user.value.id }`,
-      num: 999,
-      page: 0
-    })
-  ).items
+  const tempList = await api.user('@me')['chat-rooms']
+  for (const chatRoom of tempList) {
+    const { members } = chatRoom
+    if (members.length > 2)
+      continue
+
+    const fId = members.find(member => member !== user.value.id)
+    if (!fId) {
+      ElMessage.error('聊天室数据异常')
+      continue
+    }
+    const f = store.state.user.friends.find((friend: Users.Friend) => friend.id === fId)
+    const u = await api.user(fId)
+    chatRoom.name = f?.remark || u.username
+    chatRoom.avatar = u.avatar
+  }
+  chatRooms.value = tempList
 })
 </script>
 
@@ -188,6 +205,7 @@ div.contain {
           column-gap: 5px;
           padding: 5px;
           font-size: 12px;
+          color: var(--color-text-regular);
           cursor: pointer;
           border-radius: 4px;
           transition: 0.3s;
@@ -197,7 +215,7 @@ div.contain {
           > img.avatar {
             width: 48px;
             height: 48px;
-            border-radius: 4px;
+            border-radius: 50%;
           }
         }
       }

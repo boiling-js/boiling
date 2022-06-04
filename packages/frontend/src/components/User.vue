@@ -4,7 +4,7 @@
     <div
       v-if="isMe"
       class="avatar is-me" :style="{
-        backgroundImage: `url(/api${info.avatar})`
+        backgroundImage: `url(${info.avatar})`
       }"
       @click="$refs.avatar.show()">
       <div class="avatar-shadow"> 更换头像 </div>
@@ -12,7 +12,7 @@
     <div
       v-else
       class="avatar" :style="{
-        backgroundImage: `url(/api${info.avatar})`
+        backgroundImage: `url(${info.avatar})`
       }"/>
     <div
       v-if="type === 'inline'"
@@ -67,17 +67,14 @@ const
   isMe = computed(() => store.state.user.id === props.info.id),
   getChatRoom = async () => {
     const members = [store.state.user.id, +props.info.id]
-    try {
-      return await api['chat-rooms'].query({
-        disableToast: true,
-        key: `members:${ members.join(',') }`
-      })
-    } catch (e) {
-      if (e instanceof Error && e.message.match(/^\[404-/)) {
-        return await api['chat-rooms'].add({ members })
-      } else
-        throw e
+    const { items: [ cr ] } = await api['chat-rooms'].query({
+      disableToast: true,
+      key: `members:${ members.join(',') }`
+    })
+    if (!cr) {
+      return await api['chat-rooms'].add({ members })
     }
+    return cr
   },
   changeAvatar = async (avatar: string) => {
     await ElMessageBox.confirm(

@@ -36,7 +36,7 @@ export namespace ChatRoomsService {
   export function exists(arg0: string | number[]): Promise<boolean>
   export function exists(arg0: string | number[]): Promise<boolean> {
     if (Array.isArray(arg0)) {
-      return Model.exists({ members: { $all: arg0 } })
+      return Model.exists({ members: arg0 })
     } else {
       return Model.exists({ _id: arg0 })
     }
@@ -68,7 +68,7 @@ export namespace ChatRoomsService {
     if (Array.isArray(arg0)) {
       return Model.findOne({ members: { $all: arg0 } })
     } else {
-      return Model.findOne({ id: arg0 })
+      return Model.findOne({ _id: arg0 })
     }
   }
   /**
@@ -77,7 +77,7 @@ export namespace ChatRoomsService {
    */
   export async function getOrThrow(arg0: string | number[]) {
     await existsOrThrow(arg0)
-    return get(arg0)
+    return get(arg0) as any as Exclude<Awaited<ReturnType<typeof get>>, null>
   }
   export function search(key: string) {
     const keywords = key.split(' ')
@@ -92,11 +92,19 @@ export namespace ChatRoomsService {
         names.push(keyword)
       }
     })
-    const filter: Parameters<typeof Model.find>[0] = {
-      name: { $regex: new RegExp(names.map(n => `(.*${ n }.*)`).join('|')) }
+    const filter: Parameters<typeof Model.find>[0] = {}
+    if (names.length > 0) {
+      filter.name = { $regex: new RegExp(names.map(n => `(.*${ n }.*)`).join('|')) }
     }
     if (members.length > 0) {
-      filter['members'] = { $in: members }
+      if (members.length === 2) {
+        filter.members = {
+          $all: members,
+          $size: 2
+        }
+      } else {
+        filter.members = { $in: members }
+      }
     }
     return Model.find(filter)
   }
@@ -106,7 +114,8 @@ export namespace ChatRoomsService {
    */
   export async function getGroups(uid: number) {
     return Model.find({
-      members: { $in: [ uid ], $not: { $size: 2 } }
+      members: { $in: [ uid ], $not: { $size: 2 } },
+      channelId: { $eq: null }
     })
   }
   /**
@@ -127,6 +136,7 @@ export namespace ChatRoomsService {
     await existsOrThrow(id)
     await Model.updateOne({ _id: id }, options)
   }
+
   export namespace Message {
     export const Model = MessageModel
     export type M = Pick<Messages.Model, 'content'>
@@ -136,8 +146,7 @@ export namespace ChatRoomsService {
      * 如果为聊天室的第一条消息，则在用户的聊天室列表中添加该聊天室
      */
     export async function create(chatRoomId: string, senderId: number, msg: string | M) {
-      if (!await ChatRoomsService.exists(chatRoomId))
-        throw new HttpError('NOT_FOUND', `id 为 '${ chatRoomId }' 的聊天室不存在`)
+      await ChatRoomsService.existsOrThrow(chatRoomId)
       const sender = await UsersService.getOrThrow(senderId)
       if (typeof msg === 'string') {
         msg = { content: msg }
@@ -216,6 +225,20 @@ export namespace ChatRoomsService {
       return Promise.all(
         (chatRoom?.members ?? []).map(id => UsersService.getOrThrow(id))
       )
+    }
+
+    /**
+     * 删除聊天室成员
+     * @param chatRoomId 聊天室id
+     * @param uId 成员id
+     */
+    export async function del(chatRoomId: string, uId: number) {
+      const chatRoom = await ChatRoomsService.getOrThrow(chatRoomId)
+      const i = chatRoom.members.indexOf(uId)
+      if (i === -1)
+        throw new HttpError('NOT_FOUND', `id 为 '${ uId }' 的用户不在聊天室 '${ chatRoomId }' 中`)
+      chatRoom.members.splice(i, 1)
+      return chatRoom.save()
     }
   }
 }

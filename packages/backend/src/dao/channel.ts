@@ -12,10 +12,11 @@ export const channelSchema = new Schema<Channels.Model>({
     id: { type: Number, required: true },
     name: { type: String }
   }],
-  subChannel: [{
-    subTitle: { type: String },
+  subChannels: [{
+    title: { type: String },
     chatRooms: [{
       id: { type: String, required: true },
+      title: { type: String },
       desc: { type: String }
     }]
   }],

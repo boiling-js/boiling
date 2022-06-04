@@ -2,29 +2,37 @@ import { createStore } from 'vuex'
 import { Users } from '@boiling/core'
 import CreatePersistedState from 'vuex-persistedstate'
 import { api } from './api'
+import { S_ID_KEY, S_NUM_KEY, S_TK_KEY } from './hooks/useWsClient'
 
 export interface State {
   sidebarVisiable: boolean
+  sidebarCrtlVisiable: boolean
   isHiddenLeftSelector: boolean
   user: Users.Out
+}
+
+const uDefault: State['user'] = {
+  id: 0,
+  username: '',
+  avatar: '',
+  tags: [],
+  friends: [],
+  status: 'online'
 }
 
 export default createStore<State>({
   state: {
     sidebarVisiable: false,
+    sidebarCrtlVisiable: false,
     isHiddenLeftSelector: false,
-    user: {
-      id: 0,
-      username: '',
-      avatar: '',
-      tags: [],
-      friends: [],
-      status: 'online'
-    }
+    user: uDefault
   },
   mutations: {
     toggleSidebarVisiable(state) {
       state.sidebarVisiable = !state.sidebarVisiable
+    },
+    setSidebarCrtlVisiable(state, isHidden) {
+      state.sidebarCrtlVisiable = isHidden
     },
     setLeftSelectorHidden(state, isHidden) {
       state.isHiddenLeftSelector = isHidden
@@ -54,6 +62,12 @@ export default createStore<State>({
     },
     update(state, user: Users.UpdateOut) {
       state.user = { ...state.user, ...user }
+    },
+    clear(state) {
+      state.user = uDefault
+      localStorage.removeItem(S_ID_KEY)
+      localStorage.removeItem(S_TK_KEY)
+      localStorage.removeItem(S_NUM_KEY)
     }
   },
   actions: {

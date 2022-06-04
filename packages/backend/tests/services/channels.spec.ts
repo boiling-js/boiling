@@ -3,6 +3,7 @@ import cap from 'chai-as-promised'
 import { ChannelsService } from '../../src/services/channels'
 import { Users } from '@boiling/core'
 import { UsersService } from '../../src/services/users'
+import { ChatRoomsService } from '../../src/services/chat-rooms'
 
 use(cap)
 
@@ -11,17 +12,20 @@ after(() => {
 })
 
 describe('Channels Service', () => {
-  let u0: Users.Base
+  let u0: Users.Base, u1: Users.Base, u2: Users.Base
   after(async () => {
     await UsersService.Model.deleteMany({})
   })
 
   before(async () => {
     u0 = await UsersService.add({ username: '001', passwordHash: '001', avatar: '001' })
+    u1 = await UsersService.add({ username: '002', passwordHash: '002', avatar: '002' })
+    u2 = await UsersService.add({ username: '003', passwordHash: '003', avatar: '003' })
   })
 
   afterEach(async () => {
     await ChannelsService.Model.deleteMany({})
+    await ChatRoomsService.Model.deleteMany({})
   })
   it('should create a channel', async () => {
     const channel = await ChannelsService.create(u0.id, { name: 'test', avatar: 'test', description: 'test' })
@@ -54,6 +58,33 @@ describe('Channels Service', () => {
   it('should add subChannel', async () => {
     const channel = await ChannelsService.create(u0.id, { name: 'test', avatar: 'test', description: 'test' })
     await ChannelsService.addSubChannel(channel.id, 'test subChannel')
-    expect((await ChannelsService.get(channel.id))?.subChannel[0].subTitle).to.equal('test subChannel')
+    expect((await ChannelsService.get(channel.id))?.subChannels[0].title).to.equal('test subChannel')
+  })
+  it('should add member for channel', async () => {
+    const channel = await ChannelsService.create(u0.id, { name: 'test', avatar: 'test', description: 'test' })
+    await ChannelsService.addMember(channel.id, [{
+      id: u1.id,
+      name: u1.username,
+      rules: ['admin']
+    },{
+      id: u2.id,
+      name: u2.username,
+      rules: ['admin']
+    }])
+    expect((await ChannelsService.get(channel.id))?.members[1].id).to.equal(u1.id)
+    expect((await ChannelsService.get(channel.id))?.members[2].id).to.equal(u2.id)
+  })
+  it('should add chatRoom for channel', async () => {
+    const channel = await ChannelsService.create(u0.id, { name: 'test', avatar: 'test', description: 'test' })
+    await ChannelsService.addSubChannel(channel.id, 'foo')
+    const chatRoom = await ChatRoomsService.create([u0.id, u1.id, u2.id], { name: 'test subChannel chatRoom' }, channel.id)
+    await ChannelsService.addChatRoom(channel.id, 'foo', chatRoom.id)
+    expect(await ChannelsService.get(channel.id))
+      .property('subChannels')
+      .property('0')
+      .property('chatRooms')
+      .property('0')
+      .property('id')
+      .to.equal(chatRoom.id)
   })
 })

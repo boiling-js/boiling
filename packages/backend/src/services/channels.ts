@@ -61,6 +61,19 @@ export namespace ChannelsService {
       ]
     })
   }
+
+  /**
+   * 通过用户id获取频道
+   */
+  export async function getByUserId(uid: number) {
+    return Model.find({
+      members: {
+        $elemMatch: {
+          id: uid
+        }
+      }
+    })
+  }
   /**
    * 删除解散频道
    */
@@ -78,8 +91,27 @@ export namespace ChannelsService {
   /**
    * 添加子频道
    */
-  export async function addSubChannel(id: string, subTitle: string) {
+  export async function addSubChannel(id: string, title: string) {
     await existsOrThrow(id)
-    await Model.updateOne({ _id: id }, { $push: { subChannel: { subTitle } } })
+    await Model.updateOne({ _id: id }, { $push: { subChannels: { title: title } } })
+  }
+  /**
+   * 为子频道添加聊天室
+   * */
+  export async function addChatRoom(id: string, title: string, chatRoomId: string, chatRoomTitle?: string, description?: string) {
+    const channel = await getOrThrow(id)
+    const subChannel = channel.subChannels.find(item => item.title === title)
+    if (!subChannel)
+      throw new HttpError('NOT_FOUND', `频道不存在标题为 ${ title } 的子频道`)
+    // @ts-ignore
+    subChannel.chatRooms?.push?.({ id: chatRoomId, title: chatRoomTitle, description })
+    await channel.save()
+  }
+  /**
+   * 添加成员
+   */
+  export async function addMember(id: string, members: Channels.MemberMeta[]) {
+    await existsOrThrow(id)
+    await Model.updateOne({ _id: id }, { $push: { members: { $each: members } } })
   }
 }

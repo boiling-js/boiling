@@ -18,10 +18,16 @@ async function createWindow() {
   if (!process.env.VITE_PORT) {
     throw new Error('Not configured VITE_PORT.')
   }
-  await mainWindow.loadURL(`http://127.0.0.1:${process.env.VITE_PORT}`)
-  mainWindow.webContents.openDevTools({
-    mode: 'detach'
-  })
+  if (process.env.NODE_ENV === 'development') {
+    await mainWindow.loadURL(`http://127.0.0.1:${process.env.VITE_PORT}`)
+    mainWindow.webContents.openDevTools({
+      mode: 'detach'
+    })
+  } else {
+    await mainWindow.loadFile(
+      path.join(__dirname, '../static/index.html')
+    )
+  }
   ipcMain.on('window', (e, ...args) => {
     const [ action ] = args
     switch (action) {

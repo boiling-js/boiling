@@ -13,13 +13,15 @@ export namespace Channels {
   export const ChatRoomMeta = Schema.interface({
     /** id */
     id: Schema.string(),
+    /** 群名 */
+    title: Schema.string().optional(),
     /** desc */
     desc: Schema.string().optional()
   })
   export type ChatRoomMeta = Schema.InferS<typeof ChatRoomMeta>
   export const SubChannelMeta = Schema.interface({
     /** 标题 */
-    subTitle: Schema.string(),
+    title: Schema.string(),
     /** 聊天室列表 */
     chatRooms: Schema.array(ChatRoomMeta).default([]).optional()
   })
@@ -34,7 +36,7 @@ export namespace Channels {
     /** 成员列表 */
     members: Schema.array(MemberMeta),
     /** 子频道 */
-    subChannel: Schema.array(SubChannelMeta),
+    subChannels: Schema.array(SubChannelMeta),
     /** 介绍信息 */
     description: Schema.string().optional(),
     /** 创建时间 */

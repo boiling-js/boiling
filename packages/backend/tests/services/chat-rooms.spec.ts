@@ -44,13 +44,13 @@ describe('ChatRooms Service', () => {
   })
   it('should get chat room by members or id.', async () => {
     const members = [u0.id, u1.id]
-    const { id } = await ChatRoomsService.create(members)
-    await expect(ChatRoomsService.get(id))
-      .to.be.eventually.have.property('id', id)
+    const { id: chatRoomId0 } = await ChatRoomsService.create(members)
+    await expect(ChatRoomsService.get(chatRoomId0))
+      .to.be.eventually.have.property('id', chatRoomId0)
     await expect(ChatRoomsService.get(members))
-      .to.be.eventually.have.property('id', id)
+      .to.be.eventually.have.property('id', chatRoomId0)
     await expect(ChatRoomsService.get(members.reverse()))
-      .to.be.eventually.have.property('id', id)
+      .to.be.eventually.have.property('id', chatRoomId0)
     await expect(ChatRoomsService.getOrThrow(members.concat(123)))
       .to.be.eventually.rejectedWith(`[404] members 为 [${ members.concat(123).join(', ') }] 的聊天室不存在`)
     await expect(ChatRoomsService.getOrThrow('623f1b13e11111f3c2debd48'))
@@ -77,8 +77,9 @@ describe('ChatRooms Service', () => {
     await expect(ChatRoomsService.del('623f1b13e11111f3c2debd48'))
       .to.be.eventually.be.rejectedWith('[404] id 为 \'623f1b13e11111f3c2debd48\' 的聊天室不存在')
   })
-  it('should search chat room by name or members.', async function () {
+  it('should search chat room by name or members.', async () => {
     await ChatRoomsService.create([ u0.id, u1.id ], { name: 'foo' })
+    await ChatRoomsService.create([ u0.id, u1.id, u2.id ], { name: 'vuo' })
     await ChatRoomsService.create([ u0.id, u2.id ], { name: 'fuu' })
     await ChatRoomsService.create([ u0.id, u3.id ], { name: 'bar' })
     await ChatRoomsService.create([ u1.id, u3.id ], { name: 'ber' })
@@ -96,7 +97,13 @@ describe('ChatRooms Service', () => {
     ).to.be.eq(3)
     expect(
       await ChatRoomsService.search(`members:${ u0.id }`).count()
-    ).to.be.eq(3)
+    ).to.be.eq(4)
+    expect(
+      await ChatRoomsService.search(`members:${ [ u0.id, u1.id ].join(',') }`).count()
+    ).to.be.eq(1)
+    expect(
+      await ChatRoomsService.search(`members:${ [ u1.id, u0.id ].join(',') }`).count()
+    ).to.be.eq(1)
   })
   it('should get groups by uid', async () => {
     await Promise.all([
@@ -138,7 +145,7 @@ describe('ChatRooms Service', () => {
       }
     })
     it('should search messages.', async () => {
-      const { id } = await ChatRoomsService.create([u0.id, u1.id])
+      const { id: chatRoomId0 } = await ChatRoomsService.create([ u0.id, u1.id ])
       const periods: [number, string][] = [
         [11, '2000-06-01T03:24:00.000Z'],
         [14, '2000-06-01T03:24:44.000Z'],
@@ -149,7 +156,7 @@ describe('ChatRooms Service', () => {
       ]
       const messages: Messages.Model[] = []
       const asyncFuncArr = [...Array(50).keys()].map(i =>
-        () => ChatRoomsService.Message.create(id, i % 4 ? u0.id : u1.id, `hello ${i}`)
+        () => ChatRoomsService.Message.create(chatRoomId0, i % 4 ? u0.id : u1.id, `hello ${i}`)
       )
       let prevI = 0
       for (const period in periods) {
@@ -160,31 +167,31 @@ describe('ChatRooms Service', () => {
         )
         prevI = i
       }
-      await expect(ChatRoomsService.Message.search(id))
+      await expect(ChatRoomsService.Message.search(chatRoomId0))
         .to.be.eventually.have.lengthOf(messages.length)
       await expect(
-        ChatRoomsService.Message.search(id, {
+        ChatRoomsService.Message.search(chatRoomId0, {
           period: [undefined, new Date(periods[1][1])]
         })
       ).to.be.eventually.have.lengthOf(periods[1][0])
       await expect(
-        ChatRoomsService.Message.search(id, {
+        ChatRoomsService.Message.search(chatRoomId0, {
           period: [new Date(periods[1][1]), undefined]
         })
       ).to.be.eventually.have.lengthOf(messages.length - periods[0][0])
       await expect(
-        ChatRoomsService.Message.search(id, {
+        ChatRoomsService.Message.search(chatRoomId0, {
           period: [new Date(periods[1][1]), new Date(periods[2][1])]
         })
       ).to.be.eventually.have.lengthOf(periods[2][0] - periods[0][0])
       await expect(
-        ChatRoomsService.Message.search(id, { senderId: u0.id })
+        ChatRoomsService.Message.search(chatRoomId0, { senderId: u0.id })
       ).to.be.eventually.have.lengthOf(messages.filter(m => m.sender.id === u0.id).length)
       await expect(
-        ChatRoomsService.Message.search(id, { senderId: u1.id })
+        ChatRoomsService.Message.search(chatRoomId0, { senderId: u1.id })
       ).to.be.eventually.have.lengthOf(messages.filter(m => m.sender.id === u1.id).length)
       await expect(
-        ChatRoomsService.Message.search(id, {
+        ChatRoomsService.Message.search(chatRoomId0, {
           senderId: u0.id,
           period: [new Date(periods[1][1]), new Date(periods[2][1])]
         })
@@ -192,6 +199,21 @@ describe('ChatRooms Service', () => {
       await expect(
         ChatRoomsService.Message.search('623f1b13e11111f3c2debd48')
       ).to.be.eventually.have.lengthOf(0)
+    })
+    it('should search target chatroom messages.', async () => {
+      const { id: chatRoomId0 } = await ChatRoomsService.create([ u0.id, u1.id ])
+      const { id: chatRoomId1 } = await ChatRoomsService.create([ u0.id, u2.id ])
+      const { id: chatRoomId2 } = await ChatRoomsService.create([ u1.id, u2.id ])
+      await ChatRoomsService.Message.create(chatRoomId0, u0.id, '0 room message 0.')
+      await ChatRoomsService.Message.create(chatRoomId0, u1.id, '0 room message 1.')
+      await ChatRoomsService.Message.create(chatRoomId1, u0.id, '1 room message.')
+      await ChatRoomsService.Message.create(chatRoomId2, u1.id, '2 room message.')
+      await expect(ChatRoomsService.Message.search(chatRoomId0).count())
+        .to.be.eventually.eq(2)
+      await expect(ChatRoomsService.Message.search(chatRoomId1).count())
+        .to.be.eventually.eq(1)
+      await expect(ChatRoomsService.Message.search(chatRoomId2).count())
+        .to.be.eventually.eq(1)
     })
     it('should delete message by id', async () => {
       const { id } = await ChatRoomsService.create([u0.id, u1.id])

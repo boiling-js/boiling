@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.pro.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "sourceMap": false,
+    "declaration": false
+  },
+  "include": ["src/**/*.ts"]
+}

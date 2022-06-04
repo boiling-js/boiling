@@ -2,7 +2,7 @@
   <div class="message">
     <img class="avatar"
          :alt="`@${modelValue.sender.username}`"
-         :src="`/api/${modelValue.sender.avatar}`">
+         :src="`${modelValue.sender.avatar}`">
     <div class="content">
       <div class="title">
         <span class="uname">{{ modelValue.sender.username }}</span>
@@ -82,7 +82,7 @@ div.message {
       }
       :deep(img) {
         margin-top: 10px;
-        max-width: 360px;
+        max-width: 80%;
         &:not(:last-child) {
           margin-bottom: 10px;
         }

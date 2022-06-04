@@ -64,8 +64,24 @@ export const router = new Router({
   /**
    * 添加子频道
    */
-  .post(Schema.Pick(Channels.SubChannelMeta, ['subTitle']), Schema.any(), '/:channelId/subChannel', async ctx => {
+  .post(Schema.Pick(Channels.SubChannelMeta, ['title']), Schema.any(), '/:channelId/subChannels', async ctx => {
     const { channelId } = ctx.params
-    const { subTitle } = ctx.request.body
-    return ChannelsService.addSubChannel(channelId, subTitle)
+    const { title } = ctx.request.body
+    return ChannelsService.addSubChannel(channelId, title)
+  })
+  /**
+   * 添加成员
+   */
+  .post('/:channelId/members', async ctx => {
+    const { channelId } = ctx.params
+    const { members } = ctx.request.body
+    return ChannelsService.addMember(channelId, members)
+  })
+  /**
+   * 添加聊天室
+   */
+  .post('/:channelId/chatRooms/:chatRoomId', async ctx => {
+    const { channelId, chatRoomId } = ctx.params
+    const { title, chatRoomTitle, description } = ctx.request.body
+    return ChannelsService.addChatRoom(channelId, title, chatRoomId, chatRoomTitle, description)
   })

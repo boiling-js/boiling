@@ -1,6 +1,9 @@
-import { Server } from 'ws'
+import { createClient } from 'redis'
 import { createHash } from 'crypto'
 import { SeqModel } from './dao/seq'
+import { App } from 'koa-websocket'
+import DAOMain from './dao'
+import { clientManager } from './routes/ws'
 
 namespace Utils {
   export namespace Security {
@@ -12,11 +15,41 @@ namespace Utils {
       return encrypt(waitMatch) === origin
     }
   }
-  export namespace WS {
-    export let s: Server | null = null
-    export function register(ns: Server) {
-      s = ns
+  export namespace Redis {
+    export const client = createClient({
+      url: 'redis://127.0.0.1:6379',
+      database: 5
+    })
+    export async function init() {
+      client.once('error', console.error)
+      await client.connect()
+      client.removeListener('error', console.error)
     }
+  }
+  export function initApp(app: App) {
+    app.keys = ['hker92hjkugfkerbl.e[gewkg68']
+    const {
+      BACKEND_PORT: PORT = '8080',
+      BACKEND_HOST: HOST = 'localhost'
+    } = process.env
+    return new Promise<{
+      HOST: string
+      PORT: string
+      server: ReturnType<typeof app.listen>
+    }>((resolve, reject) => {
+      const server = app.listen(+PORT, HOST, async () => {
+        // connect mongodb database
+        try {
+          await DAOMain()
+          await Redis.init()
+          await clientManager.initFromRedis()
+        } catch (e) {
+          reject(e)
+        }
+        console.log(`server is running on http://${ HOST }:${ PORT }`)
+        resolve({ HOST, PORT, server })
+      })
+    })
   }
   export namespace Seq {
     export async function auto(n: string, initIndent = 0, step = 1) {

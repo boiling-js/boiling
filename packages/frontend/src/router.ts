@@ -25,13 +25,6 @@ const router = createRouter({
         id: route.params.id,
         title: route.query.title
       })
-    }, {
-      path: '/home/channel/:id',
-      component: () => import('./views/Channel.vue'),
-      props: route => ({
-        id: route.params.id,
-        title: route.query.title
-      })
     }]
   }, {
     path: '/login',
@@ -45,15 +38,36 @@ const router = createRouter({
     path: '/theme',
     component: () => import('./views/Theme.vue')
   }, {
+    name: 'channel',
+    path: '/channel/:id',
+    props: true,
+    component: () => import('./views/Channel.vue')
+  }, {
+    path: '/edit-personnel',
+    component: () => import('./views/EditPersonnel.vue')
+  }, {
+    path: '/create-channel',
+    component: () => import('./views/CreateChannel.vue'),
+    props: route => ({
+      type: route.query.type,
+      info: route.query.info
+    })
+  }, {
+    path: '/search-channel',
+    component: () => import('./components/SearchChannel.vue')
+  },{
+    path: '/create-chatRoom',
+    component: () => import('./views/CreateChatRoom.vue'),
+    props: route => ({
+      type: route.query.type,
+      info: route.query.info,
+      channelId: route.query.channelId,
+      channelTitle: route.query.channelTitle
+    })
+  }, {
     path: '/:pathMatch(.*)*',
     component: () => import('element-plus').then(({ ElEmpty }) => ElEmpty),
     props: { description: '访问到了不存在的页面' }
-  }, {
-    path: '/edit-personnel',
-    component: () => import('./components/EditPersonnel.vue')
-  }, {
-    path: '/create-channel',
-    component: () => import('./components/CreateChannel.vue')
   }]
 })
 

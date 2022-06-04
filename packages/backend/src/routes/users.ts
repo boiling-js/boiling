@@ -8,6 +8,7 @@ import extendService from '../hooks/extendService'
 import useTarget from '../hooks/useTarget'
 import useCurUser from '../hooks/useCurUser'
 import { ChatRoomsService } from '../services/chat-rooms'
+import { ChannelsService } from '../services/channels'
 
 declare module '@boiling/core' {
   interface PathParams {
@@ -32,7 +33,7 @@ export const router = new Router({
     const user = await UsersService.add({
       username,
       passwordHash: Security.encrypt(password),
-      avatar: `/img/avatar/${ Math.floor(Math.random() * 10) }.jpg`
+      avatar: `/api/img/avatar/${ Math.floor(Math.random() * 10) }.jpg`
     })
     return { id: user.id, username: user.username, avatar: user.avatar }
   })
@@ -41,10 +42,10 @@ export const router = new Router({
       extendService(UsersService, 'search', m => m.find({
         id: { $ne: useCurUser(ctx.session).id }
       })), ctx.query
-    )(ctx.query.key)
+    )(decodeURI(ctx.query.key))
   })
-  .get('/:id(number)', async ctx => {
-    return UsersService.get(ctx.params.id)
+  .get(Users.BaseOut, '/:id(number)', async ctx => {
+    return UsersService.getOrThrow(ctx.params.id)
   })
   .post(Users.Login, Users.Out.or(Schema.any()), '/:id(number)/status', async ctx => {
     const { status, password } = ctx.request.body
@@ -103,8 +104,9 @@ export const router = new Router({
       throw new HttpError('BAD_REQUEST', '标签不能为空')
     return UsersService.addTag(useTarget(ctx.session, ctx.params.id), tag)
   })
-  .get('/:id(number)/channels', async ctx => {
-    return ctx
+  /** 获取用户频道 */
+  .get('/:id(uid)/channels', async ctx => {
+    return ChannelsService.getByUserId(useTarget(ctx.session, ctx.params.id))
   })
   .del('/:id(number)/channels/:cid', async ctx => {
     console.log(ctx.params)
@@ -129,6 +131,13 @@ export const router = new Router({
   /** 获取用户讨论组 */
   .get('/:id(uid)/groups', ctx => {
     return ChatRoomsService.getGroups(useTarget(ctx.session, ctx.params.id))
+  })
+  /**
+   * 获取用户最近聊天室
+   * 不去获取频道内的聊天室
+   */
+  .get('/:id(uid)/chat-rooms', ctx => {
+    return ChatRoomsService.search(`members:${ useTarget(ctx.session, ctx.params.id) }`)
   })
   /** 更改密码 */
   .patch('/:id(uid)/password', ctx => {

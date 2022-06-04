@@ -67,11 +67,16 @@ export namespace UsersService {
     return m
   }
   export function search(key: string) {
-    return Model.find({ username: new RegExp(`${key}.*`) })
+    const id = Number(key)
+    return Model.find({
+      $or: [
+        { username: new RegExp(`${key}.*`) }
+      ].concat(isNaN(id) ? [] : [{ id } as any])
+    })
   }
   export async function getAvatars() {
     return (await fs.readdir('./static/img/avatar'))
-      .map(f => `/img/avatar/${f}`)
+      .map(f => `/api/img/avatar/${f}`)
   }
   export async function update(id: number, base: Partial<Users.UpdateOut>) {
     const user = await UsersService.getOrThrow(id)
@@ -111,7 +116,11 @@ export namespace UsersService {
         tags: [],
         remark: ''
       }, opts) })
-      await Promise.all([user.save(), ChatRoomsService.create([user.id, fUid])])
+      friend.friends.push({ id: uid, ...Object.assign(<Required<Opts>>{
+          tags: [],
+          remark: ''
+        }) })
+      await Promise.all([user.save(), friend.save(), ChatRoomsService.create([user.id, fUid])])
     }
     export async function del(uid: number, fUid: number) {
       const [ user, friend ] = await Promise.all([UsersService.getOrThrow(uid), UsersService.getOrThrow(fUid)])

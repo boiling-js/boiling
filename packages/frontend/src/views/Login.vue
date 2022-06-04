@@ -11,7 +11,10 @@
                   placeholder="请输入密码"
                   show-password
                   @keydown.enter="$refs.loginBtn.$el.click()"/>
-        <div class="bottom-word">记住密码</div>
+        <el-checkbox
+          v-model="rememberPWD"
+          label="记住密码"
+          size="small"/>
       </div>
       <el-button ref="loginBtn" type="primary" @click="login()
         .then(() => {
@@ -28,8 +31,8 @@
 
 <script lang="ts" setup>
 import { useStore } from 'vuex'
-import { onMounted, onUnmounted, reactive } from 'vue'
-import { ElInput, ElButton } from 'element-plus'
+import { onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { ElInput, ElButton, ElCheckbox } from 'element-plus'
 import { Users } from '@boiling/core'
 import { api } from '../api'
 import { identifyWS, useWsClient } from '../hooks/useWsClient'
@@ -40,20 +43,33 @@ type Account = Users.Login & {
 
 const
   store = useStore(),
+  rememberPWD = ref<Boolean>(false),
   account = reactive<Account>({
     id: import.meta.env.VITE_LOGIN_UID || '',
     status: 'online',
     password: import.meta.env.VITE_LOGIN_PWD || ''
   }),
   login = async () => {
-    const { id, ...status } = account,
+    const
+      { id, ...status } = account,
       [wsClient] = useWsClient()
-    identifyWS(wsClient, id, account.password)
+
+    localStorage.setItem('VITE_LOGIN_UID', id)
+    localStorage.setItem('VITE_LOGIN_PWD', btoa(account.password))
+    identifyWS(wsClient, `Basic ${ btoa(id + ':' + account.password) }`)
     store.commit('setUser', await api.user(+id).status.add(status))
   }
 
 onMounted(() => {
   store.commit('setLeftSelectorHidden', true)
+  if (localStorage.getItem('VITE_LOGIN_REMEMBER') === 'true') {
+    rememberPWD.value = true
+    account.id = localStorage.getItem('VITE_LOGIN_UID') || ''
+    account.password = atob(localStorage.getItem('VITE_LOGIN_PWD') || '')
+  }
+})
+watch(rememberPWD, (val) => {
+  localStorage.setItem('VITE_LOGIN_REMEMBER', val ? 'true' : 'false')
 })
 onUnmounted(() => {
   store.commit('toggleLeftSelector')

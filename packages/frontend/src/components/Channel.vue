@@ -3,14 +3,7 @@
     <div
       class="avatar" :style="{
         backgroundImage: `url(${channel.avatar})`
-      }">
-      <div
-        class="avatar-shadow"
-        @click="() => {}"
-      >
-        更换头像
-      </div>
-    </div>
+      }"/>
     <div class="info">
       {{ props.channel.name }}
     </div>
@@ -18,12 +11,23 @@
       class="operates">
       <span class="material-icons"
             @click="$router.push(
-              `/home/channel/${ channel.id }?title=${ channel.name }`
+              `/channel/${ channel.id }?title=${ channel.name }`
             )">
         chat_bubble_outline
       </span>
       <span class="material-icons"
-            @click="() => {}">settings</span>
+            @click="() => $router.push({
+              path: '/create-channel',
+              query: {
+                type: 'setting',
+                info: JSON.stringify({
+                  id: channel.id,
+                  name: channel.name,
+                  avatar: channel.avatar,
+                  description: channel.description,
+                })
+              }
+            })">settings</span>
     </div>
   </div>
 </template>
@@ -65,18 +69,8 @@ const
     height: var(--size);
     line-height: var(--size);
     text-align: center;
-    cursor: pointer;
     background-size: cover;
     border-radius: 50%;
-    > div.avatar-shadow {
-      position: absolute;
-      width: var(--size);
-      height: var(--size);
-      font-size: 11px;
-      background-color: #151414;
-      border-radius: 50%;
-      opacity: 0;
-    }
     &:hover {
       > div.avatar-shadow {
         opacity: 0.8;

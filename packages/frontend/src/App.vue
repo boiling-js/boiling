@@ -3,10 +3,13 @@
   <div v-if="isLoading" class="container">
     <panel-selector v-if="isHiddenLeftSelector" class="l"/>
     <router-view v-slot="{ Component }">
-      <transition name="el-fade-in-linear">
-        <component :is="Component" class="r"/>
-      </transition>
+      <component :is="Component" class="r"/>
     </router-view>
+    <!--
+    <transition name="el-fade-in-linear">
+      <component :is="Component" class="r"/>
+    </transition>
+    -->
   </div>
   <div v-else class="container loading">
     <boiling/>
@@ -19,6 +22,7 @@ import { useStore } from 'vuex'
 import PanelSelector from './components/PanelSelector.vue'
 import TitleBar from './components/TitleBar.vue'
 import Boiling from './components/Boiling.vue'
+import { identifyWS, S_ID_KEY, S_TK_KEY, useWsClient } from './hooks/useWsClient'
 
 const
   store = useStore(),
@@ -29,16 +33,46 @@ onMounted(() => {
   setTimeout(() => {
     isLoading.value = true
   }, process.env.NODE_ENV === 'development' ? 1000 : 4000)
+  const tk = localStorage.getItem(S_TK_KEY)
+  if (tk && localStorage.getItem(S_ID_KEY)) {
+    const [ws] = useWsClient()
+    identifyWS(ws, tk, { resume: true })
+  }
 })
 </script>
 
 <style lang="scss">
 html, body { margin: 0; }
-#app {
+body {
   /* stylelint-disable length-zero-no-unit */
   --title-bar-height: 0px;
   /* stylelint-enable length-zero-no-unit */
-
+  &.is-desktop {
+    --title-bar-height: 26px;
+    #app {
+      margin: 5px;
+      height: calc(100vh - 10px);
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgb(0 0 0 / 80%);
+      div.title-bar {
+        display: flex;
+      }
+    }
+    &.Darwin #app {
+      margin: 0;
+      height: 100vh;
+      > div.title-bar {
+        > div.name {
+          justify-content: center;
+        }
+        > div.opts {
+          display: none;
+        }
+      }
+    }
+  }
+}
+#app {
   display: flex;
   height: 100vh;
   overflow: hidden;
@@ -48,17 +82,6 @@ html, body { margin: 0; }
   justify-content: space-between;
   div.title-bar {
     display: none;
-  }
-  &.is-desktop {
-    --title-bar-height: 26px;
-
-    margin: 5px;
-    height: calc(100vh - 10px);
-    border-radius: 6px;
-    box-shadow: 0 0 5px rgb(0 0 0 / 80%);
-    div.title-bar {
-      display: flex;
-    }
   }
 }
 </style>

@@ -3,16 +3,16 @@ import Koa from 'koa'
 import websockify from 'koa-websocket'
 import { expect } from 'chai'
 import { Messages, WsClient, resolveMessage } from '@boiling/core'
-import { router as WSRouter, clients } from '../src/routes/ws'
-import DAOMain from '../src/dao'
+import { router as WSRouter, clientManager } from '../src/routes/ws'
 import { UserModel } from '../src/dao/user'
-import { Security } from '../src/utils'
+import { initApp, Security } from '../src/utils'
 
 process.env.HEARTBEAT_INTERVAL = '5000'
 
 after(() => process.exit(0))
 
 describe('WS', function () {
+  this.timeout((process.env?.HEARTBEAT_INTERVAL ?? '20000') + 500)
   const users = <Record<string, [InstanceType<typeof UserModel>, string]>>{
     default: [new UserModel({
       id: 1001,
@@ -21,24 +21,22 @@ describe('WS', function () {
       passwordHash: Security.encrypt('default')
     }), `Basic ${ Buffer.from('1001:default').toString('base64')}`]
   }
-  const {
-    PORT = '19849',
-    HOST = '127.0.0.1'
-  } = {}
+  let PORT = '', HOST = ''
   const app = websockify(new Koa())
-  app.keys = ['any']
   app.ws.use(WSRouter)
 
   after(async () => {
     await UserModel.deleteMany()
   })
-  before(() => new Promise<void>((resolve, reject) => {
-    app.listen(+PORT, HOST, () =>
-      DAOMain().then(resolve).catch(reject)
-    )
-  }).then(async () => {
+  before(async () => {
+    const { PORT: p, HOST: h } = await initApp(app)
+    PORT = p
+    HOST = h
     await users.default[0].save()
-  }))
+  })
+  afterEach(() => {
+    clientManager.clear()
+  })
 
   const identifyAndHeartbeat = async (wsClient: WsClient) => {
     const m1 = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.HELLO])
@@ -53,8 +51,9 @@ describe('WS', function () {
     })
     const m2 = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.DISPATCH])
     expect(m2.op).to.equal(Messages.Opcodes.DISPATCH)
+    expect(m2.s).to.equal(1)
     expect(m2.t).to.equal('READY')
-    expect(m2.d).property('user').to.deep.equal({
+    expect(m2.d).property('user').to.deep.include({
       id: 1001,
       username: 'default',
       avatar: 'default',
@@ -66,11 +65,14 @@ describe('WS', function () {
         op: Messages.Opcodes.HEARTBEAT
       })
     }, heartbeatInterval)
+    return {
+      hello: m1,
+      ready: m2
+    }
   }
 
   it('should connect ws server.', async function () {
-    this.timeout((process.env?.HEARTBEAT_INTERVAL ?? '20000') + 500)
-    const wsClient = new WsClient(new WebSocket(`ws://${ HOST }:${ PORT }/ws`))
+    const wsClient = new WsClient(new Websocket(`ws://${ HOST }:${ PORT }/ws`) as any)
     await identifyAndHeartbeat(wsClient)
 
     let c = 0
@@ -83,16 +85,12 @@ describe('WS', function () {
     }
   })
   it('should connect ws server and receive messages.', async function () {
-    this.timeout((process.env?.HEARTBEAT_INTERVAL ?? '20000') + 500)
-    const wsClient = new WsClient(new WebSocket(`ws://${ HOST }:${ PORT }/ws`))
+    const wsClient = new WsClient(new Websocket(`ws://${ HOST }:${ PORT }/ws`) as any)
     await identifyAndHeartbeat(wsClient)
 
-    // 模拟前端请求了发消息接口后，后端找到对应用户并将消息推送给这个连接上的用户
-    // post http://server:port/chat-rooms/[时间戳]:1001:1002/messages { content: 'hello', ... }
-    // 后端把这个消息储存到数据库中，再在在线用户列表中找到这个用户把消息发送给他
-    clients.get(1001)?.dispatch('MESSAGE', {
-      content: 'hello'
-    })
+    await Promise.all(clientManager.proxyTo(1001)?.map(c => {
+      return c?.dispatch('MESSAGE', { content: 'hello' })
+    }) ?? [])
     for await (const _ of wsClient.waitMessage()) {
       const m = resolveMessage(_, [
         Messages.Opcodes.HEARTBEAT_ACK,
@@ -111,6 +109,99 @@ describe('WS', function () {
           }
           break
       }
+    }
+  })
+  it('should remove client from clients when it close.', async () => {
+    const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
+    const wsClient = new WsClient(ws as any)
+    await identifyAndHeartbeat(wsClient)
+    expect(clientManager.proxyTo(1001)).to.have.lengthOf(1)
+    ws.close(3001)
+    await new Promise(resolve => setTimeout(resolve, 100))
+    expect(clientManager.proxyTo(1001)).to.have.lengthOf(0)
+  })
+  it('should not remove client from clients.', async () => {
+    const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
+    const wsClient = new WsClient(ws as any)
+    await identifyAndHeartbeat(wsClient)
+    expect(clientManager.proxyTo(1001)).to.have.lengthOf(1)
+    ws.close(3000, 'Debug:resume')
+    await new Promise(resolve => setTimeout(resolve, 100))
+    expect(clientManager.proxyTo(1001)).to.have.lengthOf(1)
+  })
+  it('should resume client.', async () => {
+    const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
+    const wsClient = new WsClient(ws as any)
+    const { ready } = await identifyAndHeartbeat(wsClient)
+    if (ready.t !== 'READY')
+      throw new Error('not ready')
+
+    ws.close(3000, 'Debug:resume')
+    await new Promise(resolve => setTimeout(resolve, 100))
+    const sessions = clientManager.proxyTo(1001)
+    if (!sessions)
+      throw new Error('client not found')
+
+    try {
+      await Promise.all(sessions.map(
+        c => c?.dispatch('MESSAGE', { content: 'hi hi hi0' })
+      ).concat(sessions.map(
+        c => c?.dispatch('MESSAGE', { content: 'hi hi hi1' })
+      )).concat(sessions.map(
+        c => c?.dispatch('MESSAGE', { content: 'hi hi hi2' })
+      )).concat(sessions.map(
+        c => c?.dispatch('MESSAGE', { content: 'hi hi hi3' })
+      )))
+    } catch (e) {
+      const c = clientManager.proxyTo(1001)?.[0]
+      expect(await c?.messages(0))
+        .to.have.lengthOf(4)
+      expect(await c?.messages(1))
+        .to.have.lengthOf(3)
+    }
+    const resumeConnect = async () => {
+      const ws = new Websocket(`ws://${ HOST }:${ PORT }/ws`)
+      const wsClient = new WsClient(ws as any)
+
+      const m1 = await wsClient.waitOnceMessage().resolve([Messages.Opcodes.HELLO])
+      expect(m1.op).to.equal(Messages.Opcodes.HELLO)
+      const heartbeatInterval = m1.d.heartbeatInterval
+
+      wsClient.send({
+        op: Messages.Opcodes.RESUME,
+        d: {
+          token: users.default[1],
+          sessionId: ready.d.sessionId,
+          s: 0
+        }
+      })
+
+      setInterval(() => {
+        wsClient.send({
+          op: Messages.Opcodes.HEARTBEAT
+        })
+      }, heartbeatInterval)
+      let acturalContents = ''
+      for await (const _ of wsClient.waitMessage()) {
+        const m = resolveMessage(_, [
+          Messages.Opcodes.HEARTBEAT_ACK,
+          Messages.Opcodes.DISPATCH
+        ])
+        if (m.op === Messages.Opcodes.DISPATCH) {
+          if (m.t === 'MESSAGE') {
+            acturalContents += m.d.content
+          }
+          if (m.t === 'RESUMED') {
+            break
+          }
+        }
+      }
+      expect(acturalContents)
+        .to.deep.equal('hi hi hi0hi hi hi1hi hi hi2hi hi hi3')
+    }
+    await resumeConnect()
+    if (ready.t === 'READY') {
+      clientManager.removeClient(ready.d.sessionId)
     }
   })
   it('should connect ws server and throw `BAD_REQUEST` error.', function (done) {
@@ -169,6 +260,9 @@ describe('WS', function () {
           expect(code).to.be.eq(4408)
           expect(msg.toString())
             .to.be.eq('超时未发送心跳包')
+
+          expect(clientManager.proxyTo(1001), 'client should be removed')
+            .to.have.lengthOf(0)
           resolve()
         } catch (e) {
           reject(e)
@@ -210,7 +304,7 @@ describe('WS', function () {
             >>JSON.parse(d.toString())
           expect(m.op).to.equal(Messages.Opcodes.DISPATCH)
           expect(m.t).to.equal('READY')
-          expect(m.d).property('user').to.deep.equal({
+          expect(m.d).property('user').to.deep.include({
             id: 1001,
             username: 'default',
             avatar: 'default',

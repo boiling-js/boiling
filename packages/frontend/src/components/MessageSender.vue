@@ -30,9 +30,14 @@
         <span class="material-icons"
               @click="() => addFile('image')"
               v-text="'image'"/>
-        <span class="material-icons" v-text="'gif_box'"/>
-        <span class="material-icons" v-text="'upload_file'"/>
-        <span class="material-icons" v-text="'code'"/>
+        <!-- TODO send file -->
+        <!--<span class="material-icons"
+              @click="() => addFile('image/gif')"
+              v-text="'gif_box'"/>
+        <span class="material-icons"
+              @click="() => addFile('unknown')"
+              v-text="'upload_file'"/>-->
+        <!--<span class="material-icons" v-text="'code'"/>-->
       </div>
       <el-tooltip content="CTRL + Enter" placement="top">
         <el-button class="send"

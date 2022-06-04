@@ -29,7 +29,12 @@
   ),
   $fill-color: (
     "blank": #202225,
-  )
+  ),
+  $bg-color: (
+    '': #202225,
+    'page': #282c34,
+    'overlay': #2c313a,
+  ),
 );
 
 @use "element-plus/theme-chalk/src/index.scss" as *;
@@ -41,21 +46,31 @@
 .el-icon {
   font-size: var(--font-size);
 }
-.el-overlay {
-  top: 31px;
-  right: 5px;
-  bottom: 5px;
-  left: 5px;
-  height: calc(100% - 36px);
-  background-color: rgb(0 0 0 / 80%);
-  border-radius: 0 0 6px 6px;
-}
-.el-overlay-dialog {
-  top: 31px;
-  right: 5px;
-  bottom: 5px;
-  left: 5px;
-}
 .el-message-box {
   width: 300px;
+}
+body {
+  .el-overlay {
+    background-color: rgb(0 0 0 / 80%);
+    border-radius: 0 0 6px 6px;
+  }
+  &.is-desktop {
+    .el-overlay, .el-overlay-dialog {
+      top: 31px;
+      right: 5px;
+      bottom: 5px;
+      left: 5px;
+      height: calc(100% - 36px);
+    }
+    &.Darwin {
+      .el-overlay, .el-overlay-dialog {
+        top: 26px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: calc(100% - 26px);
+        border-radius: 0;
+      }
+    }
+  }
 }

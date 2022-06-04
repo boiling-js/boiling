@@ -12,8 +12,9 @@
         placeholder="请输入ID/用户名/关键字"
         :suffix-icon="Search"
         @keydown.enter="refresh"/>
-      <div
-        class="search-friend">
+      <div class="search-friend">
+        <el-empty v-if="users.items.length === 0"
+                  description="暂无搜索结果"/>
         <user v-for="user in users.items" :key="user.id"
               :info="user"/>
       </div>
@@ -30,7 +31,7 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { ElDialog, ElInput, ElPagination } from 'element-plus'
+import { ElEmpty, ElDialog, ElInput, ElPagination } from 'element-plus'
 import { Search }  from '@element-plus/icons-vue'
 import { Pagination, SearchQuery, Users } from '@boiling/core'
 import User from './User.vue'
@@ -65,9 +66,12 @@ div.search-user {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    > .user {
+    > div.user {
       margin: 10px 0;
       width: calc(50% - 30px);
+    }
+    > div.el-empty {
+      width: 100%;
     }
   }
 }

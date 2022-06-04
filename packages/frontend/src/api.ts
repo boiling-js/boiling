@@ -20,7 +20,7 @@ interface OfficialApi {
     avatars: Promise<string[]>
   }
   /** 获取指定用户 */
-  user(id: number | '@me'): {
+  user(id: number | '@me'): Promise<Users.BaseOut> & {
     upd(d: Users.UpdateOut): Promise<void>
     password: {
       upd(d: { oldPwd: string, newPwd: string }): Promise<void>
@@ -34,6 +34,8 @@ interface OfficialApi {
     }
     /** 获取讨论组 */
     groups: Promise<ChatRooms.Model[]>
+    /** 获取聊天室 */
+    'chat-rooms': Promise<ChatRooms.Model[]>
     /** 获取好友列表 */
     friends: Promise<Users.FriendOut[]> & {
       /** 添加好友 */
@@ -50,25 +52,30 @@ interface OfficialApi {
     avatar: {
       upd(d: { avatar: string }): Promise<void>
     }
+    /** 获取频道 */
+    channels: Promise<Channels.Model[]>
   }
   'chat-rooms': QueryPromise<Pagination<ChatRooms.Model>, SearchQuery & {
     disableToast?: boolean
   }> & {
     /** 创建聊天室 */
-    add(d: Pick<ChatRooms.Model, 'members' | 'name' | 'avatar'>): Promise<ChatRooms.Model>
+    add(d: Pick<ChatRooms.Model, 'members' | 'name' | 'avatar' | 'channelId'>): Promise<ChatRooms.Model>
   }
   /** 聊天室 */
   'chat-room'(chatRoomId: string): {
     upd(d: {
       name?: string
       avatar?: string
-      members?: string[]
+      members?: number[]
     }): Promise<void>
     messages: QueryPromise<Pagination<Messages.Model>, SearchQuery> & {
       /** 发送消息 */
       add(d: { content: string }): Promise<Messages.Model>
     }
     members: Promise<Users.FriendOut[]>
+    member(uid: number| '@me'): {
+      del(): Promise<void>
+    }
     files: Promise<void>
   }
   /** 频道 */
@@ -86,9 +93,18 @@ interface OfficialApi {
     /** 删除频道 */
     del(): Promise<void>
     /** 子频道 */
-    subChannel: {
+    subChannels: {
       /** 创建子频道 */
-      add(d: {subTitle: string}): Promise<void>
+      add(d: {title: string}): Promise<void>
+    }
+    /** 聊天室 */
+    chatRoom(chatRoomId: string): {
+      /** 创建聊天室 */
+      add(d: {title: string, chatRoomTitle?: string, description?: string}): Promise<void>
+    }
+    members: {
+      /** 添加成员 */
+      add(d: { members: Channels.MemberMeta[] }): Promise<void>
     }
   }
 }

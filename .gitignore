@@ -1,11 +1,14 @@
 lib
 dist
+releases
 temp
 .temp
 .cache
 .env
 
 packages/backend/static/uploads
+packages/electron/static/assets
+packages/electron/static/index.html
 
 yarn.lock
 node_modules/
