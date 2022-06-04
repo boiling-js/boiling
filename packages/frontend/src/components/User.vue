@@ -4,7 +4,7 @@
     <div
       v-if="isMe"
       class="avatar is-me" :style="{
-        backgroundImage: `url(/api${info.avatar})`
+        backgroundImage: `url(${info.avatar})`
       }"
       @click="$refs.avatar.show()">
       <div class="avatar-shadow"> 更换头像 </div>
