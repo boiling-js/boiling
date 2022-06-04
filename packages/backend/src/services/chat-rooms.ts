@@ -68,7 +68,7 @@ export namespace ChatRoomsService {
     if (Array.isArray(arg0)) {
       return Model.findOne({ members: { $all: arg0 } })
     } else {
-      return Model.findOne({ id: arg0 })
+      return Model.findOne({ _id: arg0 })
     }
   }
   /**
@@ -77,7 +77,7 @@ export namespace ChatRoomsService {
    */
   export async function getOrThrow(arg0: string | number[]) {
     await existsOrThrow(arg0)
-    return get(arg0)
+    return get(arg0) as any as Exclude<Awaited<ReturnType<typeof get>>, null>
   }
   export function search(key: string) {
     const keywords = key.split(' ')
@@ -225,6 +225,20 @@ export namespace ChatRoomsService {
       return Promise.all(
         (chatRoom?.members ?? []).map(id => UsersService.getOrThrow(id))
       )
+    }
+
+    /**
+     * 删除聊天室成员
+     * @param chatRoomId 聊天室id
+     * @param uId 成员id
+     */
+    export async function del(chatRoomId: string, uId: number) {
+      const chatRoom = await ChatRoomsService.getOrThrow(chatRoomId)
+      const i = chatRoom.members.indexOf(uId)
+      if (i === -1)
+        throw new HttpError('NOT_FOUND', `id 为 '${ uId }' 的用户不在聊天室 '${ chatRoomId }' 中`)
+      chatRoom.members.splice(i, 1)
+      return chatRoom.save()
     }
   }
 }

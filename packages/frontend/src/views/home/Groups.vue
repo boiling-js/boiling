@@ -1,12 +1,12 @@
 <template>
   <div class="groups">
     <div class="header">
-      <el-input
+      <!--<el-input
         v-model="input2"
         class="search"
         placeholder="搜索群组"
         :prefix-icon="Search"
-      />
+      />-->
       <span
         class="material-icons md-light add"
         @click="() => $router.push({
@@ -29,8 +29,8 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { ElInput } from 'element-plus'
-import { Search } from '@element-plus/icons-vue'
+// import { ElInput } from 'element-plus'
+// import { Search } from '@element-plus/icons-vue'
 import { api } from '../../api'
 import { ChatRooms } from '@boiling/core'
 import Group from '../../components/Group.vue'

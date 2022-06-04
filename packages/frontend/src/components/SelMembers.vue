@@ -12,7 +12,7 @@
         :key="friend.id"
         :label="friend.id">
         <el-avatar
-          :src="`/api${friend.avatar}`"
+          :src="`${friend.avatar}`"
         />
         {{ friend.remark ||friend.username }}
       </el-checkbox>

@@ -2,7 +2,7 @@
   <el-scrollbar>
     <div class="channels">
       <channel
-        v-for="channel in channels?.items"
+        v-for="channel in channels"
         :key="channel.id"
         :channel="channel"
       />
@@ -13,14 +13,14 @@
 <script lang="ts" setup>
 import Channel from '../../components/Channel.vue'
 import { nextTick, onMounted, ref } from 'vue'
-import { Channels, Pagination } from '@boiling/core'
+import { Channels } from '@boiling/core'
 import { api } from '../../api'
 
-const channels = ref<Pagination<Channels.Model>>()
+const channels = ref<Channels.Model[]>()
 
 onMounted(async () => {
   await nextTick(async () => {
-    channels.value = await api.channels.query({ key: '' })
+    channels.value = await api.user('@me').channels
   })
 })
 </script>

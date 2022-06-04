@@ -82,7 +82,7 @@ div.message {
       }
       :deep(img) {
         margin-top: 10px;
-        max-width: 360px;
+        max-width: 80%;
         &:not(:last-child) {
           margin-bottom: 10px;
         }

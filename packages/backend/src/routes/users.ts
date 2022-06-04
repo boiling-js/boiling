@@ -8,6 +8,7 @@ import extendService from '../hooks/extendService'
 import useTarget from '../hooks/useTarget'
 import useCurUser from '../hooks/useCurUser'
 import { ChatRoomsService } from '../services/chat-rooms'
+import { ChannelsService } from '../services/channels'
 
 declare module '@boiling/core' {
   interface PathParams {
@@ -103,8 +104,9 @@ export const router = new Router({
       throw new HttpError('BAD_REQUEST', '标签不能为空')
     return UsersService.addTag(useTarget(ctx.session, ctx.params.id), tag)
   })
-  .get('/:id(number)/channels', async ctx => {
-    return ctx
+  /** 获取用户频道 */
+  .get('/:id(uid)/channels', async ctx => {
+    return ChannelsService.getByUserId(useTarget(ctx.session, ctx.params.id))
   })
   .del('/:id(number)/channels/:cid', async ctx => {
     console.log(ctx.params)

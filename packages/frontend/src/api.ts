@@ -52,6 +52,8 @@ interface OfficialApi {
     avatar: {
       upd(d: { avatar: string }): Promise<void>
     }
+    /** 获取频道 */
+    channels: Promise<Channels.Model[]>
   }
   'chat-rooms': QueryPromise<Pagination<ChatRooms.Model>, SearchQuery & {
     disableToast?: boolean
@@ -64,13 +66,16 @@ interface OfficialApi {
     upd(d: {
       name?: string
       avatar?: string
-      members?: string[]
+      members?: number[]
     }): Promise<void>
     messages: QueryPromise<Pagination<Messages.Model>, SearchQuery> & {
       /** 发送消息 */
       add(d: { content: string }): Promise<Messages.Model>
     }
     members: Promise<Users.FriendOut[]>
+    member(uid: number| '@me'): {
+      del(): Promise<void>
+    }
     files: Promise<void>
   }
   /** 频道 */

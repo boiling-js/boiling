@@ -45,6 +45,7 @@
           {{ node.label }}
           <div class="operations">
             <el-icon
+              v-if="node.level === 1"
               class="add"
               @click="() => $router.push({
                 path: '/create-chatRoom',
@@ -54,11 +55,12 @@
                   channelTitle: node.label
                 }
               })">
-              <Plus/>
+              <plus/>
             </el-icon>
-            <el-icon class="set" @click="() => {}">
-              <Setting/>
-            </el-icon>
+            <!--<el-icon
+              class="set" @click="() => {}">
+              <setting/>
+            </el-icon>-->
           </div>
         </template>
       </el-tree>

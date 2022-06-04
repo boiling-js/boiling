@@ -5,6 +5,7 @@ import usePagination from '../hooks/usePagination'
 import { clientManager } from './ws'
 import useCurUser from '../hooks/useCurUser'
 import extendService from '../hooks/extendService'
+import useTarget from '../hooks/useTarget'
 
 export const router = new Router({
   prefix: '/chat-rooms' as '/chat-rooms'
@@ -75,4 +76,11 @@ export const router = new Router({
     const { chatRoomId } = ctx.params
     const { name, avatar, members } = ctx.request.body
     return ChatRoomsService.update(chatRoomId, { name, avatar, members })
+  })
+  /**
+   * 删除聊天室成员
+   */
+  .delete('/:chatRoomId/members/:userId(uid)', async ctx => {
+    console.log('del')
+    return ChatRoomsService.User.del(ctx.params.chatRoomId, useTarget(ctx.session, ctx.params.userId))
   })
