@@ -95,11 +95,10 @@ jobs:
           name: frontend-pack-dist
       - name: Untar frontend-pack-dist
         run: tar -xvf frontend-pack-dist.tar
-      - run: ls -all
       - name: rsync deployments
         uses: boiling-js/boiling/.github/actions/rsync@master
         with:
-          path: dist/
+          path: ./packages/frontend/dist
           remote-path: /www/dist/
           host: ${{ secrets.PRO_HOST }}
           user: developer
