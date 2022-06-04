@@ -41,7 +41,7 @@
           退出群聊后，你将不会收到该群消息。
         </div>
         <el-button type="danger"
-                   @click="()=>{}"
+                   @click="dropGroup"
                    v-text="'确认'"/>
       </div>
       <el-divider/>
@@ -61,7 +61,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { ElDialog, ElForm, ElInput, ElFormItem, ElButton, ElDivider, ElAvatar } from 'element-plus'
+import { ElDialog, ElForm, ElInput, ElFormItem, ElButton, ElDivider, ElAvatar, ElMessageBox } from 'element-plus'
 import { ChatRooms, Users } from '@boiling/core'
 import { api } from '../api'
 import SelMembers from './SelMembers.vue'
@@ -83,6 +83,16 @@ const
       name: form.value?.name,
       members: members.value.map(m => m.id)
     })
+    show.value = false
+  },
+  dropGroup = async() => {
+    await ElMessageBox.confirm(
+      '是否确认退出群聊？', '确认', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      }
+    )
+    await api['chat-room'](form.value?.id ?? '').member('@me').del()
     show.value = false
   }
 

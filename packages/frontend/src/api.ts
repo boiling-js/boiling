@@ -73,6 +73,9 @@ interface OfficialApi {
       add(d: { content: string }): Promise<Messages.Model>
     }
     members: Promise<Users.FriendOut[]>
+    member(uid: number| '@me'): {
+      del(): Promise<void>
+    }
     files: Promise<void>
   }
   /** 频道 */
