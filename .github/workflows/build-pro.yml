@@ -47,12 +47,12 @@ jobs:
           ref: ${{ github.ref }}
       - name: prepare enviroment
         uses: boiling-js/boiling/.github/actions/prepare-env@master
-      - name: build win app
+      - name: build mac app
         run: yarn build:app -m
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: app-windows
+          name: app-macos
           path: ./packages/electron/release/boiling-${{ github.ref }}.dmg
 
   package-frontend:
