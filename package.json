@@ -13,7 +13,9 @@
     "lint": "eslint --fix ./packages/*/src/**/*.{ts,vue}",
     "core": "yarn workspace @boiling/core",
     "b": "yarn workspace @boiling/backend",
-    "f": "yarn workspace @boiling/frontend"
+    "f": "yarn workspace @boiling/frontend",
+    "cp-dist": "copyfiles --flat packages/frontend/dist packages/electron/static",
+    "build:app": "yarn f build && yarn cp-dist && yarn workspace @boiling/electron build:app"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^15.0.0",
@@ -23,6 +25,7 @@
     "@typescript-eslint/parser": "^4.21.0",
     "chai": "^4.3.4",
     "commitlint": "^15.0.0",
+    "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
     "eslint": "^7.24.0",
