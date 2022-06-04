@@ -35,12 +35,13 @@ jobs:
         run: yarn workspace @boiling/utils build
       - name: build win app
         run: yarn build:app -w
-      - run: dir ./packages/electron/releases
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: app-windows
-          path: ./packages/electron/releases/boiling-${{ github.ref_name }}.msi
+          path: |
+            ./packages/electron/releases/boiling Setup ${{ github.ref_name }}.exe
+            ./packages/electron/releases/boiling-${{ github.ref_name }}-win.zip
 
   build-mac-app:
     name: Build MacOS app
@@ -93,7 +94,8 @@ jobs:
         with:
           name: frontend-pack-dist
       - name: Untar frontend-pack-dist
-        run: tar -xvf frontend-pack-dist.tar ./dist
+        run: tar -xvf frontend-pack-dist.tar
+      - run: ls -all
       - name: rsync deployments
         uses: boiling-js/boiling/.github/actions/rsync@master
         with:
