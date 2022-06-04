@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: app-windows
-          path: ./packages/electron/release/boiling-${{ github.ref_name }}.exe
+          path: ./packages/electron/release/boiling-${{ github.ref_name }}.msi
 
   build-mac-app:
     needs: [prepare-env]
