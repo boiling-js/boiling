@@ -31,7 +31,7 @@
 
 <script lang="ts" setup>
 import { useStore } from 'vuex'
-import {onMounted, onUnmounted, reactive, ref, watch} from 'vue'
+import { onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { ElInput, ElButton, ElCheckbox } from 'element-plus'
 import { Users } from '@boiling/core'
 import { api } from '../api'
