@@ -7,28 +7,43 @@
   "main": "dist/runner.js",
   "scripts": {
     "start": "electron -r ts-node/register src/runner.ts",
-    "build:src": "tsc -p ./tsconfig.pro.json",
+    "build:src": "tsc -p ./tsconfig.pro.json && copyfiles src/*.js dist --flat",
     "build:app": "yarn build:src && electron-builder -c.extraMetadata.name=boiling",
     "build:app:mac": "yarn build:app -m",
     "build:app:win": "yarn build:app -w",
     "build:app:linux": "yarn build:app -l"
   },
   "devDependencies": {
+    "asar": "^3.1.0",
     "electron": "16.0.9",
     "electron-builder": "^23.0.3"
   },
+  "dependencies": {
+    "@boiling/utils": "file:../utils"
+  },
   "build": {
     "appId": "com.boiling.app",
+    "productName": "boiling",
     "directories": {
       "output": "releases"
     },
+    "files": [
+      "dist/**/*",
+      "static/**/*"
+    ],
     "mac": {
       "icon": "static/favicon.icns",
-      "target": [ "dmg", "zip" ]
+      "target": [
+        "dmg",
+        "zip"
+      ]
     },
     "win": {
       "icon": "static/favicon.png",
-      "target": [ "nsis", "zip" ]
+      "target": [
+        "nsis",
+        "zip"
+      ]
     }
   }
 }
